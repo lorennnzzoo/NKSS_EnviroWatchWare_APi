@@ -13,7 +13,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
     public class AuthController : ApiController
     {
         private readonly UserService user_service;
-        private Helpers.Validator validator = new Helpers.Validator();
+        private readonly Helpers.Validator validator = new Helpers.Validator();
         public AuthController(UserService _user_service)
         {
             this.user_service = _user_service;
@@ -26,10 +26,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
         {
             try
             {
-                var result = validator.ValidateProperties(user);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(user);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 user_service.CreateUser(user);

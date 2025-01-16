@@ -1,4 +1,5 @@
-﻿using Repositories;
+﻿using NKSS_EnviroWatchWare_APi.Logging;
+using Repositories;
 using Repositories.Interfaces;
 using Services;
 using Services.Interfaces;
@@ -16,7 +17,7 @@ namespace NKSS_EnviroWatchWare_APi
         {
             // Web API configuration and services
             // 
-
+            //config.Filters.Add(new LoggingFilter());
             var container = new UnityContainer();
             //company
             container.RegisterType<ICompanyRepository, CompanyRepository>(new HierarchicalLifetimeManager());
@@ -66,6 +67,7 @@ namespace NKSS_EnviroWatchWare_APi
             config.EnableCors(cors);
 
             // Web API routes
+            
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

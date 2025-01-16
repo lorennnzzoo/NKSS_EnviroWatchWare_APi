@@ -13,7 +13,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     public class AnalyzerController : ApiController
     {
         private readonly AnalyzerService analyzer_service;
-        private Helpers.Validator validator = new Helpers.Validator();
+        private readonly Helpers.Validator validator = new Helpers.Validator();
         public AnalyzerController(AnalyzerService _analyzer_service)
         {
             this.analyzer_service = _analyzer_service;
@@ -70,10 +70,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 //if (analyzer == null)
                 //    return BadRequest("Invalid data.");
-                var result = validator.ValidateProperties(analyzer);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(analyzer);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 analyzer_service.CreateAnalyzer(analyzer);
@@ -96,10 +96,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         {
             try
             {
-                var result = validator.ValidateProperties(analyzer);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(analyzer);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 analyzer_service.UpdateAnalyzer(analyzer);

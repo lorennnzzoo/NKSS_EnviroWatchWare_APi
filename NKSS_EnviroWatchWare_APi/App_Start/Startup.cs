@@ -46,7 +46,7 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
 
             HttpConfiguration config = new HttpConfiguration();
-            WebApiConfig.Register(config);
+            //WebApiConfig.Register(config);
         }
     }
 }

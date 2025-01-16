@@ -13,7 +13,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     public class OxideController : ApiController
     {
         private readonly OxideService oxide_service;
-        private Helpers.Validator validator = new Helpers.Validator();
+        private readonly Helpers.Validator validator = new Helpers.Validator();
         public OxideController(OxideService _oxide_service)
         {
             this.oxide_service = _oxide_service;
@@ -69,10 +69,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 //if (oxide == null)
                 //    return BadRequest("Invalid data.");
-                var result = validator.ValidateProperties(oxide);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(oxide);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 oxide_service.CreateOxide(oxide);
@@ -97,10 +97,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 //if (oxide == null)
                 //    return BadRequest("Invalid data.");
-                var result = validator.ValidateProperties(oxide);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(oxide);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 oxide_service.UpdateOxide(oxide);

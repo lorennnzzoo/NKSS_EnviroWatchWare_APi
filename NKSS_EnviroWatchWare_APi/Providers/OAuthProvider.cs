@@ -13,8 +13,8 @@ namespace NKSS_EnviroWatchWare_APi.Providers
 {
     public class OAuthProvider : OAuthAuthorizationServerProvider
     {
-        private UserService userService;
-        private LicenseService licenseService;
+        private readonly UserService userService;
+        private readonly LicenseService licenseService;
         public OAuthProvider(UserService _userService, LicenseService _licenseService)
         {
             userService = _userService;

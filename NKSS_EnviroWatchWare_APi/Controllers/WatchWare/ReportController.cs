@@ -11,8 +11,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
 
     public class ReportController : ApiController
     {
-        private readonly ReportService report_service;
-        private Helpers.Validator validator = new Helpers.Validator();
+        private readonly ReportService report_service;        
         public ReportController(ReportService _report_service)
         {
             this.report_service = _report_service;

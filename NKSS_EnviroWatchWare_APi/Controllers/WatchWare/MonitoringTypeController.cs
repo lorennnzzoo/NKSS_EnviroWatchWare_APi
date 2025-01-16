@@ -13,7 +13,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     public class MonitoringTypeController : ApiController
     {
         private readonly MonitoringTypeService monitoringType_service;
-        private Helpers.Validator validator = new Helpers.Validator();
+        private readonly Helpers.Validator validator = new Helpers.Validator();
         public MonitoringTypeController(MonitoringTypeService _monitoringType_service)
         {
             this.monitoringType_service = _monitoringType_service;
@@ -68,10 +68,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 //if (monitoringType == null)
                 //    return BadRequest("Invalid data.");
-                var result = validator.ValidateProperties(monitoringType);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(monitoringType);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 monitoringType_service.CreateMonitoringType(monitoringType);
@@ -96,10 +96,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 //if (monitoringType == null)
                 //    return BadRequest("Invalid data.");
-                var result = validator.ValidateProperties(monitoringType);
-                if (!result.isValid)
+                var (isValid, errorMessage) = validator.ValidateProperties(monitoringType);
+                if (!isValid)
                 {
-                    return BadRequest(result.errorMessage);
+                    return BadRequest(errorMessage);
                 }
 
                 monitoringType_service.UpdateMonitoringType(monitoringType);

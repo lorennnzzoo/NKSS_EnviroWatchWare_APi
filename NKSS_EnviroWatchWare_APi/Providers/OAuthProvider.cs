@@ -14,9 +14,11 @@ namespace NKSS_EnviroWatchWare_APi.Providers
     public class OAuthProvider : OAuthAuthorizationServerProvider
     {
         private UserService userService;
-        public OAuthProvider(UserService _userService)
+        private LicenseService licenseService;
+        public OAuthProvider(UserService _userService, LicenseService _licenseService)
         {
             userService = _userService;
+            licenseService = _licenseService;
         }
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
@@ -29,10 +31,18 @@ namespace NKSS_EnviroWatchWare_APi.Providers
             var user = await userService.ValidateUserAsync(context.UserName, context.Password);
             if (user != null)
             {
-                //identity.AddClaim(new Claim(ClaimTypes.Role, user.Username));
-                identity.AddClaim(new Claim(ClaimTypes.Name, user.Username));
-                identity.AddClaim(new Claim("LoggedOn", DateTime.Now.ToString()));
-                await Task.Run(() => context.Validated(identity));
+                if (licenseService.IsLicenseValid("WatchWare"))
+                {
+                    //identity.AddClaim(new Claim(ClaimTypes.Role, user.Username));
+                    identity.AddClaim(new Claim(ClaimTypes.Name, user.Username));
+                    identity.AddClaim(new Claim("LoggedOn", DateTime.Now.ToString()));
+                    userService.UpdateUserLoginTime(user.Id);
+                    await Task.Run(() => context.Validated(identity));
+                }
+                else
+                {
+                    context.SetError("License Expired", "Provided License is expired.");
+                }
             }
             else
             {

@@ -61,5 +61,17 @@ namespace Repositories
                 db.Execute(query, User);
             }
         }
+
+        public void UpdateUserLoginTime(Guid userId)
+        {
+            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
+            {
+                db.Open();
+
+                var query = "UPDATE public.\"User\" SET \"LastLoggedIn\" = NOW() WHERE \"Id\" = @UserId";
+
+                db.Execute(query,new {UserId=userId });
+            }
+        }
     }
 }

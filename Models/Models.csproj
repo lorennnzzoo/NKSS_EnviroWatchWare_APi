@@ -46,6 +46,7 @@
     <Compile Include="ChannelType.cs" />
     <Compile Include="Company.cs" />
     <Compile Include="DashBoard\ChannelDataFeedByStation.cs" />
+    <Compile Include="Licenses\License.cs" />
     <Compile Include="MonitoringType.cs" />
     <Compile Include="Oxide.cs" />
     <Compile Include="Post\Analyzer.cs" />

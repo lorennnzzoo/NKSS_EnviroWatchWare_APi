@@ -20,25 +20,24 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
     {
         public void Configuration(IAppBuilder app)
         {
-            ConfigureAuth(app);
-            //GlobalConfiguration.Configure(WebApiConfig.Register);
+            ConfigureAuth(app);            
         }
 
         public void ConfigureAuth(IAppBuilder app)
-        {
-            // This is very important line Cross Origin Source (CORS) it is used to enable cross-site HTTP requests
-            // For security reasons, browsers restrict cross-origin HTTP requests
-            //app.UseCors(CorsOptions.AllowAll);
+        {            
             var container = new UnityContainer();
             container.RegisterType<IUserRepository, UserRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IUserService, UserService>(new HierarchicalLifetimeManager());
+            container.RegisterType<ILicenseRepository, LicenseRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<ILicenseService, LicenseService>(new HierarchicalLifetimeManager());
+            container.RegisterType<ICryptoService, CryptoService>(new HierarchicalLifetimeManager());
 
             var oauthProvider = container.Resolve<OAuthProvider>();
             var OAuthOptions = new OAuthAuthorizationServerOptions
             {
                 AllowInsecureHttp = true,
-                TokenEndpointPath = new PathString("/auth/login"),
-                AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30), // Token expiration time
+                TokenEndpointPath = new PathString("/Auth/Login"),
+                AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30), 
                 Provider = oauthProvider
             };
 
@@ -47,7 +46,7 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
 
             HttpConfiguration config = new HttpConfiguration();
-            WebApiConfig.Register(config); // Register the request
+            WebApiConfig.Register(config);
         }
     }
 }

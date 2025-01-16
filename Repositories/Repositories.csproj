@@ -80,6 +80,7 @@
     <Compile Include="Helpers\UserPGSqlHelper.cs" />
     <Compile Include="Interfaces\IChannelDataFeedRepository.cs" />
     <Compile Include="Interfaces\IChannelTypeRepository.cs" />
+    <Compile Include="Interfaces\ILicenseRepository.cs" />
     <Compile Include="Interfaces\IReportRepository.cs" />
     <Compile Include="Interfaces\IScalingFactorRepository.cs" />
     <Compile Include="Interfaces\IUserRepository.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Interfaces\IMonitoringTypeRepository.cs" />
     <Compile Include="Interfaces\IOxideRepository.cs" />
     <Compile Include="Interfaces\IStationRepository.cs" />
+    <Compile Include="Repositories\LicenseRepository.cs" />
     <Compile Include="Repositories\MonitoringTypeRepository.cs" />
     <Compile Include="Repositories\OxideRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

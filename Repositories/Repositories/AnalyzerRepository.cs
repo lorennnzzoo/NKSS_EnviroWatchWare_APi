@@ -67,9 +67,7 @@ namespace Repositories
                 var query = PGSqlHelper.GetUpdateQuery<Analyzer>();
 
                 db.Execute(query, analyzer);
-            }
-           
-
+            }          
         }
     }
 }

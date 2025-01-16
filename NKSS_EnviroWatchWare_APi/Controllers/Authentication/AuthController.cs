@@ -33,7 +33,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
                 }
 
                 user_service.CreateUser(user);
-                return Ok();
+                return Ok("Account Creation Successfull");
             }
             catch(Exception ex)
             {

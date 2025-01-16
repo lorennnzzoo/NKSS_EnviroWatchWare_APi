@@ -36,6 +36,7 @@ namespace NKSS_EnviroWatchWare_APi
                         c.UseFullTypeNameInSchemaIds();
                         c.SingleApiVersion("v1", "NKSS_EnviroWatchWare_APi");
                         c.OperationFilter<AddAuthorizationHeaderOperationFilter>();
+                        c.DocumentFilter<AuthTokenOperation>();
                         // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
                         // included in the docs for a given API version. Like "SingleApiVersion", each call to "Version"

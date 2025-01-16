@@ -36,15 +36,27 @@ namespace Services
             _userRepository.Update(user);
         }
 
+        public void UpdateUserLoginTime(Guid userId)
+        {
+            _userRepository.UpdateUserLoginTime(userId);
+        }
+
         public async Task<Models.User> ValidateUserAsync(string username,string password)
         {
             Models.User validUser =await _userRepository.GetByUsernameAsync(username);
-            if (validUser.Password == password)
+            if (validUser != null)
             {
-                return validUser;
+                if (validUser.Password == password)
+                {
+                    return validUser;
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
-            { 
+            {
                 return null;
             }
         }

@@ -12,5 +12,6 @@ namespace Services.Interfaces
         void UpdateUser(Models.User user);
 
         Task<Models.User> ValidateUserAsync(string username,string password);
+        void UpdateUserLoginTime(Guid userId);
     }
 }

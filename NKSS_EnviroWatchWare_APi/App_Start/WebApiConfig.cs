@@ -11,27 +11,13 @@ using Unity.WebApi;
 namespace NKSS_EnviroWatchWare_APi
 {
     public static class WebApiConfig
-    {
-        //public static void Register(HttpConfiguration config)
-        //{
-        //    // Web API configuration and services
-
-        //    // Web API routes
-        //    config.MapHttpAttributeRoutes();
-
-        //    config.Routes.MapHttpRoute(
-        //        name: "DefaultApi",
-        //        routeTemplate: "api/{controller}/{id}",
-        //        defaults: new { id = RouteParameter.Optional }
-        //    );
-        //}
-
+    {       
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-            var container = new UnityContainer();
+            // 
 
-            // Register interfaces and implementations for Dependency Injection
+            var container = new UnityContainer();
             //company
             container.RegisterType<ICompanyRepository, CompanyRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<ICompanyService, CompanyService>(new HierarchicalLifetimeManager());
@@ -48,7 +34,7 @@ namespace NKSS_EnviroWatchWare_APi
             container.RegisterType<IOxideRepository, OxideRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IOxideService, OxideService>(new HierarchicalLifetimeManager());
             //monitoring type
-            container.RegisterType<IMonitoringTypeRepository,MonitoringTypeRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IMonitoringTypeRepository, MonitoringTypeRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IMonitoringTypeService, MonitoringTypeService>(new HierarchicalLifetimeManager());
             //scaling factor
             container.RegisterType<IScalingFactorRepository, ScalingFactorRepository>(new HierarchicalLifetimeManager());
@@ -65,8 +51,15 @@ namespace NKSS_EnviroWatchWare_APi
             //user
             container.RegisterType<IUserRepository, UserRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IUserService, UserService>(new HierarchicalLifetimeManager());
+            //crypto
+            
+            container.RegisterType<ICryptoService, CryptoService>(new HierarchicalLifetimeManager());
+            //license
+            container.RegisterType<ILicenseRepository, LicenseRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<ILicenseService, LicenseService>(new HierarchicalLifetimeManager());
             // Set up Unity as the Dependency Resolver
             config.DependencyResolver = new UnityDependencyResolver(container);
+
 
 
             var cors = new EnableCorsAttribute("*", "*", "*");

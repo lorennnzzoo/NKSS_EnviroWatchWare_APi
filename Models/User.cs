@@ -13,6 +13,8 @@ namespace Models
         public string Password { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime LastLoggedIn { get; set; }
         public bool Active { get; set; } = true;
     }
 }

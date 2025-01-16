@@ -13,5 +13,7 @@ namespace Repositories.Interfaces
 
         Models.User GetByUsername(string username);
         Task<Models.User> GetByUsernameAsync(string username);
+
+        void UpdateUserLoginTime( Guid userId);        
     }
 }

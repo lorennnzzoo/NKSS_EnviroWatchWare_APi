@@ -12,9 +12,11 @@ namespace Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private readonly ICryptoService cryptoService;
+        public UserService(IUserRepository userRepository, ICryptoService _cryptoService)
         {
             _userRepository = userRepository;
+            cryptoService = _cryptoService;
         }
         public void CreateUser(Models.Post.Authentication.User user)
         {
@@ -28,6 +30,7 @@ namespace Services
                 throw new Exceptions.PhoneNumberTooLongException(user.PhoneNumber);
             }
             user.Email = user.Email.ToLower();
+            user.Password = cryptoService.Encrypt(user.Password);
             _userRepository.Add(user);
         }
 
@@ -46,7 +49,7 @@ namespace Services
             Models.User validUser =await _userRepository.GetByUsernameAsync(username);
             if (validUser != null)
             {
-                if (validUser.Password == password)
+                if (cryptoService.Decrypt(validUser.Password) ==  password)
                 {
                     return validUser;
                 }

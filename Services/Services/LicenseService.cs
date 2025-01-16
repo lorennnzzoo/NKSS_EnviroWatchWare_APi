@@ -17,6 +17,22 @@ namespace Services
             _licenseRepository = licenseRepository;
             _cryptoService = cryptoService;
         }
+
+        public void AddLicense(Models.Licenses.License license)
+        {
+            Models.Licenses.License licenseExists= _licenseRepository.GetLicenseByType(license.LicenseType);
+            if (licenseExists != null)
+            {
+                throw new Exceptions.LicenseTypeAlreadyExistsException(license.LicenseType);
+            }
+            _licenseRepository.Add(license);
+        }
+
+        public void DeleteLicenes(string licenseType)
+        {
+            _licenseRepository.Delete(licenseType);
+        }
+
         public bool IsLicenseValid(string licenseType)
         {
             var license = _licenseRepository.GetLicenseByType(licenseType);
@@ -28,5 +44,9 @@ namespace Services
             return false;
         }
 
+        public void Update(Models.Licenses.License license)
+        {
+            _licenseRepository.Update(license);
+        }
     }
 }

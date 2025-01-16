@@ -9,6 +9,8 @@ namespace Services.Interfaces
     public interface ILicenseService
     {
         bool IsLicenseValid(string licenseType);
-
+        void AddLicense(Models.Licenses.License license);
+        void DeleteLicenes(string licenseType);
+        void Update(Models.Licenses.License license);
     }
 }

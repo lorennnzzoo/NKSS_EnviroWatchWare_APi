@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\LicensePGSqlHelper.cs" />
     <Compile Include="Helpers\PGSqlHelper.cs" />
     <Compile Include="Helpers\UserPGSqlHelper.cs" />
     <Compile Include="Interfaces\IChannelDataFeedRepository.cs" />

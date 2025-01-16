@@ -45,5 +45,6 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
                 return ResponseMessage(response);
             }
         }
+        
     }
 }

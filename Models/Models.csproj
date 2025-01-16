@@ -50,6 +50,7 @@
     <Compile Include="Oxide.cs" />
     <Compile Include="Post\Analyzer.cs" />
     <Compile Include="Post\Authentication\User.cs" />
+    <Compile Include="Post\Authentication\UserLogin.cs" />
     <Compile Include="Post\Channel.cs" />
     <Compile Include="Post\ChannelType.cs" />
     <Compile Include="Post\Company.cs" />

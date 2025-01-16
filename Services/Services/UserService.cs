@@ -1,4 +1,5 @@
-﻿using Repositories.Interfaces;
+﻿using Models.Post.Authentication;
+using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,19 @@ namespace Services
         public void UpdateUser(Models.User user)
         {
             _userRepository.Update(user);
+        }
+
+        public async Task<Models.User> ValidateUserAsync(string username,string password)
+        {
+            Models.User validUser =await _userRepository.GetByUsernameAsync(username);
+            if (validUser.Password == password)
+            {
+                return validUser;
+            }
+            else
+            { 
+                return null;
+            }
         }
     }
 }

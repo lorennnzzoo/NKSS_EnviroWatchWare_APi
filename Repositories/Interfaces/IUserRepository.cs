@@ -12,5 +12,6 @@ namespace Repositories.Interfaces
         void Update(Models.User User);
 
         Models.User GetByUsername(string username);
+        Task<Models.User> GetByUsernameAsync(string username);
     }
 }

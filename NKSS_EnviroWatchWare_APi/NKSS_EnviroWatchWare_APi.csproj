@@ -312,6 +312,7 @@
     <Compile Include="Helpers\ChannelValidator.cs" />
     <Compile Include="Helpers\Validator.cs" />
     <Compile Include="Logging\LoggingFilter.cs" />
+    <Compile Include="MiddlerWare\CorsMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\OAuthProvider.cs" />
     <Compile Include="SwaggerFilter\AddAuthorizationHeaderOperationFilter.cs" />

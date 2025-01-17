@@ -15,9 +15,6 @@ namespace NKSS_EnviroWatchWare_APi
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
-            //LogManager.Setup().LoadConfigurationFromFile("NLog.config");
-            //var logger = LogManager.GetCurrentClassLogger();
-            //logger.Info("Application started");
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

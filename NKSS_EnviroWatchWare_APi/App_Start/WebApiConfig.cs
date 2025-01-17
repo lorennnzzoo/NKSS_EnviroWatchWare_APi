@@ -17,6 +17,14 @@ namespace NKSS_EnviroWatchWare_APi
         {
             // Web API configuration and services
             // 
+
+            //var corsAttr = new EnableCorsAttribute("http://localhost:4200", // Origins
+            //"accept,authorization,content-type,origin", // Headers
+            //"GET,POST,PUT,DELETE,OPTIONS"); // Methods
+            //config.EnableCors(corsAttr);
+
+
+
             //config.Filters.Add(new LoggingFilter());
             var container = new UnityContainer();
             //company
@@ -63,11 +71,10 @@ namespace NKSS_EnviroWatchWare_APi
 
 
 
-            var cors = new EnableCorsAttribute("*", "*", "*");
-            config.EnableCors(cors);
+           
 
             // Web API routes
-            
+
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

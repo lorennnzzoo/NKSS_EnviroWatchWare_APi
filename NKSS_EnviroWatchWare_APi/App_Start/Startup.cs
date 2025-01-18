@@ -43,6 +43,8 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
             container.RegisterType<ILicenseRepository, LicenseRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<ILicenseService, LicenseService>(new HierarchicalLifetimeManager());
             container.RegisterType<ICryptoService, CryptoService>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRoleRepository, RoleRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRoleService, RoleService>(new HierarchicalLifetimeManager());
 
             var oauthProvider = container.Resolve<OAuthProvider>();
             var OAuthOptions = new OAuthAuthorizationServerOptions

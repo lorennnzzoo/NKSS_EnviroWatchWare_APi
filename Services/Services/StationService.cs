@@ -40,7 +40,7 @@ namespace Services
             return _stationRepository.GetById(id);
         }
 
-        public void UpdateStation(Station station)
+        public void UpdateStation(Models.Put.Station station)
         {
             _stationRepository.Update(station);
         }

@@ -10,7 +10,7 @@ namespace Services.Interfaces
         IEnumerable<Station> GetAllStationsByCompanyId(int companyId);
         Station GetStationById(int id);
         void CreateStation(Post.Station station);
-        void UpdateStation(Station station);
+        void UpdateStation(Models.Put.Station station);
         void DeleteStation(int id);
     }
 }

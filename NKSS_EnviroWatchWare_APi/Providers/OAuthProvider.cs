@@ -14,11 +14,13 @@ namespace NKSS_EnviroWatchWare_APi.Providers
     public class OAuthProvider : OAuthAuthorizationServerProvider
     {
         private readonly UserService userService;
+        private readonly RoleService roleService;
         private readonly LicenseService licenseService;
-        public OAuthProvider(UserService _userService, LicenseService _licenseService)
+        public OAuthProvider(UserService _userService, LicenseService _licenseService, RoleService _roleService)
         {
             userService = _userService;
             licenseService = _licenseService;
+            roleService = _roleService;
         }
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
@@ -33,7 +35,8 @@ namespace NKSS_EnviroWatchWare_APi.Providers
             {
                 if (licenseService.IsLicenseValid("WatchWare"))
                 {
-                    //identity.AddClaim(new Claim(ClaimTypes.Role, user.Username));
+                    var roleInfo = roleService.GetRoleById(user.RoleId);
+                    identity.AddClaim(new Claim(ClaimTypes.Role, roleInfo.Name));
                     identity.AddClaim(new Claim(ClaimTypes.Name, user.Username));
                     identity.AddClaim(new Claim("LoggedOn", DateTime.Now.ToString()));
                     userService.UpdateUserLoginTime(user.Id);

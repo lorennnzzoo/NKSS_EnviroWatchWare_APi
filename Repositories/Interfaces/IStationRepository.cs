@@ -9,7 +9,7 @@ namespace Repositories.Interfaces
         Station GetById(int id);
         IEnumerable<Station> GetAll();        
         void Add(Post.Station station);
-        void Update(Station station);
+        void Update(Models.Put.Station station);
         void Delete(int id);
         IEnumerable<int> GetActiveStationIds();
        

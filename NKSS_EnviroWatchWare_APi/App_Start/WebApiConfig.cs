@@ -66,6 +66,9 @@ namespace NKSS_EnviroWatchWare_APi
             //license
             container.RegisterType<ILicenseRepository, LicenseRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<ILicenseService, LicenseService>(new HierarchicalLifetimeManager());
+            //role
+            container.RegisterType<IRoleRepository, RoleRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRoleService, RoleService>(new HierarchicalLifetimeManager());
             // Set up Unity as the Dependency Resolver
             config.DependencyResolver = new UnityDependencyResolver(container);
 

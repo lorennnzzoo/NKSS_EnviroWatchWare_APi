@@ -111,7 +111,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 
         [HttpPut]
         [Route("UpdateStation")]
-        public IHttpActionResult Update(Station station)
+        public IHttpActionResult Update(Models.Put.Station station)
         {
             try
             {

@@ -66,12 +66,12 @@ namespace Repositories
             }
         }
 
-        public void Update(Station station)
+        public void Update(Models.Put.Station station)
         {
             using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
             {
                 db.Open();
-                var query = PGSqlHelper.GetUpdateQuery<Station>();
+                var query = PGSqlHelper.GetUpdateQuery<Models.Put.Station>();
                 db.Execute(query, station);
             }
         }

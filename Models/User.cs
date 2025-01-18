@@ -15,6 +15,7 @@ namespace Models
         public string Email { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime LastLoggedIn { get; set; }
+        public int RoleId { get; set; }
         public bool Active { get; set; } = true;
     }
 }

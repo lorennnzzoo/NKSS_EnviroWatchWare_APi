@@ -8,16 +8,18 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
-{    
+{
     [Authorize]
     [RoutePrefix("Auth")]
     public class AuthController : ApiController
     {
         private readonly UserService user_service;
+        private readonly RoleService role_service;
         private readonly Helpers.Validator validator = new Helpers.Validator();
-        public AuthController(UserService _user_service)
+        public AuthController(UserService _user_service, RoleService _role_service)
         {
             this.user_service = _user_service;
+            this.role_service = _role_service;
         }
 
         [HttpPost]
@@ -36,7 +38,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
                 user_service.CreateUser(user);
                 return Ok("Account Creation Successfull, Please Login");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 HttpResponseMessage response = new HttpResponseMessage();
                 if (ex.GetType() == typeof(Services.Exceptions.UserAlreadyExistsException))
@@ -46,7 +48,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
                         Content = new StringContent(ex.Message)
                     };
                 }
-                else if(ex.GetType() == typeof(Services.Exceptions.PhoneNumberTooLongException))
+                else if (ex.GetType() == typeof(Services.Exceptions.PhoneNumberTooLongException))
                 {
                     response = new HttpResponseMessage(HttpStatusCode.RequestedRangeNotSatisfiable)
                     {
@@ -59,10 +61,36 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
                     {
                         Content = new StringContent(ex.Message)
                     };
-                }              
+                }
                 return ResponseMessage(response);
             }
         }
-        
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetRoles")]
+        public IHttpActionResult GetRoles()
+        {
+            try
+            {
+                var roles = role_service.GetAllRoles();
+                if (roles.Count() > 0)
+                {
+                    return Ok(roles);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

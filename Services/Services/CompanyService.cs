@@ -31,7 +31,7 @@ namespace Services
             _companyRepository.Add(company);
         }
 
-        public void UpdateCompany(Company company)
+        public void UpdateCompany(Models.Put.Company company)
         {
             _companyRepository.Update(company);
         }

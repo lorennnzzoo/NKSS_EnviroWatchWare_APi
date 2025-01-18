@@ -13,7 +13,7 @@ namespace Services.Interfaces
         IEnumerable<Company> GetAllCompanies();
         Company GetCompanyById(int id);
         void CreateCompany(Post.Company company);
-        void UpdateCompany(Company company);
+        void UpdateCompany(Models.Put.Company company);
         void DeleteCompany(int id);
     }
 }

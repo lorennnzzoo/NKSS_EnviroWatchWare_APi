@@ -14,6 +14,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     {
         private readonly CompanyService company_service;
         private Helpers.Validator validator = new Helpers.Validator();
+        private Helpers.CompanyValidator companyValidator = new Helpers.CompanyValidator();
         public CompanyController(CompanyService _company_service)
         {
             this.company_service = _company_service;
@@ -70,7 +71,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 //if (company == null)
                 //    return BadRequest("Invalid data.");
-                var result= validator.ValidateProperties(company);
+                var result= companyValidator.ValidateProperties(company);
                 if (!result.isValid)
                 {
                     return BadRequest(result.errorMessage);
@@ -92,13 +93,11 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 
         [HttpPut]
         [Route("UpdateCompany")]
-        public IHttpActionResult Update(Company company)
+        public IHttpActionResult Update(Models.Put.Company company)
         {
             try
             {
-                //if (company == null)
-                //    return BadRequest("Invalid data.");
-                var result = validator.ValidateProperties(company);
+                var result = companyValidator.ValidateProperties(company);
                 if (!result.isValid)
                 {
                     return BadRequest(result.errorMessage);

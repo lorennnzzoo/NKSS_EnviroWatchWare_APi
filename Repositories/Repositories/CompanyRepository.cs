@@ -53,12 +53,12 @@ namespace Repositories
         }
 
         // Update existing company
-        public void Update(Company company)
+        public void Update(Models.Put.Company company)
         {
             using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
             {
                 db.Open();
-                var query = PGSqlHelper.GetUpdateQuery<Company>();
+                var query = PGSqlHelper.GetUpdateQuery<Models.Put.Company>();
                 db.Execute(query, company);
             }
         }

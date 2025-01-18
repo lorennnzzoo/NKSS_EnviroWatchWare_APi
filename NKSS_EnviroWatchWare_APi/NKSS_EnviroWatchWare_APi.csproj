@@ -310,6 +310,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ChannelValidator.cs" />
+    <Compile Include="Helpers\CompanyValidator.cs" />
     <Compile Include="Helpers\Validator.cs" />
     <Compile Include="Logging\LoggingFilter.cs" />
     <Compile Include="MiddlerWare\CorsMiddleware.cs" />

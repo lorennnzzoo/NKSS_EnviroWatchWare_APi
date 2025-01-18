@@ -9,7 +9,7 @@ namespace Repositories.Interfaces
         Company GetById(int id);
         IEnumerable<Company> GetAll();
         void Add(Post.Company company);
-        void Update(Company company);
+        void Update(Models.Put.Company company);
         void Delete(int id);
     }
 

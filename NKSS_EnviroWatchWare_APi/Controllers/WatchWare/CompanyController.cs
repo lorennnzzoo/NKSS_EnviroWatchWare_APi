@@ -5,6 +5,7 @@ using System;
 using System.Web.Http;
 using System.Net.Http;
 using System.Net;
+using System.IO;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
@@ -96,7 +97,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         public IHttpActionResult Update(Models.Put.Company company)
         {
             try
-            {
+            {                
                 var result = companyValidator.ValidateProperties(company);
                 if (!result.isValid)
                 {

@@ -11,7 +11,7 @@ namespace Models
         public int? Id { get; set; }
         public string OxideName { get; set; }
         public string Limit { get; set; }
-        public bool Active { get; set; }
+        public bool? Active { get; set; } = true;
     }
 
 }

@@ -12,7 +12,7 @@ namespace NKSS_EnviroWatchWare_APi.Helpers
             if (obj == null) return (false, "Request body cannot be null.");
 
             // Exclude specific properties from validation
-            var excludedProperties = new HashSet<string> { "ScalingFactorId" };
+            var excludedProperties = new HashSet<string> { "ScalingFactorId", "Threshold" };
 
             var nullProperties = obj.GetType()
                                     .GetProperties()

@@ -21,7 +21,7 @@ namespace Models
         public int? Port { get; set; }
         public string Manufacturer { get; set; }
         public string Model { get; set; }
-        public bool Active { get; set; } 
+        public bool? Active { get; set; } = true;
     }
 
 }

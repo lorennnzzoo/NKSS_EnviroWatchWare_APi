@@ -17,7 +17,7 @@ namespace Models
 
         public double MaxOutput { get; set; }
 
-        public bool Active { get; set; } 
+        public bool? Active { get; set; } = true;
     }
 
 }

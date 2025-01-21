@@ -48,5 +48,28 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
                 return ResponseMessage(response);
             }
         }
+
+
+        [HttpGet]
+        [Route("GetSelectionData")]
+        public IHttpActionResult GetSelectionData()
+        {
+            try
+            {
+
+                var reportData = report_service.GetSelectionModel();
+                return Ok(reportData);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.ToString())
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
     }
 }

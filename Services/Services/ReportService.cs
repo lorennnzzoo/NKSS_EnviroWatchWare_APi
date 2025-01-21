@@ -126,7 +126,44 @@ namespace Services
 
             return reportData;
         }
-        
+
+        public Models.Report.Selection.SelectionModel GetSelectionModel()
+        {
+            Models.Report.Selection.SelectionModel selectionModel = new Models.Report.Selection.SelectionModel();
+            var companies = _companyRepository.GetAll();
+
+            foreach(var company in companies)
+            {
+                Models.Report.Selection.Company companySelection = new Models.Report.Selection.Company();
+                companySelection.Id = Convert.ToInt32(company.Id);
+                companySelection.Name = company.LegalName;
+
+                var stationsOfCompany = _stationRepository.GetAll().Where(e => e.CompanyId == company.Id);
+                if (stationsOfCompany.Count() > 0)
+                {
+                    foreach (var station in stationsOfCompany)
+                    {
+                        Models.Report.Selection.Station stationSelection = new Models.Report.Selection.Station();
+                        stationSelection.Id = Convert.ToInt32(station.Id);
+                        stationSelection.Name = station.Name;
+
+                        var channelsOfStation = _channelRepository.GetAll().Where(e => e.StationId == station.Id);
+                        foreach (var channel in channelsOfStation)
+                        {
+                            Models.Report.Selection.Channel channelSelection = new Models.Report.Selection.Channel();
+                            channelSelection.Id = Convert.ToInt32(channel.Id);
+                            channelSelection.Name = channel.Name;
+                            stationSelection.Channels.Add(channelSelection);
+                        }
+                        companySelection.Stations.Add(stationSelection);
+                    }
+                }
+                selectionModel.Companies.Add(companySelection);
+                selectionModel.CleanUp();
+            }
+            return selectionModel;
+        }
+
         private List<int> GetChannelIdsForStation(int stationId)
         {
             return _channelRepository.GetAll()

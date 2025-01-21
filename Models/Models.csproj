@@ -83,6 +83,7 @@
     <Compile Include="Put\Company.cs" />
     <Compile Include="Put\Station.cs" />
     <Compile Include="Report\ReportData.cs" />
+    <Compile Include="Report\SelectionModel.cs" />
     <Compile Include="Roles.cs" />
     <Compile Include="ScalingFactor.cs" />
     <Compile Include="Station.cs" />

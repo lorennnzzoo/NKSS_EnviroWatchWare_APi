@@ -22,6 +22,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
         {
             try
             {
+                
+                filter.StationsId.Remove(0);
+                filter.ChannelsId.Remove(0);
+
                 //var result = validator.ValidateProperties(filter);
                 //if (!result.isValid)
                 //{
@@ -29,7 +33,11 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
                 //}
                 if (filter.CompanyId == 0)
                 {
-                    return BadRequest("CompanyId Cant be 0");
+                    return BadRequest("Select Parameters");
+                }
+                if (filter.From == null || filter.To == null)
+                {
+                    return BadRequest("Please Choose From and To");
                 }
                 if (filter.From > filter.To)
                 {

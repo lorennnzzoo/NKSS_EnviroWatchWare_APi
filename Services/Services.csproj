@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Environment\Development.cs" />
+    <Compile Include="Exceptions\CompanyExceptions.cs" />
     <Compile Include="Exceptions\LicenseExceptions.cs" />
     <Compile Include="Exceptions\UserExceptions.cs" />
     <Compile Include="Interfaces\IChannelDataFeedService.cs" />

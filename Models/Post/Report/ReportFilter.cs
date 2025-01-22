@@ -9,11 +9,11 @@ namespace Models.Post.Report
     public class ReportFilter
     {
         public int CompanyId { get; set; }
-        public List<int> StationsId { get; set; } 
-        public List<int> ChannelsId { get; set; }
+        public List<int> StationsId { get; set; } = new List<int>();
+        public List<int> ChannelsId { get; set; } = new List<int>();
         public DataAggregationType DataAggregationType { get; set; }
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
+        public DateTime? From { get; set; }
+        public DateTime? To { get; set; }
     }
     public enum DataAggregationType
     {

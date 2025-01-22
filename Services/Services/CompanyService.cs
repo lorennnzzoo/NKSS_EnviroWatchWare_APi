@@ -28,6 +28,11 @@ namespace Services
 
         public void CreateCompany(Post.Company company)
         {
+            IEnumerable<Company> companies=_companyRepository.GetAll();
+            if (companies != null)
+            {
+                throw new Exceptions.CompanyExceptions();
+            }
             _companyRepository.Add(company);
         }
 

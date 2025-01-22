@@ -11,6 +11,11 @@ namespace Models.Report
         public DateTime From { get; set; }
         public DateTime To { get; set; }
         public Company Company { get; set; }
+        
+        public void CleanChannelLessData()
+        {
+            Company.Stations = Company.Stations.Where(s => s.Channels.Any()).ToList();
+        }
     }
 
     public class Station

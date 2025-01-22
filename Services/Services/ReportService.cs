@@ -81,7 +81,7 @@ namespace Services
                 {
                     List<int> channelIds = GetChannelIdsForStation(stationId);
                     stationsOfCompany.Add(_stationRepository.GetById(stationId));
-                    channelsOfStation.AddRange( _channelRepository.GetAll().Where(e => e.StationId == stationId).ToList());
+                    channelsOfStation.AddRange( _channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e => e.Active == true).ToList());
                     StationChannelPairs.Add(stationId, channelIds);
                 }
             }
@@ -89,7 +89,7 @@ namespace Services
             else
             {
                 List<int> stationIds = _stationRepository.GetAll()
-                                                         .Where(e => e.CompanyId == filter.CompanyId)
+                                                         .Where(e => e.CompanyId == filter.CompanyId).Where(e=>e.Active=true)
                                                          .Select(e => e.Id).OfType<int>()
                                                          .ToList();
 
@@ -97,7 +97,7 @@ namespace Services
                 {
                     List<int> channelIds = GetChannelIdsForStation(stationId);
                     stationsOfCompany.Add(_stationRepository.GetById(stationId));
-                    channelsOfStation.AddRange( _channelRepository.GetAll().Where(e => e.StationId == stationId).ToList());
+                    channelsOfStation.AddRange( _channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e=>e.Active==true).ToList());
                     StationChannelPairs.Add(stationId, channelIds);
                 }
             }
@@ -116,14 +116,15 @@ namespace Services
                         {
                             Name=c.Name,
                             Units=c.LoggingUnits,  
-                            Data=GenerateReport((int) c.Id,filter.DataAggregationType,filter.From,filter.To)
+                            Data=GenerateReport((int) c.Id,filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To))
                         }).ToList()
                     }).ToList()
                 },
-                From=filter.From,
-                To=filter.To,
-            };            
+                From= Convert.ToDateTime(filter.From),
+                To= Convert.ToDateTime(filter.To),
+            };
 
+            reportData.CleanChannelLessData();
             return reportData;
         }
 
@@ -167,7 +168,7 @@ namespace Services
         private List<int> GetChannelIdsForStation(int stationId)
         {
             return _channelRepository.GetAll()
-                                     .Where(e => e.StationId == stationId)
+                                     .Where(e => e.StationId == stationId).Where(e=>e.Active=true)
                                      .Select(e => e.Id).OfType<int>()
                                      .ToList();
         }

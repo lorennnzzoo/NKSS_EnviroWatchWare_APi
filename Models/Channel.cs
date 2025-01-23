@@ -12,8 +12,8 @@ namespace Models
         public int? StationId { get; set; }
         public string Name { get; set; }
         public string LoggingUnits { get; set; }
-        public int? ProtocolId { get; set; }       
-        public bool Active { get; set; } 
+        public int? ProtocolId { get; set; }
+        public bool Active { get; set; } = true;
         public int? ValuePosition { get; set; }
         public decimal? MaximumRange { get; set; }
         public decimal? MinimumRange { get; set; }

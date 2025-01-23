@@ -17,7 +17,7 @@ namespace Models
         public string Address { get; set; }
         public string PinCode { get; set; }
         public byte[] Logo { get; set; }
-        //public bool Active { get; set; }
+        public bool Active { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Models.Report;
+using Npgsql;
 using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,70 +18,34 @@ namespace Repositories
         public ReportRepository()
         {
             _connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString; ;
-        }
-        public List<Data> Generate12HourAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
+        }       
+
+        public DataTable GetRawChannelDataAsDataTable(List<int> channelIds, DateTime from, DateTime to)
         {
-            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
+            using (var conn = new NpgsqlConnection(_connectionString))
             {
-                db.Open();
-                var query = $"SELECT \"ChannelValue\", \"ChannelDataLogTime\"            FROM public.\"ChannelData_12HourAvg\"            WHERE \"ChannelId\" = @ChannelId           AND \"ChannelDataLogTime\" >= '{From.ToString("yyyy-MM-dd HH:mm:00")}'           AND \"ChannelDataLogTime\" <= '{To.ToString("yyyy-MM-dd HH:mm:00")}'";
-                return db.Query<Data>(query, new { ChannelId = ChannelId }).ToList();
+                conn.Open();
+
+                // Query the PostgreSQL function
+                var query = @"
+            SELECT * 
+            FROM public.""GetRawChannelDataWithIds""(@StartTime, @EndTime, @ChannelIds)";
+
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("StartTime", from);
+                    cmd.Parameters.AddWithValue("EndTime", to);
+                    cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
+
+                    // Use NpgsqlDataAdapter to fill a DataTable
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        var dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+                        return dataTable;
+                    }
+                }
             }
-        }
-
-        public List<Data> Generate15MinsAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
-            {
-                db.Open();
-                var query = $"SELECT \"ChannelValue\", \"ChannelDataLogTime\"            FROM public.\"ChannelData_15MinAvg\"            WHERE \"ChannelId\" = @ChannelId           AND \"ChannelDataLogTime\" >= '{From.ToString("yyyy-MM-dd HH:mm:00")}'           AND \"ChannelDataLogTime\" <= '{To.ToString("yyyy-MM-dd HH:mm:00")}'";
-                return db.Query<Data>(query, new { ChannelId = ChannelId }).ToList();
-            }
-        }
-
-        public List<Data> Generate1HourAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
-            {
-                db.Open();
-                var query = $"SELECT \"ChannelValue\", \"ChannelDataLogTime\"            FROM public.\"ChannelData_HourlyAvg\"            WHERE \"ChannelId\" = @ChannelId           AND \"ChannelDataLogTime\" >= '{From.ToString("yyyy-MM-dd HH:mm:00")}'           AND \"ChannelDataLogTime\" <= '{To.ToString("yyyy-MM-dd HH:mm:00")}'";
-                return db.Query<Data>(query, new { ChannelId = ChannelId }).ToList();
-            }
-        }
-
-        public List<Data> Generate24HourAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
-            {
-                db.Open();
-                var query = $"SELECT \"ChannelValue\", \"ChannelDataLogTime\"            FROM public.\"ChannelData_24HourAvg\"            WHERE \"ChannelId\" = @ChannelId           AND \"ChannelDataLogTime\" >= '{From.ToString("yyyy-MM-dd HH:mm:00")}'           AND \"ChannelDataLogTime\" <= '{To.ToString("yyyy-MM-dd HH:mm:00")}'";
-                return db.Query<Data>(query, new { ChannelId = ChannelId }).ToList();
-            }
-        }
-
-        public List<Data> GenerateMonthAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Data> GenerateRawDataReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
-            {
-                db.Open();
-                var query = $"SELECT pgp_sym_decrypt(public.\"ChannelData\".\"ChannelValue\"::bytea, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=<>?') AS ChannelValue, \"ChannelDataLogTime\"            FROM public.\"ChannelData\"            WHERE \"ChannelId\" = @ChannelId           AND \"ChannelDataLogTime\" >= '{From.ToString("yyyy-MM-dd HH:mm:00")}'           AND \"ChannelDataLogTime\" <= '{To.ToString("yyyy-MM-dd HH:mm:00")}'";
-                return db.Query<Data>(query,new { ChannelId=ChannelId}).ToList();
-            }
-        }
-
-        public List<Data> GenerateSixMonthAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Data> GenerateYearAvgReportForChannel(int ChannelId, DateTime From, DateTime To)
-        {
-            throw new NotImplementedException();
         }
     }
 }

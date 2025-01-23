@@ -44,4 +44,11 @@ namespace Models.Report
         public decimal ChannelValue { get; set; }
         public DateTime ChannelDataLogTime { get; set; }
     }
+
+
+    public class ChannelDataResult
+    {
+        public DateTime ChannelDataLogTime { get; set; }
+        public Dictionary<string, string> DynamicColumns { get; set; }
+    }
 }

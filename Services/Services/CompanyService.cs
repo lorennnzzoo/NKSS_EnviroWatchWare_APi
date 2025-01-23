@@ -3,6 +3,7 @@ using Post = Models.Post;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Services
 {
@@ -28,8 +29,8 @@ namespace Services
 
         public void CreateCompany(Post.Company company)
         {
-            IEnumerable<Company> companies=_companyRepository.GetAll();
-            if (companies != null)
+            IEnumerable<Company> companies=_companyRepository.GetAll().Where(e=>e.Active==true);
+            if (companies .Count()>0)
             {
                 throw new Exceptions.CompanyExceptions();
             }

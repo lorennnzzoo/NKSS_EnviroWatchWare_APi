@@ -4,6 +4,7 @@ using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,33 +25,43 @@ namespace Services
             _reportRepository = reportRepository;
         }
 
-        public List<Data> GenerateReport(int ChannelId, DataAggregationType dataAggregationType, DateTime From, DateTime To)
+        public DataTable GenerateReport(List<int> ChannelIds, DataAggregationType dataAggregationType, DateTime From, DateTime To)
         {
             
             switch (dataAggregationType)
             {
                 case DataAggregationType.Raw:
-                    return _reportRepository.GenerateRawDataReportForChannel(ChannelId, From, To);
-                case DataAggregationType.FifteenMin:
-                    return _reportRepository.Generate15MinsAvgReportForChannel(ChannelId, From, To);
-                case DataAggregationType.OneHour:
-                    return _reportRepository.Generate1HourAvgReportForChannel(ChannelId, From, To);
-                case DataAggregationType.TwelveHours:
-                    return _reportRepository.Generate12HourAvgReportForChannel(ChannelId, From, To);
-                case DataAggregationType.TwentyFourHours:
-                    return _reportRepository.Generate24HourAvgReportForChannel(ChannelId, From, To);
-                case DataAggregationType.Month:
-                    return _reportRepository.GenerateMonthAvgReportForChannel(ChannelId, From, To);
-                case DataAggregationType.SixMonths:
-                    return _reportRepository.GenerateSixMonthAvgReportForChannel(ChannelId, From, To);
-                case DataAggregationType.Year:
-                    return _reportRepository.GenerateYearAvgReportForChannel(ChannelId, From, To);
+                    return _reportRepository.GetRawChannelDataAsDataTable(ChannelIds, From, To);                
                 default:
-                    return new List<Data>();
+                    return new DataTable();
             }            
         }
+        public List<ChannelDataResult> TransformDataTableToChannelDataResult(DataTable dataTable)
+        {
+            var results = new List<ChannelDataResult>();
 
-        public ReportData GetReport(ReportFilter filter)
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var result = new ChannelDataResult
+                {
+                    ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
+                    DynamicColumns = new Dictionary<string, string>()
+                };
+
+                // Deserialize the JSONB column into a dictionary
+                var dynamicColumnsJson = row.Field<string>("dynamic_columns");
+                if (!string.IsNullOrEmpty(dynamicColumnsJson))
+                {
+                    result.DynamicColumns = Newtonsoft.Json.JsonConvert
+                        .DeserializeObject<Dictionary<string, string>>(dynamicColumnsJson);
+                }
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+        public List<ChannelDataResult> GetReport(ReportFilter filter)
         {
             
             Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
@@ -102,29 +113,9 @@ namespace Services
                 }
             }
 
-            
-            ReportData reportData = new ReportData {
-                Company = new Company
-                {
-                    Name=companyDetail.LegalName,
-                    Address=companyDetail.Address,
-                    Logo=companyDetail.Logo,
-                    Stations = stationsOfCompany.Select(e =>new Station
-                    {
-                        Name=e.Name,
-                        Channels=channelsOfStation.Where(S=>S.StationId==e.Id).Select(c=>new Channel
-                        {
-                            Name=c.Name,
-                            Units=c.LoggingUnits,  
-                            Data=GenerateReport((int) c.Id,filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To))
-                        }).ToList()
-                    }).ToList()
-                },
-                From= Convert.ToDateTime(filter.From),
-                To= Convert.ToDateTime(filter.To),
-            };
 
-            reportData.CleanChannelLessData();
+            DataTable reportDataTable =GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To));
+            var reportData = TransformDataTableToChannelDataResult(reportDataTable);
             return reportData;
         }
 

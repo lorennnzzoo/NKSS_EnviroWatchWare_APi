@@ -1,15 +1,18 @@
 ﻿
 
+using Models.Report;
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace Services.Interfaces
 {
     public interface IReportService
     {
-        Models.Report.ReportData GetReport(Models.Post.Report.ReportFilter filter);
+        List<ChannelDataResult> GetReport(Models.Post.Report.ReportFilter filter);
 
-        List<Models.Report.Data> GenerateReport(int ChannelId, Models.Post.Report.DataAggregationType dataAggregationType,DateTime From,DateTime To);
+        DataTable GenerateReport(List<int> ChannelIds, Models.Post.Report.DataAggregationType dataAggregationType,DateTime From,DateTime To);
+        List<ChannelDataResult> TransformDataTableToChannelDataResult(DataTable dataTable);
         Models.Report.Selection.SelectionModel GetSelectionModel();
     }
 }

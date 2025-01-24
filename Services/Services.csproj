@@ -92,6 +92,10 @@
       <Project>{17b7fff2-b137-46c2-a774-08e9d5627a5f}</Project>
       <Name>Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Protocol\Protocol.csproj">
+      <Project>{398403c7-9183-4efe-b8c5-3a481a2d041a}</Project>
+      <Name>Protocol</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Repositories\Repositories.csproj">
       <Project>{30e22c99-7c1e-45c7-8aaa-642c47e58a47}</Project>
       <Name>Repositories</Name>

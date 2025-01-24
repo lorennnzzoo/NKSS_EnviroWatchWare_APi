@@ -5,6 +5,7 @@ using Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using Models.DashBoard;
+using System;
 
 namespace Services
 {
@@ -45,6 +46,15 @@ namespace Services
                 allStationsFeed.Add(stationfeed);
             }
             return allStationsFeed;
+        }
+
+        public void InsertChannelData(int channelId, decimal channelValue, DateTime datetime, string passPhrase)
+        {
+            if (channelValue < 0)
+            {
+                channelValue = 0;
+            }
+            _channelDataFeedRepository.InsertChannelData(channelId, channelValue, datetime, passPhrase);
         }
     }
 }

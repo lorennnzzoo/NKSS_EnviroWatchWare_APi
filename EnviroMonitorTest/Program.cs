@@ -1,4 +1,5 @@
-﻿using Repositories;
+﻿using Models;
+using Repositories;
 using Repositories.Interfaces;
 using Services;
 using Services.Interfaces;
@@ -7,93 +8,83 @@ using Services.Services.EnviroMonitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 using Unity;
 using Unity.Lifetime;
 
-namespace NKSS_EnviroMonitor
+namespace EnviroMonitorTest
 {
-    static class Program
+    class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        //static void Main()
-        //{
-        //    var container = ConfigureDependencies();
+        public const string GROUPNAME = "EnviroMonitor";
+        public static IEnviroMonitorService enviroMonitorService;
+        public readonly IConfigSettingService configSettingService;
 
-        //    // Resolve dependencies for the service
-        //    var enviroMonitorService = container.Resolve<IEnviroMonitorService>();
-        //    var configSettingService = container.Resolve<IConfigSettingService>();
-        //    ServiceBase[] ServicesToRun;
-        //    ServicesToRun = new ServiceBase[]
-        //    {
-        //        new NKSS_EnviroMonitor(enviroMonitorService, configSettingService)
-        //    };
-        //    ServiceBase.Run(ServicesToRun);
-        //}
-
-        static void Main()
+        static List<ConfigSetting> configSettings = new List<ConfigSetting>();
+        public Program(IEnviroMonitorService _enviroMonitorService, IConfigSettingService _configSettingService)
         {
-            var container = ConfigureDependencies();
-
-            // Resolve dependencies for the service
-            var enviroMonitorService = container.Resolve<IEnviroMonitorService>();
-            var configSettingService = container.Resolve<IConfigSettingService>();
-
-            // Create the service instance with resolved dependencies
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            enviroMonitorService = _enviroMonitorService;
+            configSettingService = _configSettingService;
+            configSettings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).ToList();
+            if (!configSettings.Any())
             {
-                new NKSS_EnviroMonitor(enviroMonitorService, configSettingService)
-            };
-            ServiceBase.Run(ServicesToRun);
+                throw new Services.Exceptions.NoRecordsFoundForGroupNameException(GROUPNAME);
+            }
         }
-
-        /// <summary>
-        /// Configures the Unity container and registers dependencies.
-        /// </summary>
-        /// <returns>IUnityContainer</returns>
-        public static IUnityContainer ConfigureDependencies()
+        static void Main(string[] args)
         {
             var container = new UnityContainer();
 
-            // Register all dependencies
+            //company
             container.RegisterType<ICompanyRepository, CompanyRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<ICompanyService, CompanyService>(new HierarchicalLifetimeManager());
+            //station
             container.RegisterType<IStationRepository, StationRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IStationService, StationService>(new HierarchicalLifetimeManager());
+            //channel
             container.RegisterType<IChannelRepository, ChannelRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IChannelService, ChannelService>(new HierarchicalLifetimeManager());
+            //analyzer
             container.RegisterType<IAnalyzerRepository, AnalyzerRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IAnalyzerService, AnalyzerService>(new HierarchicalLifetimeManager());
+            //oxide
             container.RegisterType<IOxideRepository, OxideRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IOxideService, OxideService>(new HierarchicalLifetimeManager());
+            //monitoring type
             container.RegisterType<IMonitoringTypeRepository, MonitoringTypeRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IMonitoringTypeService, MonitoringTypeService>(new HierarchicalLifetimeManager());
+            //scaling factor
             container.RegisterType<IScalingFactorRepository, ScalingFactorRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IScalingFactorService, ScalingFactorService>(new HierarchicalLifetimeManager());
+            //channel type
             container.RegisterType<IChannelTypeRepository, ChannelTypeRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IChannelTypeService, ChannelTypeService>(new HierarchicalLifetimeManager());
+            //channel data feed
             container.RegisterType<IChannelDataFeedRepository, ChannelDataFeedRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IChannelDataFeedService, ChannelDataFeedService>(new HierarchicalLifetimeManager());
+            //report 
             container.RegisterType<IReportRepository, ReportRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IReportService, ReportService>(new HierarchicalLifetimeManager());
+            //user
             container.RegisterType<IUserRepository, UserRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IUserService, UserService>(new HierarchicalLifetimeManager());
+            //crypto
+
             container.RegisterType<ICryptoService, CryptoService>(new HierarchicalLifetimeManager());
+            //license
             container.RegisterType<ILicenseRepository, LicenseRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<ILicenseService, LicenseService>(new HierarchicalLifetimeManager());
+            //role
             container.RegisterType<IRoleRepository, RoleRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IRoleService, RoleService>(new HierarchicalLifetimeManager());
+            //config setting
             container.RegisterType<IConfigSettingRepository, ConfigSettingRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IConfigSettingService, ConfigSettingService>(new HierarchicalLifetimeManager());
             container.RegisterType<IEnviroMonitorService, EnviroMonitorService>(new HierarchicalLifetimeManager());
-
-            return container;
+            // Resolve Program with dependencies
+            var program = container.Resolve<Program>();
+            enviroMonitorService.Run(configSettings);   
         }
-
     }
 }

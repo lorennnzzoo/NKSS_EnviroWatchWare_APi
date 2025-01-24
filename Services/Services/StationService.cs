@@ -4,15 +4,18 @@ using Repositories.Interfaces;
 using Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Services
 {
     public class StationService : IStationService
     {
         private readonly IStationRepository _stationRepository;
-        public StationService(IStationRepository stationRepository)
+        private readonly IChannelService channelService;
+        public StationService(IStationRepository stationRepository, IChannelService _channelService)
         {
             _stationRepository = stationRepository;
+            channelService = _channelService;
 
         }
         public void CreateStation(Post.Station station)
@@ -22,6 +25,14 @@ namespace Services
 
         public void DeleteStation(int id)
         {
+            var channelsLinkedToStation = channelService.GetAllChannelsByStationId(id).ToList();
+            if (channelsLinkedToStation.Any())
+            {
+                foreach(var channel in channelsLinkedToStation)
+                {
+                    channelService.DeleteChannel(Convert.ToInt32( channel.Id));
+                }
+            }
             _stationRepository.Delete(id);
         }
 

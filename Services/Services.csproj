@@ -45,8 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Environment\Development.cs" />
+    <Compile Include="Exceptions\AnalyzerExceptions.cs" />
     <Compile Include="Exceptions\CompanyExceptions.cs" />
     <Compile Include="Exceptions\LicenseExceptions.cs" />
+    <Compile Include="Exceptions\OxideExceptions.cs" />
+    <Compile Include="Exceptions\ScalingFactorExceptions.cs" />
     <Compile Include="Exceptions\UserExceptions.cs" />
     <Compile Include="Interfaces\IChannelDataFeedService.cs" />
     <Compile Include="Interfaces\IChannelTypeService.cs" />

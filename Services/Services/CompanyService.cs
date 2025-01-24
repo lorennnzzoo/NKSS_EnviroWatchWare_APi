@@ -4,17 +4,20 @@ using Repositories.Interfaces;
 using Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Services
 {
     public class CompanyService : ICompanyService
     {
         private readonly ICompanyRepository _companyRepository;
+        private readonly IStationService stationService;
 
         // Constructor for dependency injection
-        public CompanyService(ICompanyRepository companyRepository)
+        public CompanyService(ICompanyRepository companyRepository, IStationService _stationService)
         {
             _companyRepository = companyRepository;
+            stationService = _stationService;
         }
 
         public IEnumerable<Company> GetAllCompanies()
@@ -32,7 +35,7 @@ namespace Services
             IEnumerable<Company> companies=_companyRepository.GetAll().Where(e=>e.Active==true);
             if (companies .Count()>0)
             {
-                throw new Exceptions.CompanyExceptions();
+                throw new Exceptions.CompaniesLimitReachedException();
             }
             _companyRepository.Add(company);
         }
@@ -44,6 +47,14 @@ namespace Services
 
         public void DeleteCompany(int id)
         {
+            var stationsLinkedToCompany = stationService.GetAllStationsByCompanyId(id).ToList();
+            if (stationsLinkedToCompany.Any())
+            {
+                foreach(var station in stationsLinkedToCompany)
+                {
+                    stationService.DeleteStation(Convert.ToInt32( station.Id));
+                }
+            }
             _companyRepository.Delete(id);
         }
     }

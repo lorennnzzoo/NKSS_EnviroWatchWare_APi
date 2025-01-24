@@ -3,15 +3,18 @@ using Post = Models.Post;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Services
 {
     public class ScalingFactorService : IScalingFactorService
     {
         private readonly IScalingFactorRepository _scalingFactorRepository;
-        public ScalingFactorService(IScalingFactorRepository scalingFactorRepository)
+        private readonly IChannelRepository _channelRepository;
+        public ScalingFactorService(IScalingFactorRepository scalingFactorRepository, IChannelRepository channelRepository)
         {
             _scalingFactorRepository = scalingFactorRepository;
+            _channelRepository = channelRepository;
         }
         public void CreateScalingFactor(Models.Post.ScalingFactor scalingFactor)
         {
@@ -20,6 +23,11 @@ namespace Services
 
         public void DeleteScalingFactor(int id)
         {
+            var channelsLinkedToScalingFactor = _channelRepository.GetAll().Where(e => e.ScalingFactorId == id).ToList();
+            if (channelsLinkedToScalingFactor.Any())
+            {
+                throw new Exceptions.ScalingFactorCannotBeDeletedException(string.Join(",", channelsLinkedToScalingFactor.Select(e => e.Name)));
+            }
             _scalingFactorRepository.Delete(id);
         }
 

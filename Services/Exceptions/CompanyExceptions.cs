@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Services.Exceptions
 {
-    public class CompanyExceptions : Exception
+    public class CompaniesLimitReachedException : Exception
     {
-        public CompanyExceptions()
+        public CompaniesLimitReachedException()
            : base($"Cannot create more than 1 company")
         {
         }

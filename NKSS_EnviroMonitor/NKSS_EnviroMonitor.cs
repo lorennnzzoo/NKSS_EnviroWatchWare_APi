@@ -1,4 +1,6 @@
-﻿using Models;
+﻿using log4net;
+using log4net.Config;
+using Models;
 using Services.Interfaces;
 using Services.Interfaces.EnviroMonitor;
 using System;
@@ -16,6 +18,7 @@ namespace NKSS_EnviroMonitor
 {
     public partial class NKSS_EnviroMonitor : ServiceBase
     {
+        private static readonly ILog logger = LogManager.GetLogger(typeof(Program));
         private const string GROUPNAME = "EnviroMonitor";
         private bool isRunning = false; 
         private readonly IEnviroMonitorService enviroMonitorService;
@@ -24,26 +27,31 @@ namespace NKSS_EnviroMonitor
         private Timer dataLoggingTimer;
         public NKSS_EnviroMonitor(IEnviroMonitorService _enviroMonitorService, IConfigSettingService _configSettingService)
         {
+            XmlConfigurator.Configure(new System.IO.FileInfo("log4net.config"));
             configSettingService = _configSettingService;
             enviroMonitorService = _enviroMonitorService;
             InitializeComponent();
             try
             {
-                configSettings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).ToList();
+                configSettings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).ToList();                
                 if (!configSettings.Any())
                 {
                     throw new Services.Exceptions.NoRecordsFoundForGroupNameException(GROUPNAME);
                 }
+                logger.Info($"Config settings for {GROUPNAME} count : {configSettings.Count}");
             }
             catch(Exception ex)
             {
+                logger.Error("Error at NKSS_EnviroMonitor Constructor",ex);
                 Environment.Exit(1);
             }
         }
 
         protected override void OnStart(string[] args)
         {
+            logger.Info("Service started");
             int interval = GetIntervalFromConfig();
+            logger.Info($"Service Interval : {interval}");
             dataLoggingTimer = new Timer(interval)
             {
                 AutoReset = true, // Repeat the timer
@@ -55,8 +63,10 @@ namespace NKSS_EnviroMonitor
 
         private void DataLoggingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            logger.Info("Timer elapsed");
             if (isRunning)
             {
+                logger.Info("Last thread still running so skipping");
                 return;  // Skip if the task is still running
             }
             isRunning = true;
@@ -78,6 +88,7 @@ namespace NKSS_EnviroMonitor
                 dataLoggingTimer.Stop();
                 dataLoggingTimer.Dispose();
             }
+            logger.Info("Service stopped");
         }
 
         private int GetIntervalFromConfig()
@@ -87,7 +98,7 @@ namespace NKSS_EnviroMonitor
             {
                 return interval;
             }
-
+            logger.Info($"Service Interval not found using default 60seconds");
             return 60000; // Default to 1 minute
         }
     }

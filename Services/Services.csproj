@@ -47,13 +47,17 @@
     <Compile Include="Environment\Development.cs" />
     <Compile Include="Exceptions\AnalyzerExceptions.cs" />
     <Compile Include="Exceptions\CompanyExceptions.cs" />
+    <Compile Include="Exceptions\ConfigSettingExceptions.cs" />
+    <Compile Include="Exceptions\EnviroMonitorServicesExceptions.cs" />
     <Compile Include="Exceptions\LicenseExceptions.cs" />
     <Compile Include="Exceptions\OxideExceptions.cs" />
     <Compile Include="Exceptions\ScalingFactorExceptions.cs" />
     <Compile Include="Exceptions\UserExceptions.cs" />
     <Compile Include="Interfaces\IChannelDataFeedService.cs" />
     <Compile Include="Interfaces\IChannelTypeService.cs" />
+    <Compile Include="Interfaces\IConfigSettingService.cs" />
     <Compile Include="Interfaces\ICryptoService.cs" />
+    <Compile Include="Interfaces\EnviroMonitor\IEnviroMonitorService.cs" />
     <Compile Include="Interfaces\ILicenseService.cs" />
     <Compile Include="Interfaces\IMonitoringTypeService.cs" />
     <Compile Include="Interfaces\IReportService.cs" />
@@ -70,7 +74,9 @@
     <Compile Include="Interfaces\ICompanyService.cs" />
     <Compile Include="Interfaces\IOxideService.cs" />
     <Compile Include="Interfaces\IStationService.cs" />
+    <Compile Include="Services\ConfigSettingService.cs" />
     <Compile Include="Services\CryptoService.cs" />
+    <Compile Include="Services\EnviroMonitor\EnviroMonitorService.cs" />
     <Compile Include="Services\LicenseService.cs" />
     <Compile Include="Services\MonitoringTypeService.cs" />
     <Compile Include="Services\OxideService.cs" />

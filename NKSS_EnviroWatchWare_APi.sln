@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositorie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{022927DD-D0D5-4872-A8EE-2CDB5871C0E3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WindowsServices", "WindowsServices", "{8AE5EEDC-6492-47FF-98F4-8ECB0D2431E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKSS_EnviroMonitor", "NKSS_EnviroMonitor\NKSS_EnviroMonitor.csproj", "{30F10ABA-2011-44A0-84D0-8DE1EDE2E753}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +37,16 @@ Global
 		{022927DD-D0D5-4872-A8EE-2CDB5871C0E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{022927DD-D0D5-4872-A8EE-2CDB5871C0E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{022927DD-D0D5-4872-A8EE-2CDB5871C0E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F10ABA-2011-44A0-84D0-8DE1EDE2E753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F10ABA-2011-44A0-84D0-8DE1EDE2E753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F10ABA-2011-44A0-84D0-8DE1EDE2E753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F10ABA-2011-44A0-84D0-8DE1EDE2E753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{30F10ABA-2011-44A0-84D0-8DE1EDE2E753} = {8AE5EEDC-6492-47FF-98F4-8ECB0D2431E9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5CDBF8C-8B93-40FD-97AE-7DBEC5C26586}

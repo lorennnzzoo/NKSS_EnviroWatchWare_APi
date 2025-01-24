@@ -64,6 +64,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelType.cs" />
     <Compile Include="Company.cs" />
+    <Compile Include="ConfigSetting.cs" />
     <Compile Include="DashBoard\ChannelDataFeedByStation.cs" />
     <Compile Include="Licenses\License.cs" />
     <Compile Include="MonitoringType.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Post\Channel.cs" />
     <Compile Include="Post\ChannelType.cs" />
     <Compile Include="Post\Company.cs" />
+    <Compile Include="Post\ConfigSetting.cs" />
     <Compile Include="Post\MonitoringType.cs" />
     <Compile Include="Post\Oxide.cs" />
     <Compile Include="Post\Report\ReportFilter.cs" />

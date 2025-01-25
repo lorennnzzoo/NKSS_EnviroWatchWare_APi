@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -92,5 +93,24 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetUserRole")]
+        public IHttpActionResult GetUserRole()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            if (claimsIdentity == null)
+            {
+                return Unauthorized();
+            }
+            var roleClaim = claimsIdentity.FindFirst(ClaimTypes.Role);
+
+            if (roleClaim == null)
+            {
+                return NotFound();
+            }
+            return Ok(new { Role = roleClaim.Value });
+        }
+
     }
 }

@@ -20,16 +20,33 @@ namespace Protocol
             decimal? value = null;
             logger.Info($"Fetching value for : {analyzer.ProtocolType}");
             logger.Info($"Checking if the protocol exists");
-            if (Mapper.ProtocolDictionary.TryGetValue(analyzer.ProtocolType, out var method))
+            if (Mapper.ProtocolDictionary.TryGetValue(analyzer.ProtocolType.ToUpper(), out var method))
             {
                 logger.Info("Protocol found");
-                logger.Info("")
-                // Call the method and capture the result
+                logger.Info($"Communication Type : {analyzer.CommunicationType}");
+                if (analyzer.CommunicationType.ToUpper() == "C")
+                {
+                    logger.Info($"Comport : {analyzer.ComPort} Baudrate : {analyzer.BaudRate} StopBits : {analyzer.StopBits} DataBits : {analyzer.DataBits} Parity : {analyzer.Parity}");
+                }
+                else
+                {
+                    logger.Info($"IpAddress : {analyzer.IpAddress} Port : {analyzer.Port}");
+                }
+                logger.Info($"Command : {analyzer.Command}");
+                
                 value = method(analyzer,channel);
+                if (value.HasValue)
+                {
+                    logger.Info($"Value : {value}");
+                }
+                else
+                {
+                    logger.Warn($"Value is null");
+                }
             }
             else
             {
-                
+                logger.Warn($"No mathing protocol found for : {analyzer.ProtocolType}");
             }
             return value;
         }

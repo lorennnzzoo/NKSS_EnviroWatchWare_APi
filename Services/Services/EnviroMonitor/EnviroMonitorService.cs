@@ -4,9 +4,6 @@ using Services.Interfaces.EnviroMonitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Protocol;
 using log4net;
 using log4net.Config;
 
@@ -19,7 +16,7 @@ namespace Services.Services.EnviroMonitor
         private readonly IStationService stationService;
         private readonly IAnalyzerService analyzerService;
         private readonly IChannelDataFeedService channelDataFeedService;
-        private IChannelService channelService;       
+        private readonly IChannelService channelService;       
         public EnviroMonitorService(IConfigSettingService _configSettingService, IStationService _stationService, IAnalyzerService _analyzerService, IChannelService _channelService, IChannelDataFeedService _channelDataFeedService)
         {
             XmlConfigurator.Configure(new System.IO.FileInfo("log4net.config"));
@@ -75,10 +72,11 @@ namespace Services.Services.EnviroMonitor
                 decimal? value = Protocol.Process.FetchAnalyzerValue(analyzer, channel);
                 if (!value.HasValue)
                 {
-                    throw new ArgumentOutOfRangeException(channel.Name, "Null value cant be inserted");
+                    logger.Warn($"null value received");
                 }
                 else
                 {
+                    logger.Info($"Value received : {value}");
                     channelDataFeedService.InsertChannelData((int)channel.Id, (decimal)value, DateTime.Now, "");
                 }
             }

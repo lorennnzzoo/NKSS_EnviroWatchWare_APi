@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Unity;
 using Unity.Lifetime;
@@ -90,7 +91,11 @@ namespace EnviroMonitorTest
             var program = container.Resolve<Program>();
             try
             {
-                enviroMonitorService.Run(configSettings);   
+                while (true)
+                {    
+                    enviroMonitorService.Run(configSettings);
+                    Thread.Sleep(10000);
+                }
             }
             catch(Exception ex)
             {

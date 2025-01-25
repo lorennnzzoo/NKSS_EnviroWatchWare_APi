@@ -21,6 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{03CA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnviroMonitorTest", "EnviroMonitorTest\EnviroMonitorTest.csproj", "{0C863361-76D0-43D4-AC77-FF869ADBB5EB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WindowsServiceSetups", "WindowsServiceSetups", "{CE7321C8-6CA7-438A-B1A4-7491B25B289E}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NKSS_EnviroMonitorSetup", "NKSS_EnviroMonitorSetup\NKSS_EnviroMonitorSetup.vdproj", "{597DB52D-C076-4523-9DF7-3F8B448A911E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,8 @@ Global
 		{0C863361-76D0-43D4-AC77-FF869ADBB5EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C863361-76D0-43D4-AC77-FF869ADBB5EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C863361-76D0-43D4-AC77-FF869ADBB5EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{597DB52D-C076-4523-9DF7-3F8B448A911E}.Debug|Any CPU.ActiveCfg = Debug
+		{597DB52D-C076-4523-9DF7-3F8B448A911E}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{30F10ABA-2011-44A0-84D0-8DE1EDE2E753} = {8AE5EEDC-6492-47FF-98F4-8ECB0D2431E9}
 		{0C863361-76D0-43D4-AC77-FF869ADBB5EB} = {03CA1619-E43E-4BE5-AE9D-B56FEF12F99D}
+		{597DB52D-C076-4523-9DF7-3F8B448A911E} = {CE7321C8-6CA7-438A-B1A4-7491B25B289E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5CDBF8C-8B93-40FD-97AE-7DBEC5C26586}

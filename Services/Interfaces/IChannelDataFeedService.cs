@@ -9,8 +9,10 @@ namespace Services.Interfaces
 {
     public interface IChannelDataFeedService
     {
-        List<DashBoard.ChannelDataFeedByStation> GetAllStationsFeed();
+        List<DashBoard.ChannelDataFeed> GetStationFeed(int stationId);
 
         void InsertChannelData(int channelId, decimal channelValue, DateTime datetime, string passPhrase);
+
+        List<Models.Station> GetStationNames();
     }
 }

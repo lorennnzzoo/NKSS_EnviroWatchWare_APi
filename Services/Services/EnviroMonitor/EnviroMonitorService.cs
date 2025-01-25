@@ -77,7 +77,7 @@ namespace Services.Services.EnviroMonitor
                 else
                 {
                     logger.Info($"Value received : {value}");
-                    channelDataFeedService.InsertChannelData((int)channel.Id, (decimal)value, DateTime.Now, "");
+                    channelDataFeedService.InsertChannelData((int)channel.Id, (decimal)value, DateTime.Now, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=<>?");
                 }
             }
         }

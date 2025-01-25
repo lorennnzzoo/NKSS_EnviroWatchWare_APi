@@ -19,15 +19,38 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         }
 
         [HttpGet]
-        [Route("GetStationsFeed")]
-        public IHttpActionResult GetStationsFeed()
+        [Route("GetStationFeed")]
+        public IHttpActionResult GetStationFeed(int id)
         {
             try
             {
-                var stationsfeed = channel_data_feed_service.GetAllStationsFeed();
-                if (stationsfeed == null)
+                var stationfeed = channel_data_feed_service.GetStationFeed(id);
+                if (stationfeed == null)
                     return NotFound();
-                return Ok(stationsfeed);
+                return Ok(stationfeed);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.ToString())
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetStationNames")]
+
+        public IHttpActionResult GetStationNames()
+        {
+            try
+            {
+                var stationNames = channel_data_feed_service.GetStationNames();
+                if (stationNames == null)
+                    return NotFound();
+                return Ok(stationNames);
             }
             catch (Exception ex)
             {

@@ -29,23 +29,31 @@ namespace Services
                 {
                     Station = new DashBoard.Station
                     {
-                        Name = stationFeedbyId.Select(e => e.Name).FirstOrDefault(),
                         DataFeed = stationFeedbyId.Select(e=>new ChannelData
                         {
                             ChannelName=e.ChannelName,
                             ChannelValue=e.ChannelValue,
                             Units=e.Units,
                             ChannelDataLogTime= e.ChannelDataLogTime,
-                            PcbLimit=e.PcbLimit,
-                            Minimum=e.Minimum,
-                            Maximum=e.Maximum,
-                            Average=e.Average
+                            PcbLimit=e.PcbLimit
                         }).ToList()
                     }
                 };
                 allStationsFeed.Add(stationfeed);
             }
             return allStationsFeed;
+        }
+
+        public List<ChannelDataFeed> GetStationFeed(int stationId)
+        {
+            List<DashBoard.ChannelDataFeed> stationFeed = new List<ChannelDataFeed>();
+            stationFeed = _channelDataFeedRepository.GetByStationId(stationId).ToList();            
+            return stationFeed;
+        }
+
+        public List<Models.Station> GetStationNames()
+        {
+            return _stationRepository.GetAll().ToList();
         }
 
         public void InsertChannelData(int channelId, decimal channelValue, DateTime datetime, string passPhrase)

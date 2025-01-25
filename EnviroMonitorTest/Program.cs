@@ -1,4 +1,6 @@
-﻿using Models;
+﻿using log4net;
+using log4net.Config;
+using Models;
 using Repositories;
 using Repositories.Interfaces;
 using Services;
@@ -17,6 +19,7 @@ namespace EnviroMonitorTest
 {
     class Program
     {
+        private static readonly ILog logger = LogManager.GetLogger(typeof(Program));
         public const string GROUPNAME = "EnviroMonitor";
         public static IEnviroMonitorService enviroMonitorService;
         public readonly IConfigSettingService configSettingService;
@@ -24,6 +27,7 @@ namespace EnviroMonitorTest
         static List<ConfigSetting> configSettings = new List<ConfigSetting>();
         public Program(IEnviroMonitorService _enviroMonitorService, IConfigSettingService _configSettingService)
         {
+            XmlConfigurator.Configure(new System.IO.FileInfo("log4net.config"));
             enviroMonitorService = _enviroMonitorService;
             configSettingService = _configSettingService;
             configSettings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).ToList();
@@ -84,7 +88,14 @@ namespace EnviroMonitorTest
             container.RegisterType<IEnviroMonitorService, EnviroMonitorService>(new HierarchicalLifetimeManager());
             // Resolve Program with dependencies
             var program = container.Resolve<Program>();
-            enviroMonitorService.Run(configSettings);   
+            try
+            {
+                enviroMonitorService.Run(configSettings);   
+            }
+            catch(Exception ex)
+            {
+                logger.Error($"Error at Main", ex);
+            }
         }
     }
 }

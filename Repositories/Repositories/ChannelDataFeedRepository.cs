@@ -22,24 +22,22 @@ namespace Repositories
             {
                 db.Open();
                 var query = @"
-                                SELECT 
-                                    s.""Name"",
-                                    cdf.""ChannelName"", 
-                                    cdf.""ChannelValue"", 
-                                    cdf.""Units"", 
-                                    cdf.""ChannelDataLogTime"", 
-                                    cdf.""PcbLimit"", 
-                                    cdf.""Active"", 
-                                    cdf.""Minimum"", 
-                                    cdf.""Maximum"", 
-                                    cdf.""Average""
-                                FROM public.""ChannelDataFeed"" cdf
-                                LEFT JOIN public.""Station"" s 
-                                    ON cdf.""StationId"" = s.""Id""
-                                LEFT JOIN public.""Channel"" ch 
-                                    ON cdf.""ChannelId"" = ch.""Id""
-                                WHERE s.""Id"" = @StationId  -- Filter for StationId = 1
-                                ORDER BY ch.""Priority"";  -- Order by Priority";
+            SELECT 
+                tcd.""ChannelName"", 
+                tcd.""ChannelValue"", 
+                tcd.""Units"", 
+                tcd.""ChannelDataLogTime"", 
+                tcd.""PcbLimit""
+            FROM 
+                ""ChannelDataFeed"" tcd
+            INNER JOIN 
+                ""Channel"" chnl ON chnl.""Id"" = tcd.""ChannelId""
+            WHERE 
+                tcd.""StationId"" = @stationId
+                AND tcd.""Active"" = TRUE 
+                AND chnl.""Active"" = TRUE
+            ORDER BY 
+                chnl.""Priority"";";
                 return db.Query<Models.DashBoard.ChannelDataFeed>(query, new { StationId = stationId });
             }
         }

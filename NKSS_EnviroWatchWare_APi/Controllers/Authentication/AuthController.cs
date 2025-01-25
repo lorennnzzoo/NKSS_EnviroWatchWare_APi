@@ -23,8 +23,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
             this.role_service = _role_service;
         }
 
-        [HttpPost]
-        [AllowAnonymous]
+        [HttpPost]        
         [Route("Register")]
         public IHttpActionResult Register(Models.Post.Authentication.User user)
         {

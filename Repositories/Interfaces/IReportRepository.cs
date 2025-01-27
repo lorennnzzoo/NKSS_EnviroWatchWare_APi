@@ -11,5 +11,6 @@ namespace Repositories.Interfaces
     public interface IReportRepository
     {
         DataTable GetRawChannelDataAsDataTable(List<int> channelIds, DateTime From, DateTime To);
+        DataTable GetAvgChannelDataAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval);
     }
 }

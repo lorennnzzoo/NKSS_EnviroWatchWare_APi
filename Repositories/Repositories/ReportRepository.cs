@@ -47,5 +47,37 @@ namespace Repositories
                 }
             }
         }
+
+
+        public DataTable GetAvgChannelDataAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                // Query the PostgreSQL function GetAggregatedChannelDataWithIds
+                var query = @"
+            SELECT * 
+            FROM public.""GetAvgChannelDataWithInterval""(@StartTime, @EndTime, @ChannelIds, @IntervalMinutes)";
+
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    // Add the parameters required for the function
+                    cmd.Parameters.AddWithValue("StartTime", from);
+                    cmd.Parameters.AddWithValue("EndTime", to);
+                    cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
+                    cmd.Parameters.AddWithValue("IntervalMinutes", interval);
+
+                    // Use NpgsqlDataAdapter to fill a DataTable
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        var dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+                        return dataTable;
+                    }
+                }
+            }
+        }
+
     }
 }

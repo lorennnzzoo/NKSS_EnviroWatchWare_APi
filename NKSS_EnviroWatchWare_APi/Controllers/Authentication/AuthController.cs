@@ -111,5 +111,13 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
             return Ok(new { Role = roleClaim.Value });
         }
 
+        [HttpGet]
+        [Route("GetUsername")]
+        public IHttpActionResult GetUsername()
+        {
+            var username = User.Identity.Name;
+            return Ok(new { Username = username });
+        }
+
     }
 }

@@ -19,12 +19,7 @@ namespace Models.Post.Report
     {
         Raw = 0,
         FifteenMin = 15,
-        OneHour = 60,
-        TwelveHours = 720,
-        TwentyFourHours = 1440,
-        Month = 43200,        
-        SixMonths = 259200,   
-        Year = 525600         
+        OneHour = 60 
     }
 
 }

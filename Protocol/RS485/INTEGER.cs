@@ -145,7 +145,7 @@ namespace Protocol.RS485
                     int bytesRead = serialPort.Read(buffer, 0, buffer.Length);
                     logger.Info($"{bytesRead} Bytes read from comport");
                     logger.Info($"Converting Bytes to string");
-                    response = BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " ");
+                    response = ByteArrayToHexString(buffer);
                     logger.Info($"Converted response : {response}");
                 }
                 catch (Exception ex)

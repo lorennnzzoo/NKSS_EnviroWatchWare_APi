@@ -94,13 +94,23 @@ namespace EnviroMonitorTest
                 while (true)
                 {    
                     enviroMonitorService.Run(configSettings);
-                    Thread.Sleep(10000);
+                    Thread.Sleep(GetIntervalFromConfig());
                 }
             }
             catch(Exception ex)
             {
                 logger.Error($"Error at Main", ex);
             }
+        }
+        private static int GetIntervalFromConfig()
+        {
+            var intervalSetting = configSettings.FirstOrDefault(s => s.ContentName == "ServiceInterval");
+            if (intervalSetting != null && int.TryParse(intervalSetting.ContentValue, out int interval))
+            {
+                return interval*1000;
+            }
+            logger.Info($"Service Interval not found using default 60seconds");
+            return 60000; // Default to 1 minute
         }
     }
 }

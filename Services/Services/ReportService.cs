@@ -27,14 +27,18 @@ namespace Services
 
         public DataTable GenerateReport(List<int> ChannelIds, DataAggregationType dataAggregationType, DateTime From, DateTime To)
         {
-            
+
             switch (dataAggregationType)
             {
                 case DataAggregationType.Raw:
-                    return _reportRepository.GetRawChannelDataAsDataTable(ChannelIds, From, To);                
+                    return _reportRepository.GetRawChannelDataAsDataTable(ChannelIds, From, To);
+                case DataAggregationType.FifteenMin:
+                    return _reportRepository.GetAvgChannelDataAsDataTable(ChannelIds, From, To, 15);
+                case DataAggregationType.OneHour:
+                    return _reportRepository.GetAvgChannelDataAsDataTable(ChannelIds, From, To, 60);
                 default:
                     return new DataTable();
-            }            
+            }
         }
         public List<ChannelDataResult> TransformDataTableToChannelDataResult(DataTable dataTable)
         {
@@ -115,10 +119,9 @@ namespace Services
 
 
             DataTable reportDataTable =GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To));
-            var reportData = TransformDataTableToChannelDataResult(reportDataTable);
+            var reportData = TransformDataTableToChannelDataResult(reportDataTable);            
             return reportData;
-        }
-
+        }        
         public Models.Report.Selection.SelectionModel GetSelectionModel()
         {
             Models.Report.Selection.SelectionModel selectionModel = new Models.Report.Selection.SelectionModel();
@@ -155,7 +158,6 @@ namespace Services
             }
             return selectionModel;
         }
-
         private List<int> GetChannelIdsForStation(int stationId)
         {
             return _channelRepository.GetAll()

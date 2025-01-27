@@ -10,7 +10,8 @@ namespace Repositories.Interfaces
 {
     public interface IReportRepository
     {
-        DataTable GetRawChannelDataAsDataTable(List<int> channelIds, DateTime From, DateTime To);
-        DataTable GetAvgChannelDataAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval);
+        DataTable GetRawChannelDataReportAsDataTable(List<int> channelIds, DateTime From, DateTime To);
+        DataTable GetAvgChannelDataReportAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval);
+        DataTable GetAvgChannelDataExceedanceReportAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval);
     }
 }

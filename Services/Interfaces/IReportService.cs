@@ -9,10 +9,17 @@ namespace Services.Interfaces
 {
     public interface IReportService
     {
-        List<ChannelDataResult> GetReport(Models.Post.Report.ReportFilter filter);
+        List<ChannelDataReport> GetReport(Models.Post.Report.ReportFilter filter);
+        DataTable GenerateReport(List<int> ChannelIds, Models.Post.Report.ReportType reportType,Models.Post.Report.DataAggregationType dataAggregationType,DateTime From,DateTime To);
+        List<ChannelDataReport> TransformDataTableToExceedanceReport(DataTable dataTable);
 
-        DataTable GenerateReport(List<int> ChannelIds, Models.Post.Report.DataAggregationType dataAggregationType,DateTime From,DateTime To);
-        List<ChannelDataResult> TransformDataTableToChannelDataResult(DataTable dataTable);
+        List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable);
+
+
+
+
+
+
         Models.Report.Selection.SelectionModel GetSelectionModel();
     }
 }

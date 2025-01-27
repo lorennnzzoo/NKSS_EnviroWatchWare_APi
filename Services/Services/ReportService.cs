@@ -1,5 +1,6 @@
 ﻿using Models.Post.Report;
 using Models.Report;
+using Newtonsoft.Json;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
@@ -25,47 +26,40 @@ namespace Services
             _reportRepository = reportRepository;
         }
 
-        public DataTable GenerateReport(List<int> ChannelIds, DataAggregationType dataAggregationType, DateTime From, DateTime To)
+        public DataTable GenerateReport(List<int> ChannelIds, Models.Post.Report.ReportType reportType, DataAggregationType dataAggregationType, DateTime From, DateTime To)
         {
-
-            switch (dataAggregationType)
+            switch (reportType)
             {
-                case DataAggregationType.Raw:
-                    return _reportRepository.GetRawChannelDataAsDataTable(ChannelIds, From, To);
-                case DataAggregationType.FifteenMin:
-                    return _reportRepository.GetAvgChannelDataAsDataTable(ChannelIds, From, To, 15);
-                case DataAggregationType.OneHour:
-                    return _reportRepository.GetAvgChannelDataAsDataTable(ChannelIds, From, To, 60);
+                case ReportType.DataReport:
+                    switch (dataAggregationType)
+                    {
+                        case DataAggregationType.Raw:
+                            return _reportRepository.GetRawChannelDataReportAsDataTable(ChannelIds, From, To);
+                        case DataAggregationType.FifteenMin:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                        case DataAggregationType.OneHour:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                        default:
+                            return new DataTable();
+                    }
+
+                case ReportType.Exceedance:
+                    switch (dataAggregationType)
+                    {
+                        case DataAggregationType.Raw:
+                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To,1);
+                        case DataAggregationType.FifteenMin:
+                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 15);
+                        case DataAggregationType.OneHour:
+                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 60);
+                        default:
+                            return new DataTable();
+                    }
                 default:
                     return new DataTable();
-            }
+            }            
         }
-        public List<ChannelDataResult> TransformDataTableToChannelDataResult(DataTable dataTable)
-        {
-            var results = new List<ChannelDataResult>();
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var result = new ChannelDataResult
-                {
-                    ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
-                    DynamicColumns = new Dictionary<string, string>()
-                };
-
-                // Deserialize the JSONB column into a dictionary
-                var dynamicColumnsJson = row.Field<string>("dynamic_columns");
-                if (!string.IsNullOrEmpty(dynamicColumnsJson))
-                {
-                    result.DynamicColumns = Newtonsoft.Json.JsonConvert
-                        .DeserializeObject<Dictionary<string, string>>(dynamicColumnsJson);
-                }
-
-                results.Add(result);
-            }
-
-            return results;
-        }
-        public List<ChannelDataResult> GetReport(ReportFilter filter)
+        public List<ChannelDataReport> GetReport(ReportFilter filter)
         {
             
             Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
@@ -118,10 +112,128 @@ namespace Services
             }
 
 
-            DataTable reportDataTable =GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To));
-            var reportData = TransformDataTableToChannelDataResult(reportDataTable);            
+            DataTable reportDataTable =GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(),filter.ReportType, filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To));
+            List<ChannelDataReport> reportData = new List<ChannelDataReport>();
+            switch(filter.ReportType)
+            {
+                case ReportType.Exceedance:
+                     reportData=TransformDataTableToExceedanceReport(reportDataTable);
+                    break;
+                case ReportType.DataReport:
+                    reportData = TransformDataTableToDataReport(reportDataTable);
+                    break;
+                default:
+                    reportData = new List<ChannelDataReport>();
+                    break;
+            }
             return reportData;
-        }        
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable)
+        {
+            var results = new List<ChannelDataReport>();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var result = new ChannelDataReport
+                {
+                    ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
+                    DynamicColumns = new Dictionary<string, string>()
+                };
+
+                // Deserialize the JSONB column into a dictionary
+                var dynamicColumnsJson = row.Field<string>("dynamic_columns");
+                if (!string.IsNullOrEmpty(dynamicColumnsJson))
+                {
+                    result.DynamicColumns = Newtonsoft.Json.JsonConvert
+                        .DeserializeObject<Dictionary<string, string>>(dynamicColumnsJson);
+                }
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public List<ChannelDataReport> TransformDataTableToExceedanceReport(DataTable dataTable)
+        {
+            var results = new List<ChannelDataReport>();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var result = new ChannelDataReport
+                {
+                    ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
+                    DynamicColumns = new Dictionary<string, string>()
+                };
+
+                // Get the raw JSON string from the data
+                var dynamicColumnsJson = row.Field<string>("dynamic_columns");
+
+                // Clean up the double quotes by replacing doubled quotes ("") with single quotes (")
+                if (!string.IsNullOrEmpty(dynamicColumnsJson))
+                {
+                    dynamicColumnsJson = dynamicColumnsJson.Replace("\"\"", "\"");
+
+                    try
+                    {
+                        // Now deserialize the cleaned-up JSON string
+                        var dynamicColumns = Newtonsoft.Json.JsonConvert
+                            .DeserializeObject<Dictionary<string, Dictionary<string, object>>>(dynamicColumnsJson);
+
+                        // Iterate through the channels in the dynamic columns
+                        foreach (var dynamicColumn in dynamicColumns)
+                        {
+                            // Add each channel's data to the result
+                            var channelKey = dynamicColumn.Key;
+                            var channelData = dynamicColumn.Value;
+
+                            // You can access "Exceeded" and "avg_value" from the channelData dictionary
+                            if (channelData.ContainsKey("Exceeded"))
+                            {
+                                result.DynamicColumns.Add(channelKey + "-Exceeded", channelData["Exceeded"].ToString());
+                            }
+
+                            if (channelData.ContainsKey("avg_value"))
+                            {
+                                result.DynamicColumns.Add(channelKey, channelData["avg_value"].ToString());
+                            }
+                        }
+                    }
+                    catch (JsonException ex)
+                    {
+                        Console.WriteLine("Error deserializing dynamic columns: " + ex.Message);
+                    }
+                }
+
+                // Add the result to the list
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+
+
+
         public Models.Report.Selection.SelectionModel GetSelectionModel()
         {
             Models.Report.Selection.SelectionModel selectionModel = new Models.Report.Selection.SelectionModel();
@@ -165,5 +277,6 @@ namespace Services
                                      .Select(e => e.Id).OfType<int>()
                                      .ToList();
         }
+
     }
 }

@@ -14,12 +14,21 @@ namespace Models.Post.Report
         public DataAggregationType DataAggregationType { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
+        public ReportType ReportType { get; set; }
     }
     public enum DataAggregationType
     {
         Raw = 0,
         FifteenMin = 15,
         OneHour = 60 
+    }
+    public enum ReportType
+    {
+        DataAvailability = 1,
+        DataReport = 2,
+        Exceedance = 3,
+        Windrose = 4,
+        Trends = 5
     }
 
 }

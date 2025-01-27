@@ -20,7 +20,7 @@ namespace Repositories
             _connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString; ;
         }       
 
-        public DataTable GetRawChannelDataAsDataTable(List<int> channelIds, DateTime from, DateTime to)
+        public DataTable GetRawChannelDataReportAsDataTable(List<int> channelIds, DateTime from, DateTime to)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -29,7 +29,7 @@ namespace Repositories
                 // Query the PostgreSQL function
                 var query = @"
             SELECT * 
-            FROM public.""GetRawChannelDataWithIds""(@StartTime, @EndTime, @ChannelIds)";
+            FROM public.""GetRawChannelDataReport""(@StartTime, @EndTime, @ChannelIds)";
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
@@ -49,7 +49,7 @@ namespace Repositories
         }
 
 
-        public DataTable GetAvgChannelDataAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval)
+        public DataTable GetAvgChannelDataReportAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -58,7 +58,7 @@ namespace Repositories
                 // Query the PostgreSQL function GetAggregatedChannelDataWithIds
                 var query = @"
             SELECT * 
-            FROM public.""GetAvgChannelDataWithInterval""(@StartTime, @EndTime, @ChannelIds, @IntervalMinutes)";
+            FROM public.""GetAvgChannelDataReport""(@StartTime, @EndTime, @ChannelIds, @IntervalMinutes)";
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
@@ -79,5 +79,34 @@ namespace Repositories
             }
         }
 
+        public DataTable GetAvgChannelDataExceedanceReportAsDataTable(List<int> channelIds, DateTime from, DateTime to, int interval)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                // Query the PostgreSQL function GetAggregatedChannelDataWithIds
+                var query = @"
+            SELECT * 
+            FROM public.""GetAvgChannelDataExceedanceReport""(@StartTime, @EndTime, @ChannelIds, @IntervalMinutes)";
+
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    // Add the parameters required for the function
+                    cmd.Parameters.AddWithValue("StartTime", from);
+                    cmd.Parameters.AddWithValue("EndTime", to);
+                    cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
+                    cmd.Parameters.AddWithValue("IntervalMinutes", interval);
+
+                    // Use NpgsqlDataAdapter to fill a DataTable
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        var dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+                        return dataTable;
+                    }
+                }
+            }
+        }
     }
 }

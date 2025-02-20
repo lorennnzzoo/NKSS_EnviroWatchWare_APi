@@ -13,9 +13,34 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     public class ChannelDataFeedController : ApiController
     {
         private readonly ChannelDataFeedService channel_data_feed_service;
-        public ChannelDataFeedController(ChannelDataFeedService _channel_data_feed_service)
+        private readonly ReportService report_service;
+        public ChannelDataFeedController(ChannelDataFeedService _channel_data_feed_service, ReportService _report_service)
         {
             channel_data_feed_service = _channel_data_feed_service;
+            report_service = _report_service;
+        }
+
+
+        [HttpGet]
+        [Route("Get24HourTrendForStation")]
+        public IHttpActionResult Get24HourTrendForStation(int id)
+        {
+            try
+            {
+                var twentyFourHourTrend = report_service.Get24HourTrendForStation(id);
+                if (twentyFourHourTrend == null)
+                    return NotFound();
+                return Ok(twentyFourHourTrend);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
         }
 
         [HttpGet]
@@ -40,27 +65,27 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
-        [HttpGet]
-        [Route("GetStationNames")]
+        //[HttpGet]
+        //[Route("GetStations")]
 
-        public IHttpActionResult GetStationNames()
-        {
-            try
-            {
-                var stationNames = channel_data_feed_service.GetStationNames();
-                if (stationNames == null)
-                    return NotFound();
-                return Ok(stationNames);
-            }
-            catch (Exception ex)
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                {
-                    Content = new StringContent(ex.ToString())
-                };
+        //public IHttpActionResult GetStationNames()
+        //{
+        //    try
+        //    {
+        //        var stationNames = channel_data_feed_service.GetStations();
+        //        if (stationNames == null)
+        //            return NotFound();
+        //        return Ok(stationNames);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        //        {
+        //            Content = new StringContent(ex.ToString())
+        //        };
 
-                return ResponseMessage(response);
-            }
-        }
+        //        return ResponseMessage(response);
+        //    }
+        //}
     }
 }

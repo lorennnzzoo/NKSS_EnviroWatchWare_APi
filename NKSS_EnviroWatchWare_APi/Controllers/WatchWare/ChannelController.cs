@@ -8,7 +8,7 @@ using System.Net;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [RoutePrefix("Channel")]
     public class ChannelController : ApiController
     {
@@ -122,7 +122,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
-                    Content = new StringContent(ex.ToString())
+                    Content = new StringContent(ex.Message)
                 };
 
                 return ResponseMessage(response);
@@ -150,7 +150,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             {
                 var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
-                    Content = new StringContent(ex.ToString())
+                    Content = new StringContent(ex.Message)
                 };
 
                 return ResponseMessage(response);

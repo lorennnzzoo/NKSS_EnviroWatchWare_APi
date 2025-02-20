@@ -20,7 +20,8 @@ namespace Models.Post.Report
     {
         Raw = 0,
         FifteenMin = 15,
-        OneHour = 60 
+        OneHour = 60 ,
+        Day = 1440
     }
     public enum ReportType
     {

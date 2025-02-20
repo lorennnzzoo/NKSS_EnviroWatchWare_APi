@@ -8,7 +8,7 @@ using System.Net;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [RoutePrefix("ChannelType")]
     public class ChannelTypeController : ApiController
     {

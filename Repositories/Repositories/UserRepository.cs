@@ -19,6 +19,17 @@ namespace Repositories
         {
             _connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString;
         }
+
+        public void Activate(Guid id)
+        {
+            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
+            {
+                db.Open();
+                var query = $"UPDATE public.\"User\" SET  \"Active\" = True WHERE \"Id\" = @Id";
+                db.Execute(query, new { Id = id });
+            }
+        }
+
         public void Add(Models.Post.Authentication.User user)
         {
             using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
@@ -29,12 +40,32 @@ namespace Repositories
             }
         }
 
+        public void Delete(Guid id)
+        {
+            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
+            {
+                db.Open();
+                var query = $"UPDATE public.\"User\" SET  \"Active\" = False WHERE \"Id\" = @Id";
+                db.Execute(query, new { Id = id });
+            }
+        }
+
+        public List<User> GetAll()
+        {
+            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
+            {
+                db.Open();
+                var query = "SELECT * FROM public.\"User\"";
+                return db.Query<Models.User>(query).ToList();
+            }
+        }
+
         public User GetByUsername(string username)
         {
             using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
             {
                 db.Open();
-                var query = "SELECT * FROM public.\"User\" WHERE \"Username\" = @Username And \"Active\"=True ";
+                var query = "SELECT * FROM public.\"User\" WHERE \"Username\" = @Username  ";
                 return db.QuerySingleOrDefault<User>(query, new { Username = username });
             }
         }
@@ -45,7 +76,7 @@ namespace Repositories
             {
                 db.Open();  
 
-                var query = "SELECT * FROM public.\"User\" WHERE \"Username\" = @Username AND \"Active\" = True";                
+                var query = "SELECT * FROM public.\"User\" WHERE \"Username\" = @Username ";                
                 return await db.QuerySingleOrDefaultAsync<User>(query, new { Username = username });
             }
         }

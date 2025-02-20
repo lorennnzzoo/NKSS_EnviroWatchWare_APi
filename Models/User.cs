@@ -16,6 +16,6 @@ namespace Models
         public DateTime CreatedOn { get; set; }
         public DateTime LastLoggedIn { get; set; }
         public int RoleId { get; set; }
-        public bool Active { get; set; } = true;
+        public bool Active { get; set; }
     }
 }

@@ -23,11 +23,13 @@ namespace Repositories
                 db.Open();
                 var query = @"
             SELECT 
+                tcd.""ChannelId"", 
                 tcd.""ChannelName"", 
                 tcd.""ChannelValue"", 
                 tcd.""Units"", 
                 tcd.""ChannelDataLogTime"", 
-                tcd.""PcbLimit""
+                tcd.""PcbLimit"",
+                tcd.""Average""
             FROM 
                 ""ChannelDataFeed"" tcd
             INNER JOIN 

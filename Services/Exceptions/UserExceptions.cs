@@ -21,4 +21,29 @@ namespace Services.Exceptions
         {
         }
     }
+
+
+    public class CannotDeactivateTheLoggedInUser:Exception
+    {
+        public CannotDeactivateTheLoggedInUser()
+            : base($"Cannot deactivate your own account")
+        {
+        }
+    }
+
+    public class AdministratorAccountAlreadyExistsException : Exception
+    {
+        public AdministratorAccountAlreadyExistsException()
+            : base($"Cannot create more than one administrator account.")
+        {
+        }
+    }
+
+    public class CannotUseReservedUsernameException : Exception
+    {
+        public CannotUseReservedUsernameException(string username)
+            : base($"Cannot create account with username : {username}, It is reserved.")
+        {
+        }
+    }
 }

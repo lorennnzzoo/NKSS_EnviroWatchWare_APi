@@ -12,14 +12,24 @@ namespace Services
     {
         private readonly IStationRepository _stationRepository;
         private readonly IChannelService channelService;
-        public StationService(IStationRepository stationRepository, IChannelService _channelService)
+        //private readonly ICompanyService companyService;
+        public StationService(IStationRepository stationRepository, IChannelService _channelService
+            //, 
+            //ICompanyService _companyService
+            )
         {
             _stationRepository = stationRepository;
             channelService = _channelService;
-
+            //companyService = _companyService;
         }
         public void CreateStation(Post.Station station)
         {
+            //var allStationsOfCompany = _stationRepository.GetAll().Where(e => e.CompanyId == station.CompanyId).Where(e => e.Name.ToUpper() == station.Name.ToUpper());
+            //if (allStationsOfCompany.Any())
+            //{
+            //    var company = companyService.GetCompanyById(Convert.ToInt32( station.CompanyId));
+            //    throw new Exceptions.StationWithSameNameExists(station.Name, company.ShortName);
+            //}
             _stationRepository.Add(station);
         }
 
@@ -53,6 +63,12 @@ namespace Services
 
         public void UpdateStation(Models.Put.Station station)
         {
+            //var allStationsOfCompany = _stationRepository.GetAll().Where(e => e.CompanyId == station.CompanyId).Where(e => e.Name.ToUpper() == station.Name.ToUpper());
+            //if (allStationsOfCompany.Any())
+            //{
+            //    var company = companyService.GetCompanyById(Convert.ToInt32(station.CompanyId));
+            //    throw new Exceptions.StationWithSameNameExists(station.Name, company.ShortName);
+            //}
             _stationRepository.Update(station);
         }
     }

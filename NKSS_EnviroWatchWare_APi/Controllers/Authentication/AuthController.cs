@@ -93,6 +93,97 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
             }
         }
 
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetRole")]
+        public IHttpActionResult Get(int id)
+        {
+            try
+            {
+                var role = role_service.GetAllRoles().Where(e=>e.Id==id).FirstOrDefault();
+                if (role!=null)
+                {
+                    return Ok(role);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("ValidateToken")]
+        public IHttpActionResult ValidateToken()
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteUser")]
+        public IHttpActionResult Delete(Guid id)
+        {
+            try
+            {
+                var username = User.Identity.Name;
+                user_service.DeleteUser(id,username);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPost]
+        [Route("ActivateUser")]
+        public IHttpActionResult Activate(Guid id)
+        {
+            try
+            {
+                //var username = User.Identity.Name;
+                user_service.ActivateUser(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
         [HttpGet]
         [Route("GetUserRole")]
         public IHttpActionResult GetUserRole()
@@ -118,6 +209,35 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.Authentication
             var username = User.Identity.Name;
             return Ok(new { Username = username });
         }
+
+        [HttpGet]
+        [Route("GetAllUsers")]
+        public IHttpActionResult GetAllUsers()
+        {
+            try
+            {
+                var username = User.Identity.Name;
+                var users = user_service.GetAllUsers(username);
+                if (users.Count() > 0)
+                {
+                    return Ok(users);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage();
+
+                response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        
 
     }
 }

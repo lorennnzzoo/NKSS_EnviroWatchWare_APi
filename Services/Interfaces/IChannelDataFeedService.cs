@@ -13,6 +13,6 @@ namespace Services.Interfaces
 
         void InsertChannelData(int channelId, decimal channelValue, DateTime datetime, string passPhrase);
 
-        List<Models.Station> GetStationNames();
+        //List<Models.Station> GetStations();
     }
 }

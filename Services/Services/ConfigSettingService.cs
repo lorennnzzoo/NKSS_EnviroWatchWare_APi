@@ -47,6 +47,11 @@ namespace Services
 
         public void UpdateConfigSetting(Models.ConfigSetting configSetting)
         {
+            var configSettingsMatchedWithContentNameOfSameGroup = _configSettingsRepository.GetByGroupName(configSetting.GroupName).ToList().Where(e => e.ContentName == configSetting.ContentName).Where(e=>e.Id!=configSetting.Id);
+            if (configSettingsMatchedWithContentNameOfSameGroup.Any())
+            {
+                throw new Exceptions.CannotCreateMultipleContentsWithSameNameInSameGroup(configSetting.ContentName, configSetting.GroupName);
+            }
             _configSettingsRepository.Update(configSetting);
         }
     }

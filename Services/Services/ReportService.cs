@@ -30,6 +30,20 @@ namespace Services
         {
             switch (reportType)
             {
+                case ReportType.DataAvailability:
+                    switch (dataAggregationType)
+                    {
+                        case DataAggregationType.Raw:
+                            return _reportRepository.GetChannelDataAvailabilityReportAsDataTable(ChannelIds, From, To);
+                        //case DataAggregationType.FifteenMin:
+                        //    return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                        //case DataAggregationType.OneHour:
+                        //    return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                        //case DataAggregationType.Day:
+                        //    return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
+                        default:
+                            return new DataTable();
+                    }
                 case ReportType.DataReport:
                     switch (dataAggregationType)
                     {
@@ -39,6 +53,8 @@ namespace Services
                             return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
                         case DataAggregationType.OneHour:
                             return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                        case DataAggregationType.Day:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
                         default:
                             return new DataTable();
                     }
@@ -47,11 +63,41 @@ namespace Services
                     switch (dataAggregationType)
                     {
                         case DataAggregationType.Raw:
-                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To,1);
+                            return _reportRepository.GetRawChannelDataExceedanceReportAsDataTable(ChannelIds, From, To);
                         case DataAggregationType.FifteenMin:
                             return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 15);
                         case DataAggregationType.OneHour:
                             return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 60);
+                        case DataAggregationType.Day:
+                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 1440);
+                        default:
+                            return new DataTable();
+                    }
+                case ReportType.Trends:
+                    switch (dataAggregationType)
+                    {
+                        case DataAggregationType.Raw:
+                            return _reportRepository.GetRawChannelDataReportAsDataTable(ChannelIds, From, To);
+                        case DataAggregationType.FifteenMin:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                        case DataAggregationType.OneHour:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                        case DataAggregationType.Day:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
+                        default:
+                            return new DataTable();
+                    }
+                case ReportType.Windrose:
+                    switch (dataAggregationType)
+                    {
+                        case DataAggregationType.Raw:
+                            return _reportRepository.GetRawChannelDataReportAsDataTable(ChannelIds, From, To);
+                        case DataAggregationType.FifteenMin:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                        case DataAggregationType.OneHour:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                        case DataAggregationType.Day:
+                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
                         default:
                             return new DataTable();
                     }
@@ -116,10 +162,19 @@ namespace Services
             List<ChannelDataReport> reportData = new List<ChannelDataReport>();
             switch(filter.ReportType)
             {
+                case ReportType.DataAvailability:
+                    reportData = TransformDataTableToAvailabilityReport(reportDataTable);
+                    break;
                 case ReportType.Exceedance:
                      reportData=TransformDataTableToExceedanceReport(reportDataTable);
                     break;
                 case ReportType.DataReport:
+                    reportData = TransformDataTableToDataReport(reportDataTable);
+                    break;
+                case ReportType.Trends:
+                    reportData = TransformDataTableToDataReport(reportDataTable);
+                    break;
+                case ReportType.Windrose:
                     reportData = TransformDataTableToDataReport(reportDataTable);
                     break;
                 default:
@@ -172,7 +227,34 @@ namespace Services
 
             return results;
         }
+        public List<ChannelDataReport> TransformDataTableToAvailabilityReport(DataTable dataTable)
+        {
+            var results = new List<ChannelDataReport>();
+            var availabilityReport = new ChannelDataReport
+            {
+                DynamicColumns = new Dictionary<string, string>()
+            };
 
+            if (dataTable.Rows.Count > 0)
+            {
+                DataRow row = dataTable.Rows[0];
+                string availabilityJson = row.Field<string>("availability_report");
+
+                if (!string.IsNullOrEmpty(availabilityJson))
+                {
+                    // Deserialize to a Dictionary<string, double> first
+                    var tempDictionary = JsonConvert.DeserializeObject<Dictionary<string, double>>(availabilityJson);
+
+                    // Then convert the double values to strings
+                    foreach (var kvp in tempDictionary)
+                    {
+                        availabilityReport.DynamicColumns.Add(kvp.Key, kvp.Value.ToString("0.00")); // Format as needed
+                    }
+                }
+            }
+            results.Add(availabilityReport);
+            return results;
+        }
         public List<ChannelDataReport> TransformDataTableToExceedanceReport(DataTable dataTable)
         {
             var results = new List<ChannelDataReport>();
@@ -212,9 +294,9 @@ namespace Services
                                 result.DynamicColumns.Add(channelKey + "-Exceeded", channelData["Exceeded"].ToString());
                             }
 
-                            if (channelData.ContainsKey("avg_value"))
+                            if (channelData.ContainsKey("value"))
                             {
-                                result.DynamicColumns.Add(channelKey, channelData["avg_value"].ToString());
+                                result.DynamicColumns.Add(channelKey, channelData["value"].ToString());
                             }
                         }
                     }
@@ -278,5 +360,26 @@ namespace Services
                                      .ToList();
         }
 
+        //public List<OneHourTrend> GetOneHourTrendForChannel(int ChannelId)
+        //{
+        //    return _reportRepository.GetOneHourTrendForChannel(ChannelId, DateTime.Now.AddHours(-1), DateTime.Now);
+        //}
+
+        public List<ChannelDataReport> Get24HourTrendForStation(int StationId)
+        {
+            Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
+            List<Models.Station> stationsOfCompany = new List<Models.Station>();
+            List<Models.Channel> channelsOfStation = new List<Models.Channel>();
+            List<int> channelIds = GetChannelIdsForStation(StationId);
+            stationsOfCompany.Add(_stationRepository.GetById(StationId));
+            channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == StationId).Where(e => e.Active == true).ToList());
+            StationChannelPairs.Add(StationId, channelIds);
+            DateTime from =Convert.ToDateTime( DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:00"));
+            DateTime to = from.AddDays(1);
+            DataTable reportDataTable = GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), ReportType.DataReport, DataAggregationType.OneHour, from, to);
+            List<ChannelDataReport> reportData = new List<ChannelDataReport>();
+            reportData = TransformDataTableToDataReport(reportDataTable);
+            return reportData;
+        }
     }
 }

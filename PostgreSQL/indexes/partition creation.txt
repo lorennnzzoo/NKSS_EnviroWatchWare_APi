@@ -1,0 +1,18 @@
+-- Table: public.ChannelData_2020_01
+
+-- DROP TABLE IF EXISTS public."ChannelData_2020_01";
+
+CREATE TABLE public."ChannelData_2020_01" PARTITION OF public."ChannelData"
+    FOR VALUES FROM ('2020-01-01 00:00:00') TO ('2020-02-01 00:00:00')
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."ChannelData_2020_01"
+    OWNER to postgres;
+-- Index: idx_channeldatalogtime_chid_2020_01
+
+-- DROP INDEX IF EXISTS public.idx_channeldatalogtime_chid_2020_01;
+
+CREATE INDEX idx_channeldatalogtime_chid_2020_01
+    ON public."ChannelData_2020_01" USING btree
+    ("ChannelDataLogTime" ASC NULLS LAST, "ChannelId" ASC NULLS LAST)
+    TABLESPACE pg_default;

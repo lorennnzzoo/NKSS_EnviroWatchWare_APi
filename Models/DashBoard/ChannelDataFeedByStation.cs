@@ -15,7 +15,8 @@ namespace Models.DashBoard
     //    public Company Company { get; set; }
     //}
     public class ChannelDataFeed
-    {       
+    {
+        public int ChannelId { get; set; }
         public string ChannelName { get; set; }
 
         public string ChannelValue { get; set; }
@@ -24,7 +25,8 @@ namespace Models.DashBoard
 
         public DateTime? ChannelDataLogTime { get; set; }
 
-        public string PcbLimit { get; set; }      
+        public string PcbLimit { get; set; }
+        public decimal Average { get; set; }
     }
     public class ChannelData
     {        

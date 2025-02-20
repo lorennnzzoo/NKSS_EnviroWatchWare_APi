@@ -12,14 +12,8 @@ namespace Services.Interfaces
         List<ChannelDataReport> GetReport(Models.Post.Report.ReportFilter filter);
         DataTable GenerateReport(List<int> ChannelIds, Models.Post.Report.ReportType reportType,Models.Post.Report.DataAggregationType dataAggregationType,DateTime From,DateTime To);
         List<ChannelDataReport> TransformDataTableToExceedanceReport(DataTable dataTable);
-
         List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable);
-
-
-
-
-
-
+        List<ChannelDataReport> Get24HourTrendForStation(int StationId);
         Models.Report.Selection.SelectionModel GetSelectionModel();
     }
 }

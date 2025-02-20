@@ -13,5 +13,13 @@ namespace Services.Interfaces
 
         Task<Models.User> ValidateUserAsync(string username,string password);
         void UpdateUserLoginTime(Guid userId);
+
+        List<Models.User> GetAllUsers(string username);
+
+        void DeleteUser(Guid id,string username);
+
+        void ActivateUser(Guid id);
+
+        Models.User GetUserProfile(string username);
     }
 }

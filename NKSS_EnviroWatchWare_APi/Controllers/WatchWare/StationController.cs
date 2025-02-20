@@ -19,6 +19,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             this.station_service = _station_service;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("GetStation")]
         public IHttpActionResult Get(int id)
@@ -41,6 +42,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+        [Authorize(Roles = "Admin,Customer")]
         [HttpGet]
         [Route("GetAllStations")]
         public IHttpActionResult GetAll()
@@ -61,6 +63,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("GetAllStationsByCompany")]
         public IHttpActionResult GetAllByCompany(int companyId)
@@ -81,6 +84,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddStation")]
         public IHttpActionResult Add(Post.Station station)
@@ -109,6 +113,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("UpdateStation")]
         public IHttpActionResult Update(Models.Put.Station station)
@@ -137,6 +142,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("DeleteStation")]
         public IHttpActionResult Delete(int id)

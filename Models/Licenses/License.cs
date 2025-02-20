@@ -12,4 +12,10 @@ namespace Models.Licenses
         public string LicenseKey { get; set; }
         public bool Active { get; set; } = true;
     }
+    public class LicenseResponse
+    {
+        public string LicenseType { get; set; }
+        public string LicenseKey { get; set; }
+        public bool Valid { get; set; }
+    }
 }

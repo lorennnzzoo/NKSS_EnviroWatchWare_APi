@@ -4,18 +4,27 @@ using Repositories.Interfaces;
 using Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Services
 {
     public class ChannelService : IChannelService
     {
         private readonly IChannelRepository _channelRepository;
-        public ChannelService(IChannelRepository channelRepository)
+        private readonly IStationRepository stationRepository;
+        public ChannelService(IChannelRepository channelRepository, IStationRepository _stationRepository)
         {
             _channelRepository = channelRepository;
+            stationRepository = _stationRepository;
         }
         public void CreateChannel(Post.Channel channel)
         {
+            var allChannelsOfStation = _channelRepository.GetAll().Where(e => e.StationId == channel.StationId).Where(e => e.Name.ToUpper() == channel.Name.ToUpper());
+            if (allChannelsOfStation.Any())
+            {
+                var station = stationRepository.GetById(Convert.ToInt32( channel.StationId));
+                throw new Exceptions.ChannelWithSameNameExists(channel.Name,station.Name);
+            }
             _channelRepository.Add(channel);
         }
 
@@ -46,6 +55,12 @@ namespace Services
 
         public void UpdateChannel(Channel channel)
         {
+            var allChannelsOfStation = _channelRepository.GetAll().Where(e => e.StationId == channel.StationId).Where(e => e.Name.ToUpper() == channel.Name.ToUpper()).Where(e=>e.Id!=channel.Id);
+            if (allChannelsOfStation.Any())
+            {
+                var station = stationRepository.GetById(Convert.ToInt32(channel.StationId));
+                throw new Exceptions.ChannelWithSameNameExists(channel.Name, station.Name);
+            }
             _channelRepository.Update(channel);
         }
     }

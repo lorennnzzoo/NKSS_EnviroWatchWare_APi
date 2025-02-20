@@ -1,0 +1,15 @@
+--Create Index on Parent Table (Mandatory for Partition Pruning)
+CREATE INDEX idx_channeldatalogtime_chid 
+ON public."ChannelData" ("ChannelDataLogTime", "ChannelId");
+
+--Create Indexes on Each Partition (For Fast Lookups)
+CREATE INDEX idx_channeldatalogtime_chid_2020_01
+ON public."ChannelData_2020_01" ("ChannelDataLogTime", "ChannelId");
+
+--Refresh Statistics for PostgreSQL Query Planner
+VACUUM ANALYZE public."ChannelData";
+
+--Verify Index Scan & Partition Pruning
+EXPLAIN (ANALYZE, VERBOSE) 
+SELECT * FROM public."ChannelData"
+WHERE "ChannelDataLogTime" BETWEEN '2020-01-01 00:00' AND '2020-01-31 23:59';

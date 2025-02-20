@@ -51,10 +51,10 @@ namespace Services
             return stationFeed;
         }
 
-        public List<Models.Station> GetStationNames()
-        {
-            return _stationRepository.GetAll().ToList();
-        }
+        //public List<Models.Station> GetStations()
+        //{
+        //    return _stationRepository.GetAll().ToList();
+        //}
 
         public void InsertChannelData(int channelId, decimal channelValue, DateTime datetime, string passPhrase)
         {

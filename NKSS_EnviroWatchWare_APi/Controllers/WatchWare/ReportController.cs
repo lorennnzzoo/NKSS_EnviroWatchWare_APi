@@ -50,7 +50,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
             {
                 var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
-                    Content = new StringContent(ex.ToString())
+                    Content = new StringContent(ex.Message)
                 };
 
                 return ResponseMessage(response);

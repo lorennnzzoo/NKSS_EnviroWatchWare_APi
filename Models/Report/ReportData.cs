@@ -10,13 +10,5 @@ namespace Models.Report
     {
         public DateTime ChannelDataLogTime { get; set; }
         public Dictionary<string, string> DynamicColumns { get; set; }
-    }
-
-
-    public class ChannelDataExceedanceReport
-    {
-        public DateTime ChannelDataLogTime { get; set; }
-        public Dictionary<string, string> DynamicColumns { get; set; }
-    }
-
+    }   
 }

@@ -51,7 +51,7 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
             {
                 AllowInsecureHttp = true,
                 TokenEndpointPath = new PathString("/Auth/Login"),
-                AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30), 
+                AccessTokenExpireTimeSpan = TimeSpan.FromDays(1), 
                 Provider = oauthProvider
             };
 

@@ -38,6 +38,7 @@ namespace Repositories
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
+                    cmd.CommandTimeout = 240;
                     cmd.Parameters.AddWithValue("StartTime", From);
                     cmd.Parameters.AddWithValue("EndTime", To);
                     cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
@@ -70,6 +71,7 @@ namespace Repositories
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
+                    cmd.CommandTimeout = 240;
                     cmd.Parameters.AddWithValue("StartTime", from);
                     cmd.Parameters.AddWithValue("EndTime", to);
                     cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
@@ -100,6 +102,7 @@ namespace Repositories
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
+                    cmd.CommandTimeout = 240;
                     cmd.Parameters.AddWithValue("StartTime", from);
                     cmd.Parameters.AddWithValue("EndTime", to);
                     cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
@@ -302,6 +305,7 @@ namespace Repositories
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
+                    cmd.CommandTimeout = 240;
                     cmd.Parameters.AddWithValue("StartTime", From);
                     cmd.Parameters.AddWithValue("EndTime", To);
                     cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
@@ -332,6 +336,7 @@ namespace Repositories
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
+                    cmd.CommandTimeout = 240;
                     cmd.Parameters.AddWithValue("StartTime", from);
                     cmd.Parameters.AddWithValue("EndTime", to);
                     cmd.Parameters.AddWithValue("ChannelIds", channelIds.ToArray());
@@ -591,5 +596,6 @@ namespace Repositories
         //        }
         //    }
         //}
+
     }
 }

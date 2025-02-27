@@ -21,27 +21,27 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         }
 
 
-        [HttpGet]
-        [Route("Get24HourTrendForStation")]
-        public IHttpActionResult Get24HourTrendForStation(int id)
-        {
-            try
-            {
-                var twentyFourHourTrend = report_service.Get24HourTrendForStation(id);
-                if (twentyFourHourTrend == null)
-                    return NotFound();
-                return Ok(twentyFourHourTrend);
-            }
-            catch (Exception ex)
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                {
-                    Content = new StringContent(ex.Message)
-                };
+        //[HttpGet]
+        //[Route("Get24HourTrendForStation")]
+        //public IHttpActionResult Get24HourTrendForStation(int id)
+        //{
+        //    try
+        //    {
+        //        var twentyFourHourTrend = report_service.Get24HourTrendForStation(id);
+        //        if (twentyFourHourTrend == null)
+        //            return NotFound();
+        //        return Ok(twentyFourHourTrend);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        //        {
+        //            Content = new StringContent(ex.Message)
+        //        };
 
-                return ResponseMessage(response);
-            }
-        }
+        //        return ResponseMessage(response);
+        //    }
+        //}
 
         [HttpGet]
         [Route("GetStationFeed")]

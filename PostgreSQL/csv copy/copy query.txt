@@ -1,0 +1,4 @@
+COPY public."ChannelData" ("ChannelId", "ChannelDataLogTime", "Active", "Processed", "ChannelValue")
+FROM 'F:\\source\\repos\\ConsoleApp1\\ConsoleApp1\\bin\\Debug\\ChannelData\\ChannelData8.csv'
+DELIMITER ','
+CSV HEADER;

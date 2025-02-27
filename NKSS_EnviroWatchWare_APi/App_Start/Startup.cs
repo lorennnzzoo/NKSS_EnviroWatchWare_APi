@@ -21,6 +21,7 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
 {
     public class Startup
     {
+        string origin = System.Configuration.ConfigurationManager.AppSettings["OriginUrl"];
         public void Configuration(IAppBuilder app)
         {
             var corsPolicy = new CorsPolicy
@@ -28,7 +29,7 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
                 AllowAnyMethod = true,
                 AllowAnyHeader = true
             };
-            corsPolicy.Origins.Add("http://localhost:4200");
+            corsPolicy.Origins.Add(origin);
 
             // Register CORS on the OWIN pipeline
             app.Use(typeof(CorsMiddleware), corsPolicy);

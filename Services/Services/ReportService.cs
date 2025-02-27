@@ -103,13 +103,13 @@ namespace Services
                     }
                 default:
                     return new DataTable();
-            }            
+            }
         }
         public List<ChannelDataReport> GetReport(ReportFilter filter)
         {
-            
+
             Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
-            Models.Company companyDetail = _companyRepository.GetById(filter.CompanyId);            
+            Models.Company companyDetail = _companyRepository.GetById(filter.CompanyId);
             List<Models.Station> stationsOfCompany = new List<Models.Station>();
             List<Models.Channel> channelsOfStation = new List<Models.Channel>();
 
@@ -120,31 +120,31 @@ namespace Services
                 {
                     List<int> channelIds = GetChannelIdsForStation(stationId);
 
-                    
+
                     List<int> matchingValues = channelIds.Intersect(filter.ChannelsId).ToList();
 
 
                     stationsOfCompany.Add(_stationRepository.GetById(stationId));
-                    channelsOfStation.AddRange( matchingValues.Count > 0 ? _channelRepository.GetAll().Where(e => matchingValues.Contains(Convert.ToInt32(e.Id))).ToList() : _channelRepository.GetAll().ToList());
+                    channelsOfStation.AddRange(matchingValues.Count > 0 ? _channelRepository.GetAll().Where(e => matchingValues.Contains(Convert.ToInt32(e.Id))).ToList() : _channelRepository.GetAll().ToList());
                     StationChannelPairs.Add(stationId, matchingValues.Count > 0 ? matchingValues : channelIds);
                 }
             }
-            
+
             else if (filter.StationsId != null && filter.StationsId.Count > 0)
             {
                 foreach (int stationId in filter.StationsId)
                 {
                     List<int> channelIds = GetChannelIdsForStation(stationId);
                     stationsOfCompany.Add(_stationRepository.GetById(stationId));
-                    channelsOfStation.AddRange( _channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e => e.Active == true).ToList());
+                    channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e => e.Active == true).ToList());
                     StationChannelPairs.Add(stationId, channelIds);
                 }
             }
-            
+
             else
             {
                 List<int> stationIds = _stationRepository.GetAll()
-                                                         .Where(e => e.CompanyId == filter.CompanyId).Where(e=>e.Active=true)
+                                                         .Where(e => e.CompanyId == filter.CompanyId).Where(e => e.Active = true)
                                                          .Select(e => e.Id).OfType<int>()
                                                          .ToList();
 
@@ -152,21 +152,21 @@ namespace Services
                 {
                     List<int> channelIds = GetChannelIdsForStation(stationId);
                     stationsOfCompany.Add(_stationRepository.GetById(stationId));
-                    channelsOfStation.AddRange( _channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e=>e.Active==true).ToList());
+                    channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e => e.Active == true).ToList());
                     StationChannelPairs.Add(stationId, channelIds);
                 }
             }
 
 
-            DataTable reportDataTable =GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(),filter.ReportType, filter.DataAggregationType,Convert.ToDateTime( filter.From), Convert.ToDateTime(filter.To));
+            DataTable reportDataTable = GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), filter.ReportType, filter.DataAggregationType, Convert.ToDateTime(filter.From), Convert.ToDateTime(filter.To));
             List<ChannelDataReport> reportData = new List<ChannelDataReport>();
-            switch(filter.ReportType)
+            switch (filter.ReportType)
             {
                 case ReportType.DataAvailability:
                     reportData = TransformDataTableToAvailabilityReport(reportDataTable);
                     break;
                 case ReportType.Exceedance:
-                     reportData=TransformDataTableToExceedanceReport(reportDataTable);
+                    reportData = TransformDataTableToExceedanceReport(reportDataTable);
                     break;
                 case ReportType.DataReport:
                     reportData = TransformDataTableToDataReport(reportDataTable);
@@ -202,27 +202,57 @@ namespace Services
 
 
 
+        //public List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable)
+        //{
+        //    var results = new List<ChannelDataReport>();
+
+        //    foreach (DataRow row in dataTable.Rows)
+        //    {
+        //        var result = new ChannelDataReport
+        //        {
+        //            ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
+        //            DynamicColumns = new Dictionary<string, string>()
+        //        };
+
+        //        // Deserialize the JSONB column into a dictionary
+        //        var dynamicColumnsJson = row.Field<string>("dynamic_columns");
+        //        if (!string.IsNullOrEmpty(dynamicColumnsJson))
+        //        {
+        //            result.DynamicColumns = Newtonsoft.Json.JsonConvert
+        //                .DeserializeObject<Dictionary<string, string>>(dynamicColumnsJson);
+        //        }
+
+        //        results.Add(result);
+        //    }
+
+        //    return results;
+        //}
         public List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable)
         {
-            var results = new List<ChannelDataReport>();
+            var results = new List<ChannelDataReport>(dataTable.Rows.Count);
 
             foreach (DataRow row in dataTable.Rows)
             {
-                var result = new ChannelDataReport
-                {
-                    ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
-                    DynamicColumns = new Dictionary<string, string>()
-                };
+                var dynamicColumnsJson = row["dynamic_columns"] as string;
+                Dictionary<string, string> dynamicColumns = null;
 
-                // Deserialize the JSONB column into a dictionary
-                var dynamicColumnsJson = row.Field<string>("dynamic_columns");
                 if (!string.IsNullOrEmpty(dynamicColumnsJson))
                 {
-                    result.DynamicColumns = Newtonsoft.Json.JsonConvert
-                        .DeserializeObject<Dictionary<string, string>>(dynamicColumnsJson);
+                    try
+                    {
+                        dynamicColumns =System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(dynamicColumnsJson);
+                    }
+                    catch
+                    {
+                        dynamicColumns = new Dictionary<string, string>(); // Handle malformed JSON
+                    }
                 }
 
-                results.Add(result);
+                results.Add(new ChannelDataReport
+                {
+                    ChannelDataLogTime = (DateTime)row["ChannelDataLogTime"],
+                    DynamicColumns = dynamicColumns ?? new Dictionary<string, string>()
+                });
             }
 
             return results;
@@ -374,7 +404,7 @@ namespace Services
             stationsOfCompany.Add(_stationRepository.GetById(StationId));
             channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == StationId).Where(e => e.Active == true).ToList());
             StationChannelPairs.Add(StationId, channelIds);
-            DateTime from =Convert.ToDateTime( DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:00"));
+            DateTime from = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:00"));
             DateTime to = from.AddDays(1);
             DataTable reportDataTable = GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), ReportType.DataReport, DataAggregationType.OneHour, from, to);
             List<ChannelDataReport> reportData = new List<ChannelDataReport>();

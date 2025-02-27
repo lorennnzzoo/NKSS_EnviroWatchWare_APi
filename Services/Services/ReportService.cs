@@ -34,13 +34,17 @@ namespace Services
                     switch (dataAggregationType)
                     {
                         case DataAggregationType.Raw:
-                            return _reportRepository.GetChannelDataAvailabilityReportAsDataTable(ChannelIds, From, To);
-                        //case DataAggregationType.FifteenMin:
-                        //    return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
-                        //case DataAggregationType.OneHour:
-                        //    return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
-                        //case DataAggregationType.Day:
-                        //    return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
+                            return _reportRepository.GetAvailabilityReport(ChannelIds, From, To);
+                        case DataAggregationType.FiveMin:
+                            return _reportRepository.GetAvailabilityReport(ChannelIds, From, To);
+                        case DataAggregationType.FifteenMin:
+                            return _reportRepository.GetAvailabilityReport(ChannelIds, From, To);
+                        case DataAggregationType.ThirtyMin:
+                            return _reportRepository.GetAvailabilityReport(ChannelIds, From, To);
+                        case DataAggregationType.OneHour:
+                            return _reportRepository.GetAvailabilityReport(ChannelIds, From, To);
+                        case DataAggregationType.Day:
+                            return _reportRepository.GetAvailabilityReport(ChannelIds, From, To);
                         default:
                             return new DataTable();
                     }
@@ -48,13 +52,17 @@ namespace Services
                     switch (dataAggregationType)
                     {
                         case DataAggregationType.Raw:
-                            return _reportRepository.GetRawChannelDataReportAsDataTable(ChannelIds, From, To);
+                            return _reportRepository.GetRawDataReport(ChannelIds, From, To);
+                        case DataAggregationType.FiveMin:
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 5);
                         case DataAggregationType.FifteenMin:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 15);
+                        case DataAggregationType.ThirtyMin:
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 30);
                         case DataAggregationType.OneHour:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 60);
                         case DataAggregationType.Day:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 1440);
                         default:
                             return new DataTable();
                     }
@@ -63,13 +71,17 @@ namespace Services
                     switch (dataAggregationType)
                     {
                         case DataAggregationType.Raw:
-                            return _reportRepository.GetRawChannelDataExceedanceReportAsDataTable(ChannelIds, From, To);
+                            return _reportRepository.GetRawExceedanceReport(ChannelIds, From, To);
+                        case DataAggregationType.FiveMin:
+                            return _reportRepository.GetAverageExceedanceReport(ChannelIds, From, To, 5);
                         case DataAggregationType.FifteenMin:
-                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 15);
+                            return _reportRepository.GetAverageExceedanceReport(ChannelIds, From, To, 15);
+                        case DataAggregationType.ThirtyMin:
+                            return _reportRepository.GetAverageExceedanceReport(ChannelIds, From, To, 30);
                         case DataAggregationType.OneHour:
-                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 60);
+                            return _reportRepository.GetAverageExceedanceReport(ChannelIds, From, To, 60);
                         case DataAggregationType.Day:
-                            return _reportRepository.GetAvgChannelDataExceedanceReportAsDataTable(ChannelIds, From, To, 1440);
+                            return _reportRepository.GetAverageExceedanceReport(ChannelIds, From, To, 1440);
                         default:
                             return new DataTable();
                     }
@@ -77,13 +89,17 @@ namespace Services
                     switch (dataAggregationType)
                     {
                         case DataAggregationType.Raw:
-                            return _reportRepository.GetRawChannelDataReportAsDataTable(ChannelIds, From, To);
+                            return _reportRepository.GetRawDataReport(ChannelIds, From, To);
+                        case DataAggregationType.FiveMin:
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 5);
                         case DataAggregationType.FifteenMin:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 15);
+                        case DataAggregationType.ThirtyMin:
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 30);
                         case DataAggregationType.OneHour:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 60);
                         case DataAggregationType.Day:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 1440);
                         default:
                             return new DataTable();
                     }
@@ -91,13 +107,17 @@ namespace Services
                     switch (dataAggregationType)
                     {
                         case DataAggregationType.Raw:
-                            return _reportRepository.GetRawChannelDataReportAsDataTable(ChannelIds, From, To);
+                            return _reportRepository.GetRawDataReport(ChannelIds, From, To);
+                        case DataAggregationType.FiveMin:
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 5);
                         case DataAggregationType.FifteenMin:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 15);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 15);
+                        case DataAggregationType.ThirtyMin:
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 30);
                         case DataAggregationType.OneHour:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 60);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 60);
                         case DataAggregationType.Day:
-                            return _reportRepository.GetAvgChannelDataReportAsDataTable(ChannelIds, From, To, 1440);
+                            return _reportRepository.GetAverageDataReport(ChannelIds, From, To, 1440);
                         default:
                             return new DataTable();
                     }
@@ -105,7 +125,7 @@ namespace Services
                     return new DataTable();
             }
         }
-        public List<ChannelDataReport> GetReport(ReportFilter filter)
+        public List<Dictionary<string,object>> GetReport(ReportFilter filter)
         {
 
             Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
@@ -159,199 +179,65 @@ namespace Services
 
 
             DataTable reportDataTable = GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), filter.ReportType, filter.DataAggregationType, Convert.ToDateTime(filter.From), Convert.ToDateTime(filter.To));
-            List<ChannelDataReport> reportData = new List<ChannelDataReport>();
+            List<Dictionary<string, object>> reportData = new List<Dictionary<string, object>>();
             switch (filter.ReportType)
             {
                 case ReportType.DataAvailability:
-                    reportData = TransformDataTableToAvailabilityReport(reportDataTable);
+                    reportData = TransformTableToList(reportDataTable);
                     break;
                 case ReportType.Exceedance:
-                    reportData = TransformDataTableToExceedanceReport(reportDataTable);
+                    if (filter.DataAggregationType != DataAggregationType.Raw)
+                    {
+                        reportData = TransformAverageTableToList(reportDataTable);
+                    }
+                    else
+                    {
+                        reportData = TransformTableToList(reportDataTable);
+                    }
                     break;
                 case ReportType.DataReport:
-                    reportData = TransformDataTableToDataReport(reportDataTable);
+                    if (filter.DataAggregationType != DataAggregationType.Raw)
+                    {
+                        reportData = TransformAverageTableToList(reportDataTable);
+                    }
+                    else
+                    {
+                        reportData = TransformTableToList(reportDataTable);
+                    }
                     break;
                 case ReportType.Trends:
-                    reportData = TransformDataTableToDataReport(reportDataTable);
+                    if (filter.DataAggregationType != DataAggregationType.Raw)
+                    {
+                        reportData = TransformAverageTableToList(reportDataTable);
+                    }
+                    else
+                    {
+                        reportData = TransformTableToList(reportDataTable);
+                    }
                     break;
                 case ReportType.Windrose:
-                    reportData = TransformDataTableToDataReport(reportDataTable);
+                    if (filter.DataAggregationType != DataAggregationType.Raw)
+                    {
+                        reportData = TransformAverageTableToList(reportDataTable);
+                    }
+                    else
+                    {
+                        reportData = TransformTableToList(reportDataTable);
+                    }
                     break;
                 default:
-                    reportData = new List<ChannelDataReport>();
+                    reportData = new List<Dictionary<string, object>>();
                     break;
             }
             return reportData;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable)
-        //{
-        //    var results = new List<ChannelDataReport>();
-
-        //    foreach (DataRow row in dataTable.Rows)
-        //    {
-        //        var result = new ChannelDataReport
-        //        {
-        //            ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
-        //            DynamicColumns = new Dictionary<string, string>()
-        //        };
-
-        //        // Deserialize the JSONB column into a dictionary
-        //        var dynamicColumnsJson = row.Field<string>("dynamic_columns");
-        //        if (!string.IsNullOrEmpty(dynamicColumnsJson))
-        //        {
-        //            result.DynamicColumns = Newtonsoft.Json.JsonConvert
-        //                .DeserializeObject<Dictionary<string, string>>(dynamicColumnsJson);
-        //        }
-
-        //        results.Add(result);
-        //    }
-
-        //    return results;
-        //}
-        public List<ChannelDataReport> TransformDataTableToDataReport(DataTable dataTable)
-        {
-            var results = new List<ChannelDataReport>(dataTable.Rows.Count);
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var dynamicColumnsJson = row["dynamic_columns"] as string;
-                Dictionary<string, string> dynamicColumns = null;
-
-                if (!string.IsNullOrEmpty(dynamicColumnsJson))
-                {
-                    try
-                    {
-                        dynamicColumns =System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(dynamicColumnsJson);
-                    }
-                    catch
-                    {
-                        dynamicColumns = new Dictionary<string, string>(); // Handle malformed JSON
-                    }
-                }
-
-                results.Add(new ChannelDataReport
-                {
-                    ChannelDataLogTime = (DateTime)row["ChannelDataLogTime"],
-                    DynamicColumns = dynamicColumns ?? new Dictionary<string, string>()
-                });
-            }
-
-            return results;
-        }
-        public List<ChannelDataReport> TransformDataTableToAvailabilityReport(DataTable dataTable)
-        {
-            var results = new List<ChannelDataReport>();
-            var availabilityReport = new ChannelDataReport
-            {
-                DynamicColumns = new Dictionary<string, string>()
-            };
-
-            if (dataTable.Rows.Count > 0)
-            {
-                DataRow row = dataTable.Rows[0];
-                string availabilityJson = row.Field<string>("availability_report");
-
-                if (!string.IsNullOrEmpty(availabilityJson))
-                {
-                    // Deserialize to a Dictionary<string, double> first
-                    var tempDictionary = JsonConvert.DeserializeObject<Dictionary<string, double>>(availabilityJson);
-
-                    // Then convert the double values to strings
-                    foreach (var kvp in tempDictionary)
-                    {
-                        availabilityReport.DynamicColumns.Add(kvp.Key, kvp.Value.ToString("0.00")); // Format as needed
-                    }
-                }
-            }
-            results.Add(availabilityReport);
-            return results;
-        }
-        public List<ChannelDataReport> TransformDataTableToExceedanceReport(DataTable dataTable)
-        {
-            var results = new List<ChannelDataReport>();
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var result = new ChannelDataReport
-                {
-                    ChannelDataLogTime = row.Field<DateTime>("ChannelDataLogTime"),
-                    DynamicColumns = new Dictionary<string, string>()
-                };
-
-                // Get the raw JSON string from the data
-                var dynamicColumnsJson = row.Field<string>("dynamic_columns");
-
-                // Clean up the double quotes by replacing doubled quotes ("") with single quotes (")
-                if (!string.IsNullOrEmpty(dynamicColumnsJson))
-                {
-                    dynamicColumnsJson = dynamicColumnsJson.Replace("\"\"", "\"");
-
-                    try
-                    {
-                        // Now deserialize the cleaned-up JSON string
-                        var dynamicColumns = Newtonsoft.Json.JsonConvert
-                            .DeserializeObject<Dictionary<string, Dictionary<string, object>>>(dynamicColumnsJson);
-
-                        // Iterate through the channels in the dynamic columns
-                        foreach (var dynamicColumn in dynamicColumns)
-                        {
-                            // Add each channel's data to the result
-                            var channelKey = dynamicColumn.Key;
-                            var channelData = dynamicColumn.Value;
-
-                            // You can access "Exceeded" and "avg_value" from the channelData dictionary
-                            if (channelData.ContainsKey("Exceeded"))
-                            {
-                                result.DynamicColumns.Add(channelKey + "-Exceeded", channelData["Exceeded"].ToString());
-                            }
-
-                            if (channelData.ContainsKey("value"))
-                            {
-                                result.DynamicColumns.Add(channelKey, channelData["value"].ToString());
-                            }
-                        }
-                    }
-                    catch (JsonException ex)
-                    {
-                        Console.WriteLine("Error deserializing dynamic columns: " + ex.Message);
-                    }
-                }
-
-                // Add the result to the list
-                results.Add(result);
-            }
-
-            return results;
-        }
-
-
-
 
         public Models.Report.Selection.SelectionModel GetSelectionModel()
         {
             Models.Report.Selection.SelectionModel selectionModel = new Models.Report.Selection.SelectionModel();
             var companies = _companyRepository.GetAll();
 
-            foreach(var company in companies)
+            foreach (var company in companies)
             {
                 Models.Report.Selection.Company companySelection = new Models.Report.Selection.Company();
                 companySelection.Id = Convert.ToInt32(company.Id);
@@ -382,34 +268,305 @@ namespace Services
             }
             return selectionModel;
         }
+
+        //public List<Dictionary<string, object>> TransformTableToList(DataTable dataTable)
+        //{
+        //    var result = new List<Dictionary<string, object>>();
+        //    foreach (DataRow row in dataTable.Rows)
+        //    {
+        //        var rowDict = new Dictionary<string, object>();
+        //        foreach (DataColumn col in dataTable.Columns)
+        //        {
+        //            if (col.ColumnName.Contains("_") && !col.ColumnName.Contains("_E")) continue;
+        //            if (col.ColumnName.ToUpper() == "LOGTIME")
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : Convert.ToDateTime(row[col]).ToString("yyyy-MMM-dd HH:mm");
+        //            }
+        //            else
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : row[col];
+        //            }
+        //        }
+        //        result.Add(rowDict);
+        //    }
+
+        //    return result;
+        //}
+
+        //public List<Dictionary<string, object>> TransformTableToList(DataTable dataTable)
+        //{
+        //    var result = new List<Dictionary<string, object>>();
+        //    if (dataTable == null || dataTable.Rows.Count == 0) 
+        //    {
+        //        return result; 
+        //    }
+
+        //    string logTimeColumnName = "LOGTIME";
+        //    StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
+
+        //    foreach (DataRow row in dataTable.Rows)
+        //    {
+        //        var rowDict = new Dictionary<string, object>();
+        //        foreach (DataColumn col in dataTable.Columns)
+        //        {
+        //            string columnName = col.ColumnName;
+
+        //            bool containsUnderscore = columnName.Contains("_");
+        //            bool containsUnderscoreE = columnName.Contains("_E");
+        //            bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
+
+        //            if (containsUnderscore && !containsUnderscoreE)
+        //            {
+        //                continue; 
+        //            }
+
+        //            if (isLogTime)
+        //            {                        
+        //                rowDict[columnName] = row[col] == DBNull.Value ? null : Convert.ToDateTime(row[col]).ToString("yyyy-MMM-dd HH:mm");
+        //            }
+        //            else
+        //            {
+        //                rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+        //            }
+        //        }
+        //        result.Add(rowDict);
+        //    }
+
+        //    return result;
+        //}
+
+        public List<Dictionary<string, object>> TransformTableToList(DataTable dataTable)
+        {
+            var result = new List<Dictionary<string, object>>();
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                return result;
+            }
+
+            string logTimeColumnName = "LOGTIME";
+            StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
+
+            int originalRowCount = dataTable.Rows.Count;
+            for (int i = 0; i < originalRowCount; i++)
+            {
+                DataRow row = dataTable.Rows[0]; 
+                var rowDict = new Dictionary<string, object>();
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    string columnName = col.ColumnName;
+
+                    bool containsUnderscore = columnName.Contains('_');
+                    bool containsUnderscoreE = columnName.Contains("_E");
+                    bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
+
+                    if (containsUnderscore && !containsUnderscoreE)
+                    {
+                        continue;
+                    }
+
+                    if (isLogTime)
+                    {
+                        rowDict[columnName] = row[col] == DBNull.Value ? null : Convert.ToDateTime(row[col]).ToString("yyyy-MMM-dd HH:mm");
+                    }
+                    else
+                    {
+                        rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+                    }
+                }
+                result.Add(rowDict);
+                dataTable.Rows.Remove(row);
+            }
+
+            return result;
+        }
+
+        //public List<Dictionary<string, object>> TransformTableToList(DataTable dataTable)
+        //{
+        //    var result = new List<Dictionary<string, object>>(dataTable.Rows.Count);
+
+        //    for (int i = dataTable.Rows.Count - 1; i >= 0; i--) 
+        //    {
+        //        DataRow row = dataTable.Rows[i];
+        //        var rowDict = new Dictionary<string, object>();
+
+        //        foreach (DataColumn col in dataTable.Columns)
+        //        {
+        //            if (col.ColumnName.Contains("_") && !col.ColumnName.Contains("_E")) continue;
+
+        //            if (col.ColumnName.ToUpper() == "LOGTIME")
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : Convert.ToDateTime(row[col]).ToString("yyyy-MMM-dd HH:mm");
+        //            }
+        //            else
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : row[col];
+        //            }
+        //        }
+
+        //        result.Add(rowDict);
+        //        dataTable.Rows.RemoveAt(i); 
+        //    }
+
+        //    dataTable.Clear(); 
+        //    return result;
+        //}
+
+
+        //public List<Dictionary<string, object>> TransformAverageTableToList(DataTable dataTable)
+        //{
+        //    var result = new List<Dictionary<string, object>>();
+        //    foreach (DataRow row in dataTable.Rows)
+        //    {
+        //        var rowDict = new Dictionary<string, object>();
+        //        foreach (DataColumn col in dataTable.Columns)
+        //        {
+        //            if (col.ColumnName.Contains("_") && !col.ColumnName.Contains("_E")) continue;
+        //            if (col.ColumnName.ToUpper() == "LOGTIME")
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : Convert.ToDateTime(row[col]).AddHours(-5).AddMinutes(-30).ToString("yyyy-MMM-dd HH:mm");
+        //            }
+        //            else
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : row[col];
+        //            }
+        //        }
+        //        result.Add(rowDict);
+        //    }
+
+        //    return result;
+        //}
+
+        //public List<Dictionary<string, object>> TransformAverageTableToList(DataTable dataTable)
+        //{
+        //    var result = new List<Dictionary<string, object>>();
+        //    if (dataTable == null || dataTable.Rows.Count == 0) 
+        //    {
+        //        return result; 
+        //    }
+
+        //    string logTimeColumnName = "LOGTIME";
+        //    StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
+        //    TimeSpan timeOffset = new TimeSpan(-5, -30, 0); 
+
+        //    foreach (DataRow row in dataTable.Rows)
+        //    {
+        //        var rowDict = new Dictionary<string, object>();
+        //        foreach (DataColumn col in dataTable.Columns)
+        //        {
+        //            string columnName = col.ColumnName;
+
+        //            bool containsUnderscore = columnName.Contains("_");//ignoring other columns
+        //            bool containsUnderscoreE = columnName.Contains("_E");
+        //            bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
+
+        //            if (containsUnderscore && !containsUnderscoreE)
+        //            {
+        //                continue; 
+        //            }
+
+        //            if (isLogTime)
+        //            {                        
+        //                rowDict[columnName] = row[col] == DBNull.Value ? null : Convert.ToDateTime(row[col]).Add(timeOffset).ToString("yyyy-MMM-dd HH:mm");
+        //            }
+        //            else
+        //            {
+        //                rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+        //            }
+        //        }
+        //        result.Add(rowDict);
+        //    }
+
+        //    return result;
+        //}
+
+        public List<Dictionary<string, object>> TransformAverageTableToList(DataTable dataTable)
+        {
+            var result = new List<Dictionary<string, object>>();
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                return result;
+            }
+
+            string logTimeColumnName = "LOGTIME";
+            StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
+            TimeSpan timeOffset = new TimeSpan(-5, -30, 0);
+
+            int originalRowCount = dataTable.Rows.Count;
+            for (int i = 0; i < originalRowCount; i++)
+            {
+                DataRow row = dataTable.Rows[0]; 
+                var rowDict = new Dictionary<string, object>();
+
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    string columnName = col.ColumnName;
+
+                    bool containsUnderscore = columnName.Contains('_');
+                    bool containsUnderscoreE = columnName.Contains("_E");
+                    bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
+
+                    if (containsUnderscore && !containsUnderscoreE)
+                    {
+                        continue;
+                    }
+
+                    if (isLogTime)
+                    {
+                        rowDict[columnName] = row[col] == DBNull.Value
+                            ? null
+                            : Convert.ToDateTime(row[col]).Add(timeOffset).ToString("yyyy-MMM-dd HH:mm");
+                    }
+                    else
+                    {
+                        rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+                    }
+                }
+                result.Add(rowDict);
+                dataTable.Rows.Remove(row); 
+            }
+
+            return result;
+        }
+
+        //public List<Dictionary<string, object>> TransformAverageTableToList(DataTable dataTable)
+        //{
+        //    var result = new List<Dictionary<string, object>>(dataTable.Rows.Count);
+
+        //    for (int i = dataTable.Rows.Count - 1; i >= 0; i--) 
+        //    {
+        //        DataRow row = dataTable.Rows[i];
+        //        var rowDict = new Dictionary<string, object>();
+
+        //        foreach (DataColumn col in dataTable.Columns)
+        //        {
+        //            if (col.ColumnName.Contains("_") && !col.ColumnName.Contains("_E")) continue;
+
+        //            if (col.ColumnName.ToUpper() == "LOGTIME")
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null
+        //                    : Convert.ToDateTime(row[col]).AddHours(-5).AddMinutes(-30).ToString("yyyy-MMM-dd HH:mm");
+        //            }
+        //            else
+        //            {
+        //                rowDict[col.ColumnName] = row[col] == DBNull.Value ? null : row[col];
+        //            }
+        //        }
+
+        //        result.Add(rowDict);
+        //        dataTable.Rows.RemoveAt(i); 
+        //    }
+
+        //    dataTable.Clear();
+        //    return result;
+        //}
+
+
         private List<int> GetChannelIdsForStation(int stationId)
         {
             return _channelRepository.GetAll()
-                                     .Where(e => e.StationId == stationId).Where(e=>e.Active=true)
+                                     .Where(e => e.StationId == stationId).Where(e => e.Active = true)
                                      .Select(e => e.Id).OfType<int>()
                                      .ToList();
-        }
-
-        //public List<OneHourTrend> GetOneHourTrendForChannel(int ChannelId)
-        //{
-        //    return _reportRepository.GetOneHourTrendForChannel(ChannelId, DateTime.Now.AddHours(-1), DateTime.Now);
-        //}
-
-        public List<ChannelDataReport> Get24HourTrendForStation(int StationId)
-        {
-            Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
-            List<Models.Station> stationsOfCompany = new List<Models.Station>();
-            List<Models.Channel> channelsOfStation = new List<Models.Channel>();
-            List<int> channelIds = GetChannelIdsForStation(StationId);
-            stationsOfCompany.Add(_stationRepository.GetById(StationId));
-            channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == StationId).Where(e => e.Active == true).ToList());
-            StationChannelPairs.Add(StationId, channelIds);
-            DateTime from = Convert.ToDateTime(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:00"));
-            DateTime to = from.AddDays(1);
-            DataTable reportDataTable = GenerateReport(channelsOfStation.Select(e => e.Id).OfType<int>().ToList(), ReportType.DataReport, DataAggregationType.OneHour, from, to);
-            List<ChannelDataReport> reportData = new List<ChannelDataReport>();
-            reportData = TransformDataTableToDataReport(reportDataTable);
-            return reportData;
         }
     }
 }

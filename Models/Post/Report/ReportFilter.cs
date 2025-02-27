@@ -19,9 +19,11 @@ namespace Models.Post.Report
     public enum DataAggregationType
     {
         Raw = 0,
+        FiveMin = 5,
         FifteenMin = 15,
-        OneHour = 60 ,
-        Day = 1440
+        ThirtyMin=30,
+        OneHour = 60,
+        Day = 1440,
     }
     public enum ReportType
     {

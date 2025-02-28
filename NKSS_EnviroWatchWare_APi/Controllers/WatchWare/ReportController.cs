@@ -33,15 +33,19 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
                 //}
                 if (filter.CompanyId == 0)
                 {
-                    return BadRequest("Select Parameters");
+                    throw new ArgumentException("Select Parameters");
                 }
                 if (filter.From == null || filter.To == null)
                 {
-                    return BadRequest("Please Choose From and To");
+                    throw new ArgumentException("Please Choose From and To");
                 }
                 if (filter.From > filter.To)
                 {
-                    return BadRequest("'From' date cannot be greater than 'To' date.");
+                    throw new ArgumentException("'From' date cannot be greater than 'To' date.");
+                }
+                if (filter.To - filter.From > TimeSpan.FromDays(366))
+                {
+                    throw new ArgumentException("Cannot fetch data longer than one year at once.");
                 }
                 var reportData = report_service.GetReport(filter);
                 return Ok(reportData);

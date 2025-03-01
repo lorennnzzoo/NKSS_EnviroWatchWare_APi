@@ -88,6 +88,7 @@
     <Compile Include="Report\SelectionModel.cs" />
     <Compile Include="Roles.cs" />
     <Compile Include="ScalingFactor.cs" />
+    <Compile Include="ServiceLogs.cs" />
     <Compile Include="Station.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>

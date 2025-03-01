@@ -100,6 +100,7 @@
     <Compile Include="Interfaces\IReportService.cs" />
     <Compile Include="Interfaces\IRoleService.cs" />
     <Compile Include="Interfaces\IScalingFactorService.cs" />
+    <Compile Include="Interfaces\IServiceLogsService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="Services\AnalyzerService.cs" />
     <Compile Include="Services\ChannelDataFeedService.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Services\ReportService.cs" />
     <Compile Include="Services\RoleService.cs" />
     <Compile Include="Services\ScalingFactorService.cs" />
+    <Compile Include="Services\ServiceLogsService.cs" />
     <Compile Include="Services\StationService.cs" />
     <Compile Include="Services\UserService.cs" />
   </ItemGroup>

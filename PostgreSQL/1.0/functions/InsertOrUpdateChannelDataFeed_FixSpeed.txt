@@ -1,0 +1,141 @@
+-- FUNCTION: public.InsertOrUpdateChannelDataFeed_FixSpeed(integer, numeric, timestamp without time zone)
+
+-- DROP FUNCTION IF EXISTS public."InsertOrUpdateChannelDataFeed_FixSpeed"(integer, numeric, timestamp without time zone);
+
+CREATE OR REPLACE FUNCTION public."InsertOrUpdateChannelDataFeed_FixSpeed"(
+	p_channelid integer,
+	p_channelvalue numeric,
+	p_datetime timestamp without time zone)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_channeldataid INTEGER;
+    v_channelname character varying;
+    v_chnlunits character varying;
+    v_stationid integer;
+    v_active boolean;
+    v_min NUMERIC(10,2);
+    v_max NUMERIC(10,2);
+    v_avg NUMERIC(10,2);
+    v_pcbstandard character varying;
+    v_outputtype character varying;
+    v_scalingfactorid integer;
+    v_mininput NUMERIC;
+    v_maxinput NUMERIC;
+    v_minoutput NUMERIC;
+    v_maxoutput NUMERIC;
+    v_conversionfactor NUMERIC;
+    v_threshold NUMERIC;
+    v_minrange NUMERIC;
+    v_maxrange NUMERIC;
+    v_finalvalue NUMERIC;
+BEGIN
+    p_datetime := date_trunc('minute', p_datetime);
+
+    SELECT
+        ch."Name",
+        ch."LoggingUnits",
+        ch."StationId",
+        ch."Active",
+        ch."OutputType",
+        ch."ScalingFactorId",
+        ch."ConversionFactor",
+        ch."Threshold",
+        ch."MinimumRange",
+        ch."MaximumRange",
+        sf."MinInput",
+        sf."MaxInput",
+        sf."MinOutput",
+        sf."MaxOutput"
+    INTO
+        v_channelname, v_chnlunits, v_stationid, v_active,
+        v_outputtype, v_scalingfactorid, v_conversionfactor,
+        v_threshold, v_minrange, v_maxrange,
+        v_mininput, v_maxinput, v_minoutput, v_maxoutput
+    FROM "Channel" ch
+    LEFT JOIN "ScalingFactor" sf ON ch."ScalingFactorId" = sf."Id"
+    WHERE ch."Id" = p_channelid;
+
+    IF v_outputtype = 'DIGITAL' THEN
+        v_finalvalue := p_channelvalue * v_conversionfactor;
+
+        IF v_threshold IS NOT NULL AND v_finalvalue > v_threshold THEN
+            v_finalvalue := v_minrange + (random() * (v_maxrange - v_minrange));
+        END IF;
+
+    ELSIF v_outputtype = 'ANALOG' THEN
+        v_finalvalue := v_minoutput + ((p_channelvalue - v_mininput) * (v_maxoutput - v_minoutput) / (v_maxinput - v_mininput));
+
+        IF v_finalvalue < v_minoutput THEN
+            v_finalvalue := v_minoutput;
+        ELSIF v_finalvalue > v_maxoutput THEN
+            v_finalvalue := v_maxoutput;
+        END IF;
+
+        v_finalvalue := v_finalvalue * v_conversionfactor;
+
+        IF v_threshold IS NOT NULL AND v_finalvalue > v_threshold THEN
+            v_finalvalue := v_minrange + (random() * (v_maxrange - v_minrange));
+        END IF;
+    END IF;
+
+    v_finalvalue := ROUND(v_finalvalue, 2);
+
+    INSERT INTO "ChannelData"(
+        "ChannelId", "ChannelValue", "ChannelDataLogTime", "Active", "Processed"
+    )
+    VALUES (
+        p_channelid,
+        v_finalvalue,
+        p_datetime,
+        v_active,
+        FALSE
+    ) RETURNING "Id" INTO v_channeldataid;
+
+    IF v_channeldataid > 0 THEN
+        DELETE FROM "ChannelDataFeed" WHERE "ChannelId" = p_channelid;
+
+        -- Combined MIN/MAX/AVG query:
+        SELECT
+            MIN("ChannelValue"),
+            MAX("ChannelValue"),
+            AVG("ChannelValue")
+        INTO v_min, v_max, v_avg
+        FROM "ChannelData"
+        WHERE "ChannelId" = p_channelid
+          AND "ChannelDataLogTime" >= (p_datetime - INTERVAL '1 hour');
+
+        SELECT o."Limit"
+        INTO v_pcbstandard
+        FROM "Channel" ch
+        JOIN "Oxide" o ON ch."OxideId" = o."Id"
+        WHERE ch."Id" = p_channelid;
+
+        INSERT INTO "ChannelDataFeed"(
+            "ChannelDataId", "ChannelId", "ChannelName", "ChannelValue", "Units",
+            "ChannelDataLogTime", "PcbLimit", "StationId", "Active",
+            "Minimum", "Maximum", "Average"
+        )
+        VALUES (
+            v_channeldataid,
+            p_channelid,
+            v_channelname,
+            v_finalvalue,
+            v_chnlunits,
+            p_datetime,
+            v_pcbstandard,
+            v_stationid,
+            v_active,
+            v_min,
+            v_max,
+            v_avg
+        );
+    END IF;
+END;
+$BODY$;
+
+ALTER FUNCTION public."InsertOrUpdateChannelDataFeed_FixSpeed"(integer, numeric, timestamp without time zone)
+    OWNER TO postgres;

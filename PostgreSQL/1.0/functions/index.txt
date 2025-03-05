@@ -1,0 +1,5 @@
+CREATE INDEX idx_channel_id ON "Channel" ("Id");
+CREATE INDEX idx_channel_oxideid ON "Channel" ("OxideId");  -- If frequently queried
+CREATE INDEX idx_scalingfactor_id ON "ScalingFactor" ("Id");
+CREATE INDEX idx_channeldata_channelid_logtime ON "ChannelData" ("ChannelId", "ChannelDataLogTime");
+CREATE INDEX idx_channeldatafeed_channelid ON "ChannelDataFeed" ("ChannelId");

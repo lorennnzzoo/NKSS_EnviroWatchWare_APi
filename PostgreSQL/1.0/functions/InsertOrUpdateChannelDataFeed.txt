@@ -1,0 +1,163 @@
+-- FUNCTION: public.InsertOrUpdateChannelDataFeed(integer, numeric, timestamp without time zone, character varying)
+
+-- DROP FUNCTION IF EXISTS public."InsertOrUpdateChannelDataFeed"(integer, numeric, timestamp without time zone, character varying);
+
+CREATE OR REPLACE FUNCTION public."InsertOrUpdateChannelDataFeed"(
+	p_channelid integer,
+	p_channelvalue numeric,
+	p_datetime timestamp without time zone,
+	p_pass_phrase character varying)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_channeldataid INTEGER;
+    v_channelname character varying;
+    v_chnlunits character varying;
+    v_stationid integer;
+    v_active boolean;
+    v_min NUMERIC(10,2);
+    v_max NUMERIC(10,2);
+    v_avg NUMERIC(10,2);
+    v_pcbstandard character varying;  
+    v_outputtype character varying;  
+    v_scalingfactorid integer;  
+    v_mininput NUMERIC;
+    v_maxinput NUMERIC;
+    v_minoutput NUMERIC;
+    v_maxoutput NUMERIC;
+    v_conversionfactor NUMERIC;
+    v_threshold NUMERIC;
+    v_minrange NUMERIC;
+    v_maxrange NUMERIC;
+    v_finalvalue NUMERIC;
+BEGIN
+	p_datetime := date_trunc('minute', p_datetime);
+    -- Get the Channel details (Name, Units, StationId, Active, OutputType, ScalingFactorId, ConversionFactor)
+    SELECT 
+        ch."Name", 
+        ch."LoggingUnits", 
+        ch."StationId", 
+        ch."Active", 
+        ch."OutputType", 
+        ch."ScalingFactorId", 
+        ch."ConversionFactor", 
+        ch."Threshold", 
+        ch."MinimumRange", 
+        ch."MaximumRange",
+        sf."MinInput", 
+        sf."MaxInput", 
+        sf."MinOutput", 
+        sf."MaxOutput"
+    INTO 
+        v_channelname, v_chnlunits, v_stationid, v_active, 
+        v_outputtype, v_scalingfactorid, v_conversionfactor, 
+        v_threshold, v_minrange, v_maxrange, 
+        v_mininput, v_maxinput, v_minoutput, v_maxoutput
+    FROM "Channel" ch
+    LEFT JOIN "ScalingFactor" sf ON ch."ScalingFactorId" = sf."Id"
+    WHERE ch."Id" = p_channelid;
+
+    -- Determine the final value based on OutputType
+    IF v_outputtype = 'DIGITAL' THEN
+        -- For Digital type, no scaling needed, just apply ConversionFactor
+        v_finalvalue := p_channelvalue * v_conversionfactor;
+
+        -- Threshold check for Digital value
+        IF v_threshold IS NOT NULL AND v_finalvalue > v_threshold THEN
+            -- Generate a random value between MinRange and MaxRange for Digital
+            v_finalvalue := v_minrange + (random() * (v_maxrange - v_minrange));
+        END IF;
+        
+    ELSIF v_outputtype = 'ANALOG' THEN
+        -- For Analog type, apply linear scaling based on ScalingFactorId
+        v_finalvalue := v_minoutput + ((p_channelvalue - v_mininput) * (v_maxoutput - v_minoutput) / (v_maxinput - v_mininput));
+
+		 -- Ensure v_finalvalue is within min and max bounds
+	    IF v_finalvalue < v_minoutput THEN
+	        v_finalvalue := v_minoutput;
+	    ELSIF v_finalvalue > v_maxoutput THEN
+	        v_finalvalue := v_maxoutput;
+	    END IF;
+
+		-- Apply the conversion factor
+        v_finalvalue := v_finalvalue * v_conversionfactor;
+
+		
+        -- Threshold check for Analog value (after scaling)
+        IF v_threshold IS NOT NULL AND v_finalvalue > v_threshold THEN
+            -- Generate a random value between MinRange and MaxRange for Analog
+            v_finalvalue := v_minrange + (random() * (v_maxrange - v_minrange));
+        END IF;
+    END IF;
+	v_finalvalue := ROUND(v_finalvalue, 2);
+    -- Insert into ChannelData
+    INSERT INTO "ChannelData"(
+        "ChannelId", "ChannelValue", "ChannelDataLogTime", "Active", "Processed"
+    ) 
+    VALUES (
+        p_channelid, 
+        v_finalvalue,
+        p_datetime, 
+        v_active, 
+        FALSE
+    ) RETURNING "Id" INTO v_channeldataid;
+    
+    IF v_channeldataid > 0 THEN
+        -- Delete existing records in ContemporaryChannelData
+        DELETE FROM "ChannelDataFeed" WHERE "ChannelId" = p_channelid;
+        
+        -- Calculate min, max, avg of the last hour's data
+        SELECT 
+            MIN("ChannelValue") INTO v_min
+        FROM "ChannelData"
+        WHERE "ChannelId" = p_channelid 
+          AND "ChannelDataLogTime" >= (p_datetime - INTERVAL '1 hour');
+        
+        SELECT 
+            MAX("ChannelValue") INTO v_max
+        FROM "ChannelData"
+        WHERE "ChannelId" = p_channelid 
+          AND "ChannelDataLogTime" >= (p_datetime - INTERVAL '1 hour');
+        
+        SELECT 
+            AVG("ChannelValue") INTO v_avg
+        FROM "ChannelData"
+        WHERE "ChannelId" = p_channelid 
+          AND "ChannelDataLogTime" >= (p_datetime - INTERVAL '1 hour');
+        
+        -- Retrieve PcbLimit (standard) from the Oxide table using the oxideid from the Channel table
+        SELECT o."Limit" 
+        INTO v_pcbstandard
+        FROM "Channel" ch
+        JOIN "Oxide" o ON ch."OxideId" = o."Id"
+        WHERE ch."Id" = p_channelid;
+        
+        -- Insert into ContemporaryChannelData (ChannelDataFeed)
+        INSERT INTO "ChannelDataFeed"(
+            "ChannelDataId", "ChannelId", "ChannelName", "ChannelValue", "Units", 
+            "ChannelDataLogTime", "PcbLimit", "StationId", "Active", 
+            "Minimum", "Maximum", "Average"
+        )
+        VALUES (
+            v_channeldataid,
+            p_channelid,
+            v_channelname,  -- ChannelName from Channel table
+            v_finalvalue,  -- Final computed value
+            v_chnlunits,  -- Units from Channel table
+            p_datetime,
+            v_pcbstandard,  -- PcbLimit (standard) from Oxide
+            v_stationid,  -- StationId from Channel table
+            v_active,  -- Active from Channel table
+            v_min,
+            v_max,
+            v_avg
+        );
+    END IF;
+END;
+$BODY$;
+
+ALTER FUNCTION public."InsertOrUpdateChannelDataFeed"(integer, numeric, timestamp without time zone, character varying)
+    OWNER TO postgres;

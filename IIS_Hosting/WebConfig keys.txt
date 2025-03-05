@@ -1,0 +1,11 @@
+Also, in addition to Nathan answer, make sure you disabled WebDAV IIS module and set runAllManagedModulesForAllRequests="true" setting in the web.config:
+
+<system.webServer>
+  <modules runAllManagedModulesForAllRequests="true">
+    <remove name="WebDAVModule"/>
+  </modules>
+  <handlers>
+    <remove name="WebDAV" />
+  </handlers>
+</system.webServer>
+Without this, preflight CORS requests (which are used for PUT, DELETE methods and send additional OPTIONS request) will not work.

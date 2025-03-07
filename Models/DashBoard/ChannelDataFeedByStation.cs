@@ -27,6 +27,7 @@ namespace Models.DashBoard
 
         public string PcbLimit { get; set; }
         public decimal Average { get; set; }
+        public decimal Availability { get; set; }
     }
     public class ChannelData
     {        

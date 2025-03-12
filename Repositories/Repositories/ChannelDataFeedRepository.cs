@@ -5,122 +5,144 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using Npgsql;
+using System.Data.SqlClient;
 
 namespace Repositories
 {
     public class ChannelDataFeedRepository : IChannelDataFeedRepository
     {
         private readonly string _connectionString;
+        private readonly string _databaseProvider;
         public ChannelDataFeedRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString;
-        }        
+            _databaseProvider = ConfigurationManager.AppSettings["DatabaseProvider"];
+            //_connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString;
+            if (_databaseProvider == "NPGSQL")
+            {
+                _connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString;
+            }
+            else if (_databaseProvider == "MSSQL")
+            {
+                _connectionString = ConfigurationManager.ConnectionStrings["MicrosoftSQLConnection"].ConnectionString;
+            }
+            else
+            {
+                throw new ConfigurationErrorsException("Invalid DatabaseProvider in web.config");
+            }
+        }
+
+        private IDbConnection CreateConnection()
+        {
+            if (_databaseProvider == "NPGSQL")
+            {
+                return new NpgsqlConnection(_connectionString);
+            }
+            else if (_databaseProvider == "MSSQL")
+            {
+                return new SqlConnection(_connectionString);
+            }
+            throw new ConfigurationErrorsException("Invalid DatabaseProvider in web.config");
+        }
 
         public IEnumerable<Models.DashBoard.ChannelDataFeed> GetByStationId(int stationId)
         {
-            using (IDbConnection db = new Npgsql.NpgsqlConnection(_connectionString))
+            using (IDbConnection db = CreateConnection())
             {
                 db.Open();
-                //    var query = @"
-                //SELECT 
-                //    tcd.""ChannelId"", 
-                //    tcd.""ChannelName"", 
-                //    tcd.""ChannelValue"", 
-                //    tcd.""Units"", 
-                //    tcd.""ChannelDataLogTime"", 
-                //    tcd.""PcbLimit"",
-                //    tcd.""Average""
-                //FROM 
-                //    ""ChannelDataFeed"" tcd
-                //INNER JOIN 
-                //    ""Channel"" chnl ON chnl.""Id"" = tcd.""ChannelId""
-                //WHERE 
-                //    tcd.""StationId"" = @stationId
-                //    AND tcd.""Active"" = TRUE 
-                //    AND chnl.""Active"" = TRUE
-                //ORDER BY 
-                //    chnl.""Priority"";";
-                //            var query = @"
-                //WITH channel_availability AS (
-                //    SELECT 
-                //        ""ChannelId"",
-                //        COUNT(""ChannelDataLogTime"") AS actual_records,
-                //        1440 AS expected_records, -- Since each channel should log once per minute
-                //        ROUND((COUNT(""ChannelDataLogTime"")::DECIMAL / 1440) * 100, 2) AS availability_percentage
-                //    FROM 
-                //        ""ChannelData""
-                //    WHERE 
-                //        ""ChannelDataLogTime"" >= NOW() - INTERVAL '24 hours'
-                //    GROUP BY 
-                //        ""ChannelId""
-                //)
+                string query;
 
-                //SELECT 
-                //    tcd.""ChannelId"", 
-                //    tcd.""ChannelName"", 
-                //    tcd.""ChannelValue"", 
-                //    tcd.""Units"", 
-                //    tcd.""ChannelDataLogTime"", 
-                //    tcd.""PcbLimit"",
-                //    tcd.""Average"",
-                //    COALESCE(ca.availability_percentage, 0) AS Availability -- Handle cases where no data exists
-                //FROM 
-                //    ""ChannelDataFeed"" tcd
-                //INNER JOIN 
-                //    ""Channel"" chnl ON chnl.""Id"" = tcd.""ChannelId""
-                //LEFT JOIN 
-                //    channel_availability ca ON ca.""ChannelId"" = tcd.""ChannelId""
-                //WHERE 
-                //    tcd.""StationId"" = @stationId
-                //    AND tcd.""Active"" = TRUE 
-                //    AND chnl.""Active"" = TRUE
-                //ORDER BY 
-                //    chnl.""Priority"";";
-
-
-                string query = @"
+                if (_databaseProvider.ToUpper() == "NPGSQL")
+                {
+                    query = @"
 WITH channel_availability AS (
-    SELECT 
+    SELECT
         ""ChannelId"",
         COUNT(*) AS actual_records,
         1440 AS expected_records, -- Since each channel should log once per minute
         ROUND((COUNT(""ChannelDataLogTime"")::DECIMAL / 60) * 100, 2) AS availability_percentage
-    FROM 
+    FROM
         ""ChannelData""
-    WHERE 
+    WHERE
         ""ChannelDataLogTime"" >= NOW() - INTERVAL '1 hour'
-    GROUP BY 
+    GROUP BY
         ""ChannelId""
 )
 
-SELECT 
-    chnl.""Id"" AS ""ChannelId"", 
-    chnl.""Name"" AS ""ChannelName"", 
-    tcd.""ChannelValue"", 
-    chnl.""LoggingUnits"" as ""Units"", 
-    tcd.""ChannelDataLogTime"", 
+SELECT
+    chnl.""Id"" AS ""ChannelId"",
+    chnl.""Name"" AS ""ChannelName"",
+    tcd.""ChannelValue"",
+    chnl.""LoggingUnits"" as ""Units"",
+    tcd.""ChannelDataLogTime"",
     ox.""Limit"" AS ""PcbLimit"", -- Fetching PcbLimit from Oxide table
     tcd.""Average"",
     chnl.""Active"",
     COALESCE(ca.availability_percentage, 0) AS ""Availability"" -- Handle cases where no data exists
-FROM 
+FROM
     ""Channel"" chnl
-LEFT JOIN 
-    ""ChannelDataFeed"" tcd 
-    ON chnl.""Id"" = tcd.""ChannelId"" 
-    AND tcd.""StationId"" = @stationId 
+LEFT JOIN
+    ""ChannelDataFeed"" tcd
+    ON chnl.""Id"" = tcd.""ChannelId""
+    AND tcd.""StationId"" = @stationId
     AND tcd.""Active"" = TRUE
-LEFT JOIN 
-    ""Oxide"" ox 
+LEFT JOIN
+    ""Oxide"" ox
     ON chnl.""OxideId"" = ox.""Id"" -- Join Oxide table to fetch PcbLimit
-LEFT JOIN 
-    channel_availability ca 
+LEFT JOIN
+    channel_availability ca
     ON ca.""ChannelId"" = chnl.""Id""
-WHERE 
+WHERE
     chnl.""StationId"" = @stationId
-ORDER BY 
+ORDER BY
     chnl.""Priority"";
 ";
+                }
+                else 
+                {
+                    query = @"
+WITH channel_availability AS (
+    SELECT
+        [ChannelId],
+        COUNT(*) AS actual_records,
+        1440 AS expected_records, -- Since each channel should log once per minute
+        ROUND((COUNT([ChannelDataLogTime]) * 100.0 / 1440.0), 2) AS availability_percentage
+    FROM
+        [ChannelData]
+    WHERE
+        [ChannelDataLogTime] >= DATEADD(hour, -1, GETDATE())
+    GROUP BY
+        [ChannelId]
+)
+
+SELECT
+    chnl.[Id] AS ChannelId,
+    chnl.[Name] AS ChannelName,
+    tcd.[ChannelValue],
+    chnl.[LoggingUnits] AS Units,
+    tcd.[ChannelDataLogTime],
+    ox.[Limit] AS PcbLimit, -- Fetching PcbLimit from Oxide table
+    tcd.[Average],
+    chnl.[Active],
+    ISNULL(ca.availability_percentage, 0) AS Availability -- Handle cases where no data exists
+FROM
+    [Channel] chnl
+LEFT JOIN
+    [ChannelDataFeed] tcd
+    ON chnl.[Id] = tcd.[ChannelId]
+    AND tcd.[StationId] = @stationId
+    AND tcd.[Active] = 1
+LEFT JOIN
+    [Oxide] ox
+    ON chnl.[OxideId] = ox.[Id] -- Join Oxide table to fetch PcbLimit
+LEFT JOIN
+    channel_availability ca
+    ON ca.[ChannelId] = chnl.[Id]
+WHERE
+    chnl.[StationId] = @stationId
+ORDER BY
+    chnl.[Priority];
+";
+                }
 
                 return db.Query<Models.DashBoard.ChannelDataFeed>(query, new { StationId = stationId });
             }

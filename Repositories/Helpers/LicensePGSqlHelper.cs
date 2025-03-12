@@ -16,4 +16,15 @@ namespace Repositories.Helpers
             return $"UPDATE public.{tableName} SET {setClauses} WHERE \"LicenseType\" = @LicenseType";
         }
     }
+    public static class LicenseMSSqlHelper
+    {
+        public static string GetUpdateQuery<T>()
+        {
+            string tableName = MSSqlHelper.GetTableNameFromClass(typeof(T));
+            var properties = typeof(T).GetProperties().Where(p => p.Name != "LicenseType"); 
+            var setClauses = string.Join(", ", properties.Select(p => $"{p.Name} = @{p.Name}"));
+            return $"UPDATE dbo.{tableName} SET {setClauses} WHERE LicenseType = @LicenseType";
+        }
+    }
+
 }

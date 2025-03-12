@@ -5,6 +5,7 @@ using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -18,8 +19,10 @@ namespace Services
         private readonly IStationRepository _stationRepository;
         private readonly ICompanyRepository _companyRepository;
         private readonly IReportRepository _reportRepository;
+        private readonly string _databaseProvider;
         public ReportService(IChannelRepository channelRepository, IStationRepository stationRepository, ICompanyRepository companyRepository, IReportRepository reportRepository)
         {
+            _databaseProvider = ConfigurationManager.AppSettings["DatabaseProvider"];
             _channelRepository = channelRepository;
             _stationRepository = stationRepository;
             _companyRepository = companyRepository;
@@ -481,51 +484,96 @@ namespace Services
 
         public List<Dictionary<string, object>> TransformAverageTableToList(DataTable dataTable)
         {
-            var result = new List<Dictionary<string, object>>();
-            if (dataTable == null || dataTable.Rows.Count == 0)
+            if (_databaseProvider == "NPGSQL")
             {
+                var result = new List<Dictionary<string, object>>();
+                if (dataTable == null || dataTable.Rows.Count == 0)
+                {
+                    return result;
+                }
+                string logTimeColumnName = "LOGTIME";
+                StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
+                TimeSpan timeOffset = new TimeSpan(-5, -30, 0);
+
+                int originalRowCount = dataTable.Rows.Count;
+                for (int i = 0; i < originalRowCount; i++)
+                {
+                    DataRow row = dataTable.Rows[0];
+                    var rowDict = new Dictionary<string, object>();
+
+                    foreach (DataColumn col in dataTable.Columns)
+                    {
+                        string columnName = col.ColumnName;
+
+                        bool containsUnderscore = columnName.Contains('_');
+                        bool containsUnderscoreE = columnName.Contains("_E");
+                        bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
+
+                        if (containsUnderscore && !containsUnderscoreE)
+                        {
+                            continue;
+                        }
+                        if (isLogTime)
+                        {
+                            rowDict[columnName] = row[col] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(row[col]).Add(timeOffset).ToString("yyyy-MMM-dd HH:mm");
+                        }
+                        else
+                        {
+                            rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+                        }
+                    }
+                    result.Add(rowDict);
+                    dataTable.Rows.Remove(row);
+                }
                 return result;
             }
-
-            string logTimeColumnName = "LOGTIME";
-            StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
-            TimeSpan timeOffset = new TimeSpan(-5, -30, 0);
-
-            int originalRowCount = dataTable.Rows.Count;
-            for (int i = 0; i < originalRowCount; i++)
+            else
             {
-                DataRow row = dataTable.Rows[0]; 
-                var rowDict = new Dictionary<string, object>();
-
-                foreach (DataColumn col in dataTable.Columns)
+                var result = new List<Dictionary<string, object>>();
+                if (dataTable == null || dataTable.Rows.Count == 0)
                 {
-                    string columnName = col.ColumnName;
-
-                    bool containsUnderscore = columnName.Contains('_');
-                    bool containsUnderscoreE = columnName.Contains("_E");
-                    bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
-
-                    if (containsUnderscore && !containsUnderscoreE)
-                    {
-                        continue;
-                    }
-
-                    if (isLogTime)
-                    {
-                        rowDict[columnName] = row[col] == DBNull.Value
-                            ? null
-                            : Convert.ToDateTime(row[col]).Add(timeOffset).ToString("yyyy-MMM-dd HH:mm");
-                    }
-                    else
-                    {
-                        rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
-                    }
+                    return result;
                 }
-                result.Add(rowDict);
-                dataTable.Rows.Remove(row); 
-            }
+                string logTimeColumnName = "LOGTIME";
+                StringComparison caseInsensitiveComparison = StringComparison.OrdinalIgnoreCase;
+                TimeSpan timeOffset = new TimeSpan(-5, -30, 0);
 
-            return result;
+                int originalRowCount = dataTable.Rows.Count;
+                for (int i = 0; i < originalRowCount; i++)
+                {
+                    DataRow row = dataTable.Rows[0];
+                    var rowDict = new Dictionary<string, object>();
+
+                    foreach (DataColumn col in dataTable.Columns)
+                    {
+                        string columnName = col.ColumnName;
+
+                        bool containsUnderscore = columnName.Contains('_');
+                        bool containsUnderscoreE = columnName.Contains("_E");
+                        bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
+
+                        if (containsUnderscore && !containsUnderscoreE)
+                        {
+                            continue;
+                        }
+                        if (isLogTime)
+                        {
+                            rowDict[columnName] = row[col] == DBNull.Value
+                                ? null
+                                : Convert.ToDateTime(row[col]).ToString("yyyy-MMM-dd HH:mm");
+                        }
+                        else
+                        {
+                            rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+                        }
+                    }
+                    result.Add(rowDict);
+                    dataTable.Rows.Remove(row);
+                }
+                return result;
+            }
         }
 
         //public List<Dictionary<string, object>> TransformAverageTableToList(DataTable dataTable)

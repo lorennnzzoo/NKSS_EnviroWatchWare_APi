@@ -305,7 +305,7 @@ namespace Repositories
                 AND cd.ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
                                              AND '{To:yyyy-MM-dd HH:mm:ss}'";
 
-                    string groupByClause = " GROUP BY DATEADD(MINUTE, (DATEDIFF(MINUTE, 0, cd.ChannelDataLogTime) / {IntervalInMinutes}) * {IntervalInMinutes}, 0) ORDER BY LogTime;";
+                    string groupByClause = $" GROUP BY DATEADD(MINUTE, (DATEDIFF(MINUTE, 0, cd.ChannelDataLogTime) / {IntervalInMinutes}) * {IntervalInMinutes}, 0) ORDER BY LogTime;";
 
                     var columnClauses = new List<string>();
 
@@ -511,7 +511,7 @@ namespace Repositories
                 AND cd.ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
                                               AND '{To:yyyy-MM-dd HH:mm:ss}'";
 
-                    string groupByClause = " GROUP BY DATEADD(SECOND, DATEDIFF(SECOND, '1970-01-01', cd.ChannelDataLogTime) / ({IntervalInMinutes} * 60) * ({IntervalInMinutes} * 60), '1970-01-01') ORDER BY LogTime;";
+                    string groupByClause = $" GROUP BY DATEADD(SECOND, DATEDIFF(SECOND, '1970-01-01', cd.ChannelDataLogTime) / ({IntervalInMinutes} * 60) * ({IntervalInMinutes} * 60), '1970-01-01') ORDER BY LogTime;";
 
                     var columnClauses = new List<string>();
 

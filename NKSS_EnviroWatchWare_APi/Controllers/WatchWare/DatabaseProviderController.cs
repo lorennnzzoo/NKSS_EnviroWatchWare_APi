@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Services;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -12,9 +13,10 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     [RoutePrefix("DatabaseProvider")]
     public class DatabaseProviderController : ApiController
     {
-        public DatabaseProviderController()
+        private readonly ConfigurationService configurationService;
+        public DatabaseProviderController(ConfigurationService _configurationService)
         {
-
+            configurationService = _configurationService;
         }
 
         [HttpGet]
@@ -66,6 +68,25 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 ConfigurationManager.RefreshSection("appSettings");
 
                 return Ok("Database provider updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.ToString())
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetConfiguration()
+        {
+            try
+            {
+                var configuration=configurationService.GetConfiguration();
+                return Ok(configuration);
             }
             catch (Exception ex)
             {

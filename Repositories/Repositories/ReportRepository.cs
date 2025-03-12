@@ -53,55 +53,105 @@ namespace Repositories
         public DataTable GetAvailabilityReport(List<int> channelIds, DateTime From, DateTime To)
         {
             DataTable dataTable = new DataTable();
-            using (var conn = new NpgsqlConnection(_connectionString))
+            using (var conn = CreateConnection())
             {
                 conn.Open();
 
-                string metadataQuery = $@"
+                if (_databaseProvider == "NPGSQL")
+                {
+                    string metadataQuery = $@"
         SELECT c.""Id"" AS ""ChannelId"", s.""Name"" AS ""StationName"", c.""Name"" AS ""ChannelName"", c.""LoggingUnits"" AS ""ChannelUnits""
         FROM public.""Channel"" c
         JOIN public.""Station"" s ON c.""StationId"" = s.""Id""
         WHERE c.""Id"" IN ({string.Join(",", channelIds)});";
 
-                var channels = new List<dynamic>();
+                    var channels = new List<dynamic>();
 
-                using (var cmd = new NpgsqlCommand(metadataQuery, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    using (var cmd = new NpgsqlCommand(metadataQuery, (NpgsqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        channels.Add(new
+                        while (reader.Read())
                         {
-                            ChannelId = reader.GetInt32(0),
-                            StationName = reader.GetString(1),
-                            ChannelName = reader.GetString(2),
-                            ChannelUnits = reader.GetString(3)
-                        });
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3)
+                            });
+                        }
                     }
-                }
 
-                TimeSpan timeSpan = To - From.AddMinutes(-1);
-                int expectedDataPoints = (int)Math.Ceiling(timeSpan.TotalMinutes);
+                    TimeSpan timeSpan = To - From.AddMinutes(-1);
+                    int expectedDataPoints = (int)Math.Ceiling(timeSpan.TotalMinutes);
 
-                string selectClause = "SELECT ";
-                var columnClauses = new List<string>();
+                    string selectClause = "SELECT ";
+                    var columnClauses = new List<string>();
 
-                foreach (var channel in channels)
-                {
-                    string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
-                    string columnExpression = $@"
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
+                        string columnExpression = $@"
             ROUND(COUNT(*) FILTER (WHERE ""ChannelId"" = {channel.ChannelId}) * 100.0 / {expectedDataPoints}::numeric, 2) AS ""{columnAlias}"""; //added round and cast
-                    columnClauses.Add(columnExpression);
-                }
+                        columnClauses.Add(columnExpression);
+                    }
 
-                string finalQuery = selectClause + string.Join(", ", columnClauses) + $@"
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + $@"
         FROM public.""ChannelData""
         WHERE ""ChannelDataLogTime"" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
 
-                using (var cmd = new NpgsqlCommand(finalQuery, conn))
-                using (var adapter = new NpgsqlDataAdapter(cmd))
+                    using (var cmd = new NpgsqlCommand(finalQuery, (NpgsqlConnection)conn))
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+                }
+                else
                 {
-                    adapter.Fill(dataTable);
+                    string metadataQuery = $@"
+            SELECT c.Id AS ChannelId, s.Name AS StationName, c.Name AS ChannelName, c.LoggingUnits AS ChannelUnits
+            FROM Channel c
+            JOIN Station s ON c.StationId = s.Id
+            WHERE c.Id IN ({string.Join(",", channelIds)});";
+
+                    var channels = new List<dynamic>();
+                    using (var cmd = new SqlCommand(metadataQuery, (SqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3)
+                            });
+                        }
+                    }
+
+                    TimeSpan timeSpan = To - From.AddMinutes(-1);
+                    int expectedDataPoints = (int)Math.Ceiling(timeSpan.TotalMinutes);
+
+                    string selectClause = "SELECT ";
+                    var columnClauses = new List<string>();
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
+                        string columnExpression = $@"
+                ROUND(COUNT(CASE WHEN ChannelId = {channel.ChannelId} THEN 1 END) * 100.0 / {expectedDataPoints}, 2) AS [{columnAlias}]";
+                        columnClauses.Add(columnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + $@"
+            FROM ChannelData
+            WHERE ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
+
+                    using (var cmd = new SqlCommand(finalQuery, (SqlConnection)conn))
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
             }
             return dataTable;
@@ -110,11 +160,12 @@ namespace Repositories
         public DataTable GetAverageDataReport(List<int> channelIds, DateTime From, DateTime To, int IntervalInMinutes)
         {
             DataTable dataTable = new DataTable();
-            using (var conn = new NpgsqlConnection(_connectionString))
+            using (var conn = CreateConnection())
             {
                 conn.Open();
-
-                string metadataQuery = $@"
+                if (_databaseProvider == "NPGSQL")
+                {
+                    string metadataQuery = $@"
                                 SELECT 
                                     c.""Id"" AS ""ChannelId"", 
                                     s.""Name"" AS ""StationName"", 
@@ -128,47 +179,47 @@ namespace Repositories
                                 JOIN public.""ChannelType"" ct ON c.""ChannelTypeId"" = ct.""Id""
                                 WHERE c.""Id"" IN ({string.Join(",", channelIds)});";
 
-                var channels = new List<dynamic>();
+                    var channels = new List<dynamic>();
 
-                using (var cmd = new NpgsqlCommand(metadataQuery, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    using (var cmd = new NpgsqlCommand(metadataQuery, (NpgsqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        channels.Add(new
+                        while (reader.Read())
                         {
-                            ChannelId = reader.GetInt32(0),
-                            StationName = reader.GetString(1),
-                            ChannelName = reader.GetString(2),
-                            ChannelUnits = reader.GetString(3),
-                            OxideLimit = reader.GetString(4),
-                            ChannelTypeValue = reader.GetString(5)
-                        });
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetString(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
                     }
-                }
 
 
-                string selectClause = $@"
+                    string selectClause = $@"
                     SELECT CAST(to_timestamp(
                         FLOOR(EXTRACT(EPOCH FROM cd.""ChannelDataLogTime"") / ({IntervalInMinutes} * 60)) * ({IntervalInMinutes} * 60)
                     ) AS TIMESTAMP WITHOUT TIME ZONE) AS ""LogTime"", ";
 
-                string fromClause = " FROM public.\"ChannelData\" cd ";
+                    string fromClause = " FROM public.\"ChannelData\" cd ";
 
-                string whereClause = $@"
+                    string whereClause = $@"
                     WHERE cd.""ChannelId"" IN ({string.Join(",", channelIds)}) 
                       AND cd.""ChannelDataLogTime"" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
                                                        AND '{To:yyyy-MM-dd HH:mm:ss}'";
 
-                string groupByClause = " GROUP BY \"LogTime\" ORDER BY \"LogTime\";";
+                    string groupByClause = " GROUP BY \"LogTime\" ORDER BY \"LogTime\";";
 
-                var columnClauses = new List<string>();
+                    var columnClauses = new List<string>();
 
-                foreach (var channel in channels)
-                {
-                    string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
 
-                    string columnExpression = $@"
+                        string columnExpression = $@"
                     CAST(AVG(CASE 
                         WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.""ChannelValue"")) 
                         ELSE NULL 
@@ -197,17 +248,112 @@ namespace Repositories
                         ELSE NULL 
                     END) AS NUMERIC(10,2)) AS ""{columnAlias}""";
 
-                    columnClauses.Add(columnExpression);
+                        columnClauses.Add(columnExpression);
+                    }
+
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+
+                    using (var cmd = new NpgsqlCommand(finalQuery, (NpgsqlConnection)conn))
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
-
-
-                string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;               
-
-                using (var cmd = new NpgsqlCommand(finalQuery, conn))
-                using (var adapter = new NpgsqlDataAdapter(cmd))
+                else
                 {
-                    adapter.Fill(dataTable);
+                    string metadataQuery = $@"
+                SELECT 
+                    c.Id AS ChannelId, 
+                    s.Name AS StationName, 
+                    c.Name AS ChannelName,
+                    c.LoggingUnits AS ChannelUnits,
+                    o.Limit AS OxideLimit,
+                    ct.ChannelTypeValue
+                FROM dbo.Channel c
+                JOIN dbo.Station s ON c.StationId = s.Id
+                JOIN dbo.Oxide o ON c.OxideId = o.Id
+                JOIN dbo.ChannelType ct ON c.ChannelTypeId = ct.Id
+                WHERE c.Id IN ({string.Join(",", channelIds)})";
+
+                    var channels = new List<dynamic>();
+                    using (var cmd = new SqlCommand(metadataQuery, (SqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetString(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
+                    }
+
+                    string selectClause = $@"
+                SELECT 
+                    DATEADD(MINUTE, (DATEDIFF(MINUTE, 0, cd.ChannelDataLogTime) / {IntervalInMinutes}) * {IntervalInMinutes}, 0) AS LogTime, ";
+
+                    string fromClause = " FROM dbo.ChannelData cd ";
+
+                    string whereClause = $@"
+                WHERE cd.ChannelId IN ({string.Join(",", channelIds)}) 
+                AND cd.ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
+                                             AND '{To:yyyy-MM-dd HH:mm:ss}'";
+
+                    string groupByClause = " GROUP BY DATEADD(MINUTE, (DATEDIFF(MINUTE, 0, cd.ChannelDataLogTime) / {IntervalInMinutes}) * {IntervalInMinutes}, 0) ORDER BY LogTime;";
+
+                    var columnClauses = new List<string>();
+
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+
+                        string columnExpression = $@"
+                CAST(AVG(CASE 
+                    WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.ChannelValue)) 
+                    ELSE NULL 
+                END) AS DECIMAL(10,2)) AS [{columnAlias}_SIN], 
+
+                CAST(AVG(CASE 
+                    WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(cd.ChannelValue)) 
+                    ELSE NULL 
+                END) AS DECIMAL(10,2)) AS [{columnAlias}_COS], 
+
+                CAST(MAX(CASE 
+                    WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.ChannelValue
+                    ELSE NULL 
+                END) - MIN(CASE 
+                    WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.ChannelValue
+                    ELSE NULL 
+                END) AS DECIMAL(10,2)) AS [{columnAlias}_TOTAL_RANGE],
+
+                CAST(SUM(CASE 
+                    WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN cd.ChannelValue
+                    ELSE NULL 
+                END) AS DECIMAL(10,2)) AS [{columnAlias}_FLOW_SUM],
+
+                CAST(AVG(CASE 
+                    WHEN cd.ChannelId = {channel.ChannelId} THEN cd.ChannelValue
+                    ELSE NULL 
+                END) AS DECIMAL(10,2)) AS [{columnAlias}]";
+
+                        columnClauses.Add(columnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+
+                    using (var cmd = new SqlCommand(finalQuery, (SqlConnection)conn))
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
+
             }
             return dataTable;
         }
@@ -215,11 +361,12 @@ namespace Repositories
         public DataTable GetAverageExceedanceReport(List<int> channelIds, DateTime From, DateTime To, int IntervalInMinutes)
         {
             DataTable dataTable = new DataTable();
-            using (var conn = new NpgsqlConnection(_connectionString))
+            using (var conn = CreateConnection())
             {
                 conn.Open();
-
-                string metadataQuery = $@"
+                if (_databaseProvider == "NPGSQL")
+                {
+                    string metadataQuery = $@"
                                 SELECT 
                                     c.""Id"" AS ""ChannelId"", 
                                     s.""Name"" AS ""StationName"", 
@@ -233,46 +380,46 @@ namespace Repositories
                                 JOIN public.""ChannelType"" ct ON c.""ChannelTypeId"" = ct.""Id""
                                 WHERE c.""Id"" IN ({string.Join(",", channelIds)});";
 
-                var channels = new List<dynamic>();
+                    var channels = new List<dynamic>();
 
-                using (var cmd = new NpgsqlCommand(metadataQuery, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    using (var cmd = new NpgsqlCommand(metadataQuery, (NpgsqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        channels.Add(new
+                        while (reader.Read())
                         {
-                            ChannelId = reader.GetInt32(0),
-                            StationName = reader.GetString(1),
-                            ChannelName = reader.GetString(2),
-                            ChannelUnits = reader.GetString(3),
-                            OxideLimit = reader.GetDecimal(4), 
-                            ChannelTypeValue = reader.GetString(5)
-                        });
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetDecimal(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
                     }
-                }
 
-                string selectClause = $@"
+                    string selectClause = $@"
                                 SELECT CAST(to_timestamp(
                                     FLOOR(EXTRACT(EPOCH FROM cd.""ChannelDataLogTime"") / ({IntervalInMinutes} * 60)) * ({IntervalInMinutes} * 60)
                                 ) AS TIMESTAMP WITHOUT TIME ZONE) AS ""LogTime"", ";
 
-                string fromClause = " FROM public.\"ChannelData\" cd ";
+                    string fromClause = " FROM public.\"ChannelData\" cd ";
 
-                string whereClause = $@"
+                    string whereClause = $@"
                                 WHERE cd.""ChannelId"" IN ({string.Join(",", channelIds)}) 
                                 AND cd.""ChannelDataLogTime"" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
                                                                  AND '{To:yyyy-MM-dd HH:mm:ss}'";
 
-                string groupByClause = " GROUP BY \"LogTime\" ORDER BY \"LogTime\";";
+                    string groupByClause = " GROUP BY \"LogTime\" ORDER BY \"LogTime\";";
 
-                var columnClauses = new List<string>();
+                    var columnClauses = new List<string>();
 
-                foreach (var channel in channels)
-                {
-                    string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
 
-                    string columnExpression = $@"
+                        string columnExpression = $@"
                                 CAST(AVG(CASE 
                                     WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.""ChannelValue"")) 
                                     ELSE NULL 
@@ -307,15 +454,116 @@ namespace Repositories
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) > {channel.OxideLimit}) AS ""{columnAlias}_Exceeded""";
 
-                    columnClauses.Add(columnExpression);
+                        columnClauses.Add(columnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+
+                    using (var cmd = new NpgsqlCommand(finalQuery, (NpgsqlConnection)conn))
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
-
-                string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;                
-
-                using (var cmd = new NpgsqlCommand(finalQuery, conn))
-                using (var adapter = new NpgsqlDataAdapter(cmd))
+                else
                 {
-                    adapter.Fill(dataTable);
+                    string metadataQuery = $@"
+                SELECT 
+                    c.Id AS ChannelId, 
+                    s.Name AS StationName, 
+                    c.Name AS ChannelName,
+                    c.LoggingUnits AS ChannelUnits,
+                    CAST(o.Limit AS DECIMAL(10,2)) AS OxideLimit,  -- Ensure numeric type
+                    ct.ChannelTypeValue
+                FROM dbo.Channel c
+                JOIN dbo.Station s ON c.StationId = s.Id
+                JOIN dbo.Oxide o ON c.OxideId = o.Id
+                JOIN dbo.ChannelType ct ON c.ChannelTypeId = ct.Id
+                WHERE c.Id IN ({string.Join(",", channelIds)})";
+
+                    var channels = new List<dynamic>();
+
+                    using (var cmd = new SqlCommand(metadataQuery, (SqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetDecimal(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
+                    }
+
+                    string selectClause = $@"
+                SELECT 
+                    DATEADD(SECOND, DATEDIFF(SECOND, '1970-01-01', cd.ChannelDataLogTime) / ({IntervalInMinutes} * 60) * ({IntervalInMinutes} * 60), '1970-01-01') AS LogTime, ";
+
+                    string fromClause = " FROM dbo.ChannelData cd ";
+
+                    string whereClause = $@"
+                WHERE cd.ChannelId IN ({string.Join(",", channelIds)}) 
+                AND cd.ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
+                                              AND '{To:yyyy-MM-dd HH:mm:ss}'";
+
+                    string groupByClause = " GROUP BY DATEADD(SECOND, DATEDIFF(SECOND, '1970-01-01', cd.ChannelDataLogTime) / ({IntervalInMinutes} * 60) * ({IntervalInMinutes} * 60), '1970-01-01') ORDER BY LogTime;";
+
+                    var columnClauses = new List<string>();
+
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+
+                        string columnExpression = $@"
+                    CAST(AVG(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.ChannelValue)) 
+                        ELSE NULL 
+                    END) AS DECIMAL(10,2)) AS [{columnAlias}_SIN], 
+
+                    CAST(AVG(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(cd.ChannelValue)) 
+                        ELSE NULL 
+                    END) AS DECIMAL(10,2)) AS [{columnAlias}_COS], 
+
+                    CAST(MAX(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.ChannelValue
+                        ELSE NULL 
+                    END) - MIN(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.ChannelValue
+                        ELSE NULL 
+                    END) AS DECIMAL(10,2)) AS [{columnAlias}_TOTAL_RANGE],
+
+                    CAST(SUM(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN cd.ChannelValue
+                        ELSE NULL 
+                    END) AS DECIMAL(10,2)) AS [{columnAlias}_FLOW_SUM],
+
+                    CAST(AVG(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} THEN cd.ChannelValue
+                        ELSE NULL 
+                    END) AS DECIMAL(10,2)) AS [{columnAlias}],
+
+                    -- Exceeded column
+                    CASE 
+                        WHEN AVG(CASE WHEN cd.ChannelId = {channel.ChannelId} THEN cd.ChannelValue ELSE NULL END) > {channel.OxideLimit} 
+                        THEN 1 ELSE 0 
+                    END AS [{columnAlias}_Exceeded]";
+
+                        columnClauses.Add(columnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+
+                    using (var cmd = new SqlCommand(finalQuery, (SqlConnection)conn))
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
             }
             return dataTable;
@@ -324,11 +572,12 @@ namespace Repositories
         public DataTable GetRawDataReport(List<int> channelIds, DateTime From, DateTime To)
         {
             DataTable dataTable = new DataTable();
-            using (var conn = new NpgsqlConnection(_connectionString))
+            using (var conn = CreateConnection())
             {
                 conn.Open();
-
-                string metadataQuery = $@"
+                if (_databaseProvider == "NPGSQL")
+                {
+                    string metadataQuery = $@"
                                 SELECT 
                                     c.""Id"" AS ""ChannelId"", 
                                     s.""Name"" AS ""StationName"", 
@@ -342,45 +591,101 @@ namespace Repositories
                                 JOIN public.""ChannelType"" ct ON c.""ChannelTypeId"" = ct.""Id""
                                 WHERE c.""Id"" IN ({string.Join(",", channelIds)});";
 
-                var channels = new List<dynamic>();
+                    var channels = new List<dynamic>();
 
-                using (var cmd = new NpgsqlCommand(metadataQuery, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    using (var cmd = new NpgsqlCommand(metadataQuery, (NpgsqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        channels.Add(new
+                        while (reader.Read())
                         {
-                            ChannelId = reader.GetInt32(0),
-                            StationName = reader.GetString(1),
-                            ChannelName = reader.GetString(2),
-                            ChannelUnits = reader.GetString(3),
-                            OxideLimit = reader.GetString(4),
-                            ChannelTypeValue = reader.GetString(5)
-                        });
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetString(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
+                    }
+
+                    string selectClause = "SELECT cd.\"ChannelDataLogTime\" AS \"LogTime\", ";
+                    string fromClause = " FROM public.\"ChannelData\" cd ";
+                    string whereClause = $" WHERE cd.\"ChannelId\" IN ({string.Join(",", channelIds)}) AND cd.\"ChannelDataLogTime\" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
+                    string groupByClause = " GROUP BY cd.\"ChannelDataLogTime\" ORDER BY cd.\"ChannelDataLogTime\";";
+                    var columnClauses = new List<string>();
+
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
+                        //string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}-{channel.OxideLimit}-{channel.ChannelTypeValue}";
+                        string columnExpression = $"MAX(cd.\"ChannelValue\") FILTER (WHERE cd.\"ChannelId\" = {channel.ChannelId}) AS \"{columnAlias}\"";
+                        columnClauses.Add(columnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+                    using (var cmd = new NpgsqlCommand(finalQuery, (NpgsqlConnection)conn))
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+                }
+                else
+                {
+                    string metadataQuery = $@"
+                            SELECT 
+                                c.Id AS ChannelId, 
+                                s.Name AS StationName, 
+                                c.Name AS ChannelName,
+                                c.LoggingUnits AS ChannelUnits,
+                                o.Limit AS OxideLimit,
+                                ct.ChannelTypeValue
+                            FROM Channel c
+                            JOIN Station s ON c.StationId = s.Id
+                            JOIN Oxide o ON c.OxideId = o.Id
+                            JOIN ChannelType ct ON c.ChannelTypeId = ct.Id
+                            WHERE c.Id IN ({string.Join(",", channelIds)});";
+
+                    var channels = new List<dynamic>();
+                    using (var cmd = new SqlCommand(metadataQuery, (SqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetString(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
+                    }
+
+                    string selectClause = "SELECT cd.ChannelDataLogTime AS LogTime, ";
+                    string fromClause = " FROM ChannelData cd ";
+                    string whereClause = $" WHERE cd.ChannelId IN ({string.Join(",", channelIds)}) AND cd.ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
+                    string groupByClause = " GROUP BY cd.ChannelDataLogTime ORDER BY cd.ChannelDataLogTime;";
+                    var columnClauses = new List<string>();
+
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
+                        string columnExpression = $"MAX(CASE WHEN cd.ChannelId = {channel.ChannelId} THEN cd.ChannelValue END) AS [{columnAlias}]";
+                        columnClauses.Add(columnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+                    using (var cmd = new SqlCommand(finalQuery, (SqlConnection)conn))
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
                     }
                 }
 
-                string selectClause = "SELECT cd.\"ChannelDataLogTime\" AS \"LogTime\", ";
-                string fromClause = " FROM public.\"ChannelData\" cd ";
-                string whereClause = $" WHERE cd.\"ChannelId\" IN ({string.Join(",", channelIds)}) AND cd.\"ChannelDataLogTime\" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
-                string groupByClause = " GROUP BY cd.\"ChannelDataLogTime\" ORDER BY cd.\"ChannelDataLogTime\";";
-                var columnClauses = new List<string>();
-
-                foreach (var channel in channels)
-                {
-                    string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
-                    //string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}-{channel.OxideLimit}-{channel.ChannelTypeValue}";
-                    string columnExpression = $"MAX(cd.\"ChannelValue\") FILTER (WHERE cd.\"ChannelId\" = {channel.ChannelId}) AS \"{columnAlias}\"";
-                    columnClauses.Add(columnExpression);
-                }
-
-                string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;                
-                using (var cmd = new NpgsqlCommand(finalQuery, conn))
-                using (var adapter = new NpgsqlDataAdapter(cmd))
-                {
-                    adapter.Fill(dataTable);
-                }
             }
             return dataTable;
         }
@@ -388,11 +693,12 @@ namespace Repositories
         public DataTable GetRawExceedanceReport(List<int> channelIds, DateTime From, DateTime To)
         {
             DataTable dataTable = new DataTable();
-            using (var conn = new NpgsqlConnection(_connectionString))
+            using (var conn = CreateConnection())
             {
                 conn.Open();
-
-                string metadataQuery = $@"
+                if (_databaseProvider == "NPGSQL")
+                {
+                    string metadataQuery = $@"
                                 SELECT 
                                     c.""Id"" AS ""ChannelId"", 
                                     s.""Name"" AS ""StationName"", 
@@ -406,51 +712,123 @@ namespace Repositories
                                 JOIN public.""ChannelType"" ct ON c.""ChannelTypeId"" = ct.""Id""
                                 WHERE c.""Id"" IN ({string.Join(",", channelIds)});";
 
-                var channels = new List<dynamic>();
+                    var channels = new List<dynamic>();
 
-                using (var cmd = new NpgsqlCommand(metadataQuery, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
+                    using (var cmd = new NpgsqlCommand(metadataQuery, (NpgsqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        channels.Add(new
+                        while (reader.Read())
                         {
-                            ChannelId = reader.GetInt32(0),
-                            StationName = reader.GetString(1),
-                            ChannelName = reader.GetString(2),
-                            ChannelUnits = reader.GetString(3),
-                            OxideLimit = reader.GetDecimal(4),  
-                            ChannelTypeValue = reader.GetString(5)
-                        });
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetDecimal(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
                     }
-                }
 
-                string selectClause = "SELECT cd.\"ChannelDataLogTime\" AS \"LogTime\", ";
-                string fromClause = " FROM public.\"ChannelData\" cd ";
-                string whereClause = $" WHERE cd.\"ChannelId\" IN ({string.Join(",", channelIds)}) AND cd.\"ChannelDataLogTime\" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
-                string groupByClause = " GROUP BY cd.\"ChannelDataLogTime\" ORDER BY cd.\"ChannelDataLogTime\";";
-                var columnClauses = new List<string>();
+                    string selectClause = "SELECT cd.\"ChannelDataLogTime\" AS \"LogTime\", ";
+                    string fromClause = " FROM public.\"ChannelData\" cd ";
+                    string whereClause = $" WHERE cd.\"ChannelId\" IN ({string.Join(",", channelIds)}) AND cd.\"ChannelDataLogTime\" BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' AND '{To:yyyy-MM-dd HH:mm:ss}'";
+                    string groupByClause = " GROUP BY cd.\"ChannelDataLogTime\" ORDER BY cd.\"ChannelDataLogTime\";";
+                    var columnClauses = new List<string>();
 
-                foreach (var channel in channels)
-                {
-                    string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
-                    
-                    string columnExpression = $@"
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+
+                        string columnExpression = $@"
                                     MAX(cd.""ChannelValue"") FILTER (WHERE cd.""ChannelId"" = {channel.ChannelId}) AS ""{columnAlias}""";
 
-                    string exceededColumnExpression = $@"
+                        string exceededColumnExpression = $@"
                                     (MAX(cd.""ChannelValue"") FILTER (WHERE cd.""ChannelId"" = {channel.ChannelId}) > {channel.OxideLimit}) AS ""{columnAlias}_Exceeded""";
 
-                    columnClauses.Add(columnExpression);
-                    columnClauses.Add(exceededColumnExpression);
+                        columnClauses.Add(columnExpression);
+                        columnClauses.Add(exceededColumnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+
+                    using (var cmd = new NpgsqlCommand(finalQuery, (NpgsqlConnection)conn))
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
-
-                string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
-
-                using (var cmd = new NpgsqlCommand(finalQuery, conn))
-                using (var adapter = new NpgsqlDataAdapter(cmd))
+                else
                 {
-                    adapter.Fill(dataTable);
+                    string metadataQuery = $@"
+                SELECT 
+                    c.Id AS ChannelId, 
+                    s.Name AS StationName, 
+                    c.Name AS ChannelName,
+                    c.LoggingUnits AS ChannelUnits,
+                    CAST(o.Limit AS DECIMAL(10,2)) AS OxideLimit,  -- Ensure it's numeric
+                    ct.ChannelTypeValue
+                FROM dbo.Channel c
+                JOIN dbo.Station s ON c.StationId = s.Id
+                JOIN dbo.Oxide o ON c.OxideId = o.Id
+                JOIN dbo.ChannelType ct ON c.ChannelTypeId = ct.Id
+                WHERE c.Id IN ({string.Join(",", channelIds)})";
+
+                    var channels = new List<dynamic>();
+
+                    using (var cmd = new SqlCommand(metadataQuery, (SqlConnection)conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            channels.Add(new
+                            {
+                                ChannelId = reader.GetInt32(0),
+                                StationName = reader.GetString(1),
+                                ChannelName = reader.GetString(2),
+                                ChannelUnits = reader.GetString(3),
+                                OxideLimit = reader.GetDecimal(4),
+                                ChannelTypeValue = reader.GetString(5)
+                            });
+                        }
+                    }
+
+                    string selectClause = "SELECT cd.ChannelDataLogTime AS LogTime, ";
+                    string fromClause = " FROM dbo.ChannelData cd ";
+                    string whereClause = $@"
+                WHERE cd.ChannelId IN ({string.Join(",", channelIds)}) 
+                AND cd.ChannelDataLogTime BETWEEN '{From.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' 
+                                             AND '{To:yyyy-MM-dd HH:mm:ss}'";
+
+                    string groupByClause = " GROUP BY cd.ChannelDataLogTime ORDER BY cd.ChannelDataLogTime;";
+
+                    var columnClauses = new List<string>();
+
+                    foreach (var channel in channels)
+                    {
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+
+                        string columnExpression = $@"
+                    MAX(CASE WHEN cd.ChannelId = {channel.ChannelId} THEN cd.ChannelValue ELSE NULL END) AS [{columnAlias}]";
+
+                        string exceededColumnExpression = $@"
+                    MAX(CASE 
+                        WHEN cd.ChannelId = {channel.ChannelId} AND cd.ChannelValue > {channel.OxideLimit} THEN 1 
+                        ELSE 0 
+                    END) AS [{columnAlias}_Exceeded]";
+
+                        columnClauses.Add(columnExpression);
+                        columnClauses.Add(exceededColumnExpression);
+                    }
+
+                    string finalQuery = selectClause + string.Join(", ", columnClauses) + fromClause + whereClause + groupByClause;
+
+                    using (var cmd = new SqlCommand(finalQuery, (SqlConnection)conn))
+                    using (var adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
             }
             return dataTable;

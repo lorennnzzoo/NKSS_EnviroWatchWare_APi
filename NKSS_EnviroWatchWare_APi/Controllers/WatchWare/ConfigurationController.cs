@@ -1,4 +1,5 @@
-﻿using Services;
+﻿using Models.PollutionData;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,31 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
                 {
                     Content = new StringContent(ex.ToString())
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPost]
+        [Route("GetUploadConfig")]
+        public IHttpActionResult GetConfig(ConfigFilter filter)
+        {
+            try
+            {
+                filter.StationsId.Remove(0);
+                filter.ChannelsId.Remove(0);
+                if (filter.CompanyId == 0)
+                {
+                    throw new ArgumentException("Select Parameters");
+                }                
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
                 };
 
                 return ResponseMessage(response);

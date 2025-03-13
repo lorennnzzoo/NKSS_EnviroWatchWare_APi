@@ -1,4 +1,5 @@
-﻿using NKSS_EnviroWatchWare_APi.Providers;
+﻿using Models.PollutionData;
+using NKSS_EnviroWatchWare_APi.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +9,46 @@ using System.Web.Http;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
-    [PollutantAuthorize]
-    //[Authorize]
+    [PollutantAuthorize]    
     [RoutePrefix("PollutantData")]
     public class PollutantDataController : ApiController
     {
-        [HttpGet]
-        [Route("Check")]
-        public IHttpActionResult Get()
-        {
-            return Ok();
+        [HttpPost]
+        [Route("Upload")]
+        public IHttpActionResult Upload(PollutantDataUploadRequest Request)
+        {            
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
         }
+
+        [HttpPost]
+        [Route("UploadBulk")]
+        public IHttpActionResult UploadBulk()
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }        
     }
 }

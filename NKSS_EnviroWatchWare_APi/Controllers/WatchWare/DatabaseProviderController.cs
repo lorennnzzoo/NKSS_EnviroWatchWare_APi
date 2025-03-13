@@ -12,13 +12,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     [Authorize(Roles = "Demo")]
     [RoutePrefix("DatabaseProvider")]
     public class DatabaseProviderController : ApiController
-    {
-        private readonly ConfigurationService configurationService;
-        public DatabaseProviderController(ConfigurationService _configurationService)
-        {
-            configurationService = _configurationService;
-        }
-
+    {       
         [HttpGet]
         [Route("GetProviders")]
         public IHttpActionResult GetAll()
@@ -80,23 +74,6 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
-        [HttpGet]
-        public IHttpActionResult GetConfiguration()
-        {
-            try
-            {
-                var configuration=configurationService.GetConfiguration();
-                return Ok(configuration);
-            }
-            catch (Exception ex)
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                {
-                    Content = new StringContent(ex.ToString())
-                };
-
-                return ResponseMessage(response);
-            }
-        }
+        
     }
 }

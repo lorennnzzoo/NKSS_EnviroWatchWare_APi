@@ -52,6 +52,27 @@ namespace Repositories
             if (_databaseProvider == "NPGSQL")
             {
                 string query = @"
+                    SELECT * FROM public.""Company"";
+                    SELECT * FROM public.""Station"";
+                    SELECT * FROM public.""Channel"";
+                    SELECT * FROM public.""MonitoringType"";
+                    SELECT * FROM public.""ChannelType"";
+                    SELECT * FROM public.""Oxide"";
+                    SELECT * FROM public.""Analyzer"";
+                    SELECT * FROM public.""ScalingFactor"";
+                    SELECT * FROM public.""License"";
+                    SELECT * FROM public.""ConfigSetting"";
+                ";
+
+                using (NpgsqlConnection conn = (NpgsqlConnection)CreateConnection())
+                {
+                    NpgsqlDataAdapter dataAdapter = new NpgsqlDataAdapter(query, conn);
+                    dataAdapter.Fill(dataSet);
+                }
+            }
+            else
+            {
+                string query = @"
                                 SELECT * FROM Company;
                                 SELECT * FROM Station;
                                 SELECT * FROM Channel;
@@ -63,9 +84,9 @@ namespace Repositories
                                 SELECT * FROM License;
                                 SELECT * FROM ConfigSetting;
                             ";
-                using (SqlConnection conn = new SqlConnection(_connectionString))
+                using (SqlConnection conn = (SqlConnection)CreateConnection())
                 {
-                    SqlDataAdapter dataAdapter = new SqlDataAdapter(query, conn);                    
+                    SqlDataAdapter dataAdapter = new SqlDataAdapter(query, conn);
                     dataAdapter.Fill(dataSet);
                 }
             }

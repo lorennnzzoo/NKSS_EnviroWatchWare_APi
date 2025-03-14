@@ -50,8 +50,44 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 if (filter.CompanyId == 0)
                 {
                     throw new ArgumentException("Select Parameters");
-                }                
-                return Ok();
+                }
+                var config = configurationService.GetUploadConfig(filter.CompanyId, filter.StationsId, filter.ChannelsId);
+                if (config != null)
+                {
+                    return Ok(config);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetApiContracts")]
+        public IHttpActionResult GetApiContracts()
+        {
+            try
+            {
+
+                var contracts= configurationService.GetApiContracts();
+                if (contracts!=null)
+                {
+                    return Ok(contracts);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             catch (Exception ex)
             {

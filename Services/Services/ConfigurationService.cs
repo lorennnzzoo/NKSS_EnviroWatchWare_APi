@@ -1,4 +1,5 @@
-﻿using Repositories.Interfaces;
+﻿using Models;
+using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,19 @@ namespace Services
     public class ConfigurationService : IConfigurationService
     {
         private readonly IConfigurationRepository _configurationRepository;
-        public ConfigurationService(IConfigurationRepository configurationRepository)
+        private readonly IChannelRepository _channelRepository;
+        private readonly IStationRepository _stationRepository;
+        private readonly ICompanyRepository _companyRepository;
+
+        private readonly ConfigSettingService configSettingService;
+        private readonly string contractsGroupName="ApiContract";
+        public ConfigurationService(IConfigurationRepository configurationRepository, ConfigSettingService _configSettingService, IChannelRepository channelRepository, IStationRepository stationRepository, ICompanyRepository companyRepository)
         {
             _configurationRepository = configurationRepository;
+            configSettingService = _configSettingService;
+            _channelRepository = channelRepository;
+            _stationRepository = stationRepository;
+            _companyRepository = companyRepository;
         }
         public Dictionary<string, object> GetConfiguration()
         {
@@ -211,5 +222,136 @@ namespace Services
 
             return value.ToString(); 
         }
+
+        public IEnumerable<ConfigSetting> GetApiContracts()
+        {
+            return configSettingService.GetConfigSettingsByGroupName(contractsGroupName);
+        }
+
+        public Dictionary<string, object> GetUploadConfig(int companyId, List<int> StationsId, List<int> ChannelsId)
+        {
+            Dictionary<int, List<int>> StationChannelPairs = new Dictionary<int, List<int>>();
+            Models.Company companyDetail = _companyRepository.GetById(companyId);
+            List<Models.Station> stationsOfCompany = new List<Models.Station>();
+            List<Models.Channel> channelsOfStation = new List<Models.Channel>();
+
+
+            if (StationsId != null && StationsId.Count > 0 && ChannelsId != null && ChannelsId.Count > 0)
+            {
+                foreach (int stationId in StationsId)
+                {
+                    List<int> channelIds = GetChannelIdsForStation(stationId);
+
+
+                    List<int> matchingValues = channelIds.Intersect(ChannelsId).ToList();
+
+
+                    stationsOfCompany.Add(_stationRepository.GetById(stationId));
+                    channelsOfStation.AddRange(matchingValues.Count > 0 ? _channelRepository.GetAll().Where(e => matchingValues.Contains(Convert.ToInt32(e.Id))).ToList() : _channelRepository.GetAll().ToList());
+                    StationChannelPairs.Add(stationId, matchingValues.Count > 0 ? matchingValues : channelIds);
+                }
+            }
+
+            else if (StationsId != null && StationsId.Count > 0)
+            {
+                foreach (int stationId in StationsId)
+                {
+                    List<int> channelIds = GetChannelIdsForStation(stationId);
+                    stationsOfCompany.Add(_stationRepository.GetById(stationId));
+                    channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e => e.Active == true).ToList());
+                    StationChannelPairs.Add(stationId, channelIds);
+                }
+            }
+
+            else
+            {
+                List<int> stationIds = _stationRepository.GetAll()
+                                                         .Where(e => e.CompanyId == companyId).Where(e => e.Active = true)
+                                                         .Select(e => e.Id).OfType<int>()
+                                                         .ToList();
+
+                foreach (int stationId in stationIds)
+                {
+                    List<int> channelIds = GetChannelIdsForStation(stationId);
+                    stationsOfCompany.Add(_stationRepository.GetById(stationId));
+                    channelsOfStation.AddRange(_channelRepository.GetAll().Where(e => e.StationId == stationId).Where(e => e.Active == true).ToList());
+                    StationChannelPairs.Add(stationId, channelIds);
+                }
+            }
+
+            var ids = channelsOfStation.ToList();
+            var config = GenerateUploadConfigData(channelsOfStation);
+            return config;
+        }
+
+        private List<int> GetChannelIdsForStation(int stationId)
+        {
+            return _channelRepository.GetAll()
+                                     .Where(e => e.StationId == stationId).Where(e => e.Active = true)
+                                     .Select(e => e.Id).OfType<int>()
+                                     .ToList();
+        }
+        public Dictionary<string, object> GenerateUploadConfigData(List<Models.Channel> channelsOfStation)
+        {
+            if (channelsOfStation == null || !channelsOfStation.Any())
+            {
+                return new Dictionary<string, object> { { "error", "No channels found." } };
+            }
+
+            // 🔹 Get unique station IDs
+            var stationIds = channelsOfStation.Select(c => c.StationId).Distinct().ToList();
+
+            // 🔹 Fetch station details
+            var stations = _stationRepository.GetAll()
+                            .Where(s => stationIds.Contains(s.Id))
+                            .ToList();
+
+            // 🔹 Prepare structured dictionary
+            var xmlConfig = new Dictionary<string, object>
+    {
+        { "Stations", new List<object>() }
+    };
+
+            foreach (var station in stations)
+            {
+                var channels = channelsOfStation
+                                .Where(c => c.StationId == station.Id)
+                                .Select(c => new Dictionary<string, object>
+                                {
+                            { "Id", c.Id },
+                            { "Name", c.Name },
+                            { "LoggingUnits", c.LoggingUnits }
+                                })
+                                .ToList();
+
+                ((List<object>)xmlConfig["Stations"]).Add(new Dictionary<string, object>
+        {
+            { "Id", station.Id },
+            { "Name", station.Name },
+            { "Channels", channels }
+        });
+            }
+
+            // 🔹 Convert dictionary to JSON string
+            string jsonConfig = Newtonsoft.Json.JsonConvert.SerializeObject(xmlConfig);
+
+            // 🔹 Generate a unique key
+            string generatedKey = Guid.NewGuid().ToString();
+
+            // 🔹 Store config in ConfigSettings table
+            
+
+            configSettingService.CreateConfigSetting(new Models.Post.ConfigSetting
+            {
+                GroupName = contractsGroupName,
+                ContentName = generatedKey,
+                ContentValue = jsonConfig  // Storing the full JSON configuration
+            });
+
+            return xmlConfig; // Returning the dictionary so frontend can convert it to XML
+        }
+
+
+
     }
 }

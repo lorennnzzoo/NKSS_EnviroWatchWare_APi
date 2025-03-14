@@ -35,4 +35,25 @@ namespace Models.PollutionData
         public List<int> ChannelsId { get; set; } = new List<int>();
     }
 
+
+    public class Config
+    {
+        public List<StationConfig> Stations { get; set; }
+    }
+
+    public class StationConfig
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<ChannelConfig> Channels { get; set; }
+    }
+
+    public class ChannelConfig
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string LoggingUnits { get; set; }
+    }
+
+
 }

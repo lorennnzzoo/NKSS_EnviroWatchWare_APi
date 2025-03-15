@@ -9,9 +9,11 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
+    [DisableCors]
     [PollutantAuthorize]    
     [RoutePrefix("PollutantData")]
     public class PollutantDataController : ApiController
@@ -49,12 +51,14 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+        [OverrideAuthorization]
+        [Authorize]
         [HttpPost]
         [Route("UploadBulk")]
         public IHttpActionResult UploadBulk()
         {
             try
-            {
+            {               
                 if (!Request.Content.IsMimeMultipartContent())
                 {
                     throw new Exception("Unsupported MediaType.");
@@ -121,7 +125,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                     }
                     pollutionDataService.ImportBulkData(lines);
                 }
-
+                
                 return Ok("File uploaded successfully.");
             }
             catch (Exception ex)

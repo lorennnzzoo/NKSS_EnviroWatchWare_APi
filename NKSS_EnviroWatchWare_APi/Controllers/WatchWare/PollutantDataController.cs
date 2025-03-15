@@ -39,7 +39,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
             catch (Exception ex)
             {
-                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                var response = new HttpResponseMessage(HttpStatusCode.BadRequest)
                 {
                     Content = new StringContent(ex.Message)
                 };

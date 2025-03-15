@@ -150,7 +150,7 @@ ORDER BY
 
         public void InsertChannelData(int channelId, decimal channelValue, System.DateTime datetime, string passPhrase)
         {
-            using (IDbConnection db = new NpgsqlConnection(_connectionString))
+            using (IDbConnection db = CreateConnection())
             {
                 // Open connection
                 db.Open();
@@ -165,7 +165,22 @@ ORDER BY
                 };
 
                 // Execute stored procedure
-                db.Execute("SELECT public.\"InsertOrUpdateChannelDataFeed\"(@p_channelid, @p_channelvalue, @p_datetime, @p_pass_phrase)", parameters);
+                //db.Execute("SELECT public.\"InsertOrUpdateChannelDataFeed\"(@p_channelid, @p_channelvalue, @p_datetime, @p_pass_phrase)", parameters);
+                if (_databaseProvider == "NPGSQL")
+                {
+                    db.Execute("SELECT public.\"InsertOrUpdateChannelDataFeed\"(@p_channelid, @p_channelvalue, @p_datetime, @p_pass_phrase)", parameters);
+                }
+                else
+                {
+                    using (var cmd = new SqlCommand("dbo.InsertOrUpdateChannelDataFeed", (SqlConnection)db))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@p_channelid", channelId);
+                        cmd.Parameters.AddWithValue("@p_channelvalue", channelValue);
+                        cmd.Parameters.AddWithValue("@p_datetime", datetime);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
             }
         }
     }

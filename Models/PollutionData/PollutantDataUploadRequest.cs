@@ -13,18 +13,18 @@ namespace Models.PollutionData
 
     public class Station
     {
-        public int StationId { get; set; }  
+        public int? StationId { get; set; }  
         public string StationName { get; set; } 
         public List<Channel> Channels { get; set; }
     }
 
     public class Channel
     {
-        public int ChannelId { get; set; }  
+        public int? ChannelId { get; set; }  
         public string ChannelName { get; set; }  
         public string LoggingUnits { get; set; } 
-        public decimal Value { get; set; }  
-        public DateTime LogTime { get; set; } 
+        public decimal? Value { get; set; }  
+        public DateTime? LogTime { get; set; } 
     }
 
 

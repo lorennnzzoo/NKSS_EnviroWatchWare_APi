@@ -1,4 +1,5 @@
 ﻿using Models.PollutionData;
+using Newtonsoft.Json;
 using Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,20 +12,61 @@ namespace Services
     public class PollutionDataService : IPollutionDataService
     {
         private readonly ConfigurationService configurationService;
-        public PollutionDataService(ConfigurationService _configurationService)
+        private readonly ChannelDataFeedService channelDataFeedService; 
+        public PollutionDataService(ConfigurationService _configurationService, ChannelDataFeedService _channelDataFeedService)
         {
             configurationService = _configurationService;
+            channelDataFeedService = _channelDataFeedService;
         }
         public bool ImportData(string apiKey, PollutantDataUploadRequest request)
         {
-            bool isValidData = ValidateDataIntegrity(apiKey, request);
-            if (!isValidData)
+            
+            if (request?.Stations == null || request.Stations.Count == 0)
             {
-                throw new Exception("UnAuthorized Payload");
+                throw new Exception("Empty Payload");
             }
-            //insert data and return success or error;
+
+            
+            if (!ValidateDataIntegrity(apiKey, request))
+            {
+                throw new Exception("Unauthorized Payload");
+            }
+
+            foreach (var station in request.Stations)
+            {
+                if (station?.Channels == null || station.Channels.Count == 0)
+                {
+                    throw new Exception($"Empty Channel Payload For Station: {station?.StationName ?? "Unknown"}");
+                }
+
+                foreach (var channel in station.Channels)
+                {
+                    if (!channel.ChannelId.HasValue || !channel.Value.HasValue || !channel.LogTime.HasValue || string.IsNullOrWhiteSpace(channel.LoggingUnits))
+                    {
+                        string errorDetails = $"Invalid Channel Data: {JsonConvert.SerializeObject(channel)}";
+                        Console.WriteLine(errorDetails);  
+                        throw new Exception(errorDetails);
+                    }
+
+                    try
+                    {
+                        channelDataFeedService.InsertChannelData(
+                            channel.ChannelId.Value,
+                            channel.Value.Value,
+                            channel.LogTime.Value,
+                            ""
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error inserting data for ChannelId {channel.ChannelId.Value}: {ex.Message}");
+                        return false; 
+                    }
+                }
+            }
             return true;
         }
+
 
         public bool ValidateDataIntegrity(string apiKey, PollutantDataUploadRequest request)
         {
@@ -36,9 +78,11 @@ namespace Services
             }
             Config config = Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(contract);
             List<int> incomingChannelIds = request.Stations
-                                    .SelectMany(station => station.Channels)
-                                    .Select(channel => channel.ChannelId)
-                                    .ToList();
+                                         .SelectMany(station => station.Channels)
+                                         .Where(channel => channel.ChannelId.HasValue)
+                                         .Select(channel => channel.ChannelId.Value)  
+                                         .ToList();
+
             List<int> contractChannelIds=config.Stations
                                     .SelectMany(station => station.Channels)
                                     .Select(channel => channel.Id)

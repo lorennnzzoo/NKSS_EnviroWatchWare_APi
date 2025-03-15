@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Models.DashBoard;
 using System;
+using System.Data;
 
 namespace Services
 {
@@ -49,6 +50,11 @@ namespace Services
             List<DashBoard.ChannelDataFeed> stationFeed = new List<ChannelDataFeed>();
             stationFeed = _channelDataFeedRepository.GetByStationId(stationId).ToList();            
             return stationFeed;
+        }
+
+        public void InsertBulkData(DataTable bulkData)
+        {
+            _channelDataFeedRepository.InsertBulkData(bulkData);
         }
 
         //public List<Models.Station> GetStations()

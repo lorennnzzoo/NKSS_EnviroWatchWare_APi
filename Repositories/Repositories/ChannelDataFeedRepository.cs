@@ -16,7 +16,7 @@ namespace Repositories
         public ChannelDataFeedRepository()
         {
             _databaseProvider = ConfigurationManager.AppSettings["DatabaseProvider"];
-            //_connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString;
+            
             if (_databaseProvider == "NPGSQL")
             {
                 _connectionString = ConfigurationManager.ConnectionStrings["PostgreSQLConnection"].ConnectionString;
@@ -152,10 +152,10 @@ ORDER BY
         {
             using (IDbConnection db = CreateConnection())
             {
-                // Open connection
+                
                 db.Open();
 
-                // Execute the stored procedure using Dapper
+                
                 var parameters = new
                 {
                     p_channelid = channelId,
@@ -164,8 +164,8 @@ ORDER BY
                     p_pass_phrase = passPhrase
                 };
 
-                // Execute stored procedure
-                //db.Execute("SELECT public.\"InsertOrUpdateChannelDataFeed\"(@p_channelid, @p_channelvalue, @p_datetime, @p_pass_phrase)", parameters);
+                
+                
                 if (_databaseProvider == "NPGSQL")
                 {
                     db.Execute("SELECT public.\"InsertOrUpdateChannelDataFeed\"(@p_channelid, @p_channelvalue, @p_datetime, @p_pass_phrase)", parameters);
@@ -183,5 +183,42 @@ ORDER BY
                 }
             }
         }
+
+        public void InsertBulkData(DataTable bulkData)
+        {
+            using (IDbConnection connection = CreateConnection()) 
+            {
+                connection.Open();
+
+                if (_databaseProvider == "NPGSQL")
+                {
+                    using (var writer = ((NpgsqlConnection)connection).BeginBinaryImport(
+                        "COPY ChannelData (\"ChannelId\", \"ChannelValue\", \"ChannelDataLogTime\") FROM STDIN (FORMAT BINARY)"))
+                    {
+                        foreach (DataRow row in bulkData.Rows)
+                        {
+                            writer.StartRow();
+                            writer.Write(row["ChannelId"], NpgsqlTypes.NpgsqlDbType.Integer);
+                            writer.Write(row["ChannelValue"], NpgsqlTypes.NpgsqlDbType.Double);
+                            writer.Write(row["ChannelDataLogTime"], NpgsqlTypes.NpgsqlDbType.Timestamp);
+                        }
+                        writer.Complete();
+                    }
+                }
+                else 
+                {
+                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy((SqlConnection)connection))
+                    {
+                        bulkCopy.DestinationTableName = "ChannelData";
+                        bulkCopy.ColumnMappings.Add("ChannelId", "ChannelId");
+                        bulkCopy.ColumnMappings.Add("ChannelValue", "ChannelValue");
+                        bulkCopy.ColumnMappings.Add("ChannelDataLogTime", "ChannelDataLogTime");
+
+                        bulkCopy.WriteToServer(bulkData);
+                    }
+                }
+            }
+        }
+
     }
 }

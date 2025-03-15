@@ -12,5 +12,7 @@ namespace Services.Interfaces
         bool ValidateDataIntegrity(string apiKey,PollutantDataUploadRequest request);
 
         bool ImportData(string apiKey, PollutantDataUploadRequest request);
+
+        bool ImportBulkData(List<string> lines);
     }
 }

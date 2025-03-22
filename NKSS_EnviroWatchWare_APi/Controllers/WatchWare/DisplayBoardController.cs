@@ -39,5 +39,31 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetAllTemplates")]
+        public IHttpActionResult GetAllTemplates()
+        {
+            try
+            {
+
+                var tempates = displayBoardService.GetAllTemplates();
+                if (tempates==null)
+                {
+                    return NotFound();
+                }
+                return Ok(tempates); 
+                
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace Services
     public class DisplayBoardService : IDisplayBoardService
     {
         private readonly ConfigSettingService configSettingService;
-        private readonly string contractsGroupName = "DisplayBoardTemplates";
+        private readonly string contractsGroupName = "DisplayBoardFileGenerator";
         public DisplayBoardService(ConfigSettingService _configSettingService)
         {
             configSettingService = _configSettingService;
@@ -21,7 +21,7 @@ namespace Services
             Models.Post.ConfigSetting config = new Models.Post.ConfigSetting
             {
                 GroupName = contractsGroupName,
-                ContentName = Guid.NewGuid().ToString(),
+                ContentName = $"Template_{Guid.NewGuid().ToString()}",
                 ContentValue = Newtonsoft.Json.JsonConvert.SerializeObject(template)
             };
             configSettingService.CreateConfigSetting(config);

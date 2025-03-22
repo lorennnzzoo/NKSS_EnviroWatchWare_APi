@@ -8,7 +8,7 @@ using System.Web.Http;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
-    [Authorize(Roles = "Admin,Demo")]
+    [Authorize(Roles = "Admin,Customer,Demo")]
     [RoutePrefix("User")]
     public class UserController : ApiController
     {

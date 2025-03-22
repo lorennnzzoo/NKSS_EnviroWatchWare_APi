@@ -298,15 +298,15 @@ namespace Services
                 return new Dictionary<string, object> { { "error", "No channels found." } };
             }
 
-            // 🔹 Get unique station IDs
+            
             var stationIds = channelsOfStation.Select(c => c.StationId).Distinct().ToList();
 
-            // 🔹 Fetch station details
+            
             var stations = _stationRepository.GetAll()
                             .Where(s => stationIds.Contains(s.Id))
                             .ToList();
 
-            // 🔹 Prepare structured dictionary
+            
             var xmlConfig = new Dictionary<string, object>
     {
         { "Stations", new List<object>() }
@@ -332,23 +332,23 @@ namespace Services
         });
             }
 
-            // 🔹 Convert dictionary to JSON string
+            
             string jsonConfig = Newtonsoft.Json.JsonConvert.SerializeObject(xmlConfig);
 
-            // 🔹 Generate a unique key
+            
             string generatedKey = Guid.NewGuid().ToString();
 
-            // 🔹 Store config in ConfigSettings table
+            
             
 
             configSettingService.CreateConfigSetting(new Models.Post.ConfigSetting
             {
                 GroupName = contractsGroupName,
                 ContentName = generatedKey,
-                ContentValue = jsonConfig  // Storing the full JSON configuration
+                ContentValue = jsonConfig  
             });
 
-            return xmlConfig; // Returning the dictionary so frontend can convert it to XML
+            return xmlConfig; 
         }
 
 

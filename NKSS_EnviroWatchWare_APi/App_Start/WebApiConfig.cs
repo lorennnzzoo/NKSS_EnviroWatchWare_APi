@@ -79,7 +79,9 @@ namespace NKSS_EnviroWatchWare_APi
             container.RegisterType<IConfigurationRepository, ConfigurationRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IConfigurationService, ConfigurationService>(new HierarchicalLifetimeManager());
             //pollution data
-            container.RegisterType<IPollutionDataService, PollutionDataService>(new HierarchicalLifetimeManager());            
+            container.RegisterType<IPollutionDataService, PollutionDataService>(new HierarchicalLifetimeManager());
+            //displayBoard
+            container.RegisterType<IDisplayBoardService, DisplayBoardService>(new HierarchicalLifetimeManager());
             //
             // Set up Unity as the Dependency Resolver
             config.DependencyResolver = new UnityDependencyResolver(container);

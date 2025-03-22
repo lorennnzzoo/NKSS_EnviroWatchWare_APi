@@ -96,6 +96,7 @@
     <Compile Include="Interfaces\IConfigSettingService.cs" />
     <Compile Include="Interfaces\IConfigurationService.cs" />
     <Compile Include="Interfaces\ICryptoService.cs" />
+    <Compile Include="Interfaces\IDisplayBoardService.cs" />
     <Compile Include="Interfaces\ILicenseService.cs" />
     <Compile Include="Interfaces\IMonitoringTypeService.cs" />
     <Compile Include="Interfaces\IPollutionDataService.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Services\ConfigSettingService.cs" />
     <Compile Include="Services\ConfigurationService.cs" />
     <Compile Include="Services\CryptoService.cs" />
+    <Compile Include="Services\DisplayBoardService.cs" />
     <Compile Include="Services\LicenseService.cs" />
     <Compile Include="Services\MonitoringTypeService.cs" />
     <Compile Include="Services\OxideService.cs" />

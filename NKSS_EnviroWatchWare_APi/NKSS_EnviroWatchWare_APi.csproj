@@ -316,6 +316,7 @@
     <Compile Include="Controllers\WatchWare\ConfigSettingController.cs" />
     <Compile Include="Controllers\WatchWare\ConfigurationController.cs" />
     <Compile Include="Controllers\WatchWare\DatabaseProviderController.cs" />
+    <Compile Include="Controllers\WatchWare\DisplayBoardController.cs" />
     <Compile Include="Controllers\WatchWare\LicenseController.cs" />
     <Compile Include="Controllers\WatchWare\MonitoringTypeController.cs" />
     <Compile Include="Controllers\WatchWare\OxideController.cs" />

@@ -319,6 +319,7 @@
     <Compile Include="Controllers\WatchWare\DisplayBoardController.cs" />
     <Compile Include="Controllers\WatchWare\LicenseController.cs" />
     <Compile Include="Controllers\WatchWare\MonitoringTypeController.cs" />
+    <Compile Include="Controllers\WatchWare\NotificationController.cs" />
     <Compile Include="Controllers\WatchWare\OxideController.cs" />
     <Compile Include="Controllers\WatchWare\PollutantDataController.cs" />
     <Compile Include="Controllers\WatchWare\ReportController.cs" />

@@ -69,6 +69,7 @@
     <Compile Include="DisplayBoard\Template.cs" />
     <Compile Include="Licenses\License.cs" />
     <Compile Include="MonitoringType.cs" />
+    <Compile Include="Notification\Channels.cs" />
     <Compile Include="Oxide.cs" />
     <Compile Include="PollutionData\PollutantDataUploadRequest.cs" />
     <Compile Include="Post\Analyzer.cs" />

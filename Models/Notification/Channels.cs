@@ -20,17 +20,33 @@ namespace Models.Notification
         public int ChannelId { get; set; }
         public List<Condition> Conditions { get; set; } = new List<Condition>();
     }
-
-    public class Condition
-    {
-        public ConditionType Type { get; set; }  // Enum for condition type
-        public int Cooldown { get; set; }  // Cooldown in minutes
-    }
-
     public enum ConditionType
     {
-        Offline,
-        Exceedance
+        Value=0,
+        LogTime=1
+    }
+    public enum OperatorType
+    {
+        GreaterThan=0,    // >
+        LessThan=1,       // <
+        Equal=2,          // =
+        GreaterThanOrEqual=3, // >=
+        LessThanOrEqual=4  // <=
+    }
+    public class Condition
+    {
+        public string ConditionName { get; set; }
+        public ConditionType ConditionType { get; set; }
+        public int Cooldown { get; set; }  
+        public int Duration { get; set; }
+        public OperatorType Operator { get; set; }
+        public double Threshold { get; set; }
     }
 
+
+    public class SubscribeRequest
+    {
+        public int ChannelId { get; set; }
+        public List<Models.Notification.Condition> Conditions { get; set; }
+    }
 }

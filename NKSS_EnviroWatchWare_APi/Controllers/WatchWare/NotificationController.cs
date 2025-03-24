@@ -40,5 +40,68 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpPost]
+        [Route("CreateCondition")]
+        public IHttpActionResult CreateCondition(Models.Notification.Condition condition)
+        {
+            try
+            {
+                notificationService.CreateCondition(condition);
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetConditions")]
+        public IHttpActionResult GetConditions()
+        {
+            try
+            {
+                var conditions=notificationService.GetAllConditions();
+                if (conditions == null)
+                {
+                    return NotFound();
+                }
+                return Ok(conditions);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+        [HttpPost]
+        [Route("Subscribe")]
+        public IHttpActionResult Subscribe(Models.Notification.SubscribeRequest subscribeRequest)
+        {
+            try
+            {
+                notificationService.GenerateSubscription(subscribeRequest);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

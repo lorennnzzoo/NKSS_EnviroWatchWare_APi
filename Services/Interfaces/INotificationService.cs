@@ -13,5 +13,8 @@ namespace Services.Interfaces
         IEnumerable<ChannelStatus> GetChannelsStatuses();
         IEnumerable<ConfigSetting> GetSubscriptions();
         Station GetStation(int id);
+        void CreateCondition(Models.Notification.Condition condition);
+        IEnumerable<Condition> GetAllConditions();
+        void GenerateSubscription(Models.Notification.SubscribeRequest subscribeRequest);
     }
 }

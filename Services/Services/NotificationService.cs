@@ -37,7 +37,7 @@ namespace Services
 
         public void GenerateSubscription(SubscribeRequest subscribeRequest)
         {
-            var subscription = new
+            NotificationSubscription subscription =new NotificationSubscription
             {
                 ChannelId = subscribeRequest.ChannelId,
                 Conditions = subscribeRequest.Conditions

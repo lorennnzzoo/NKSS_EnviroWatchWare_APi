@@ -92,9 +92,32 @@ namespace Services
             return stationService.GetStationById(id);
         }
 
+        public IEnumerable<Condition> GetSubscribedConditionsOfChannel(int channelId)
+        {
+            List<NotificationSubscription> subscriptions = new List<NotificationSubscription>();            
+            IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(subscriptionsGroupName);
+            foreach(ConfigSetting setting in settings)
+            {
+                var contentValue = setting.ContentValue;
+                NotificationSubscription subscription = JsonConvert.DeserializeObject<NotificationSubscription>(contentValue);
+                subscriptions.Add(subscription);
+            }
+            return subscriptions.Where(e => e.ChannelId == channelId).FirstOrDefault().Conditions;
+
+            //i was dumb to write the below code to whoever reading this shit in future.
+            //foreach(NotificationSubscription subscription in subscriptions)
+            //{
+            //    if (subscription.ChannelId == channelId)
+            //    {
+            //        conditions = subscription.Conditions;
+            //    }
+            //}
+            
+        }
+
         public IEnumerable<ConfigSetting> GetSubscriptions()
         {
-            return configSettingService.GetConfigSettingsByGroupName(conditionsGroupName);
+            return configSettingService.GetConfigSettingsByGroupName(subscriptionsGroupName);
         }
     }
 }

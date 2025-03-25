@@ -11,7 +11,7 @@ namespace Services
     public class DisplayBoardService : IDisplayBoardService
     {
         private readonly ConfigSettingService configSettingService;
-        private readonly string contractsGroupName = "DisplayBoardFileGenerator";
+        private readonly string contractsGroupName = "DisplayBoardTemplate";
         public DisplayBoardService(ConfigSettingService _configSettingService)
         {
             configSettingService = _configSettingService;

@@ -14,5 +14,8 @@ namespace Services.Interfaces
         void AddLicense(Models.Licenses.License license);
         void DeleteLicenes(string licenseType);
         void Update(Models.Licenses.License license);
+
+        void GenerateLicenseSoftrack(Models.Licenses.Registration registration);
+        string GetCompanyNameSoftrack(int id);
     }
 }

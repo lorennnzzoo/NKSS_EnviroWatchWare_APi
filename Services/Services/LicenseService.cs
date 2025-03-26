@@ -3,7 +3,9 @@ using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Services
@@ -110,21 +112,82 @@ namespace Services
 
         public void Update(Models.Licenses.License license)
         {
-            if (IsValid(license.LicenseKey))
+            //if (IsValid(license.LicenseKey))
+            //{
+            //    Models.Licenses.License _license =GetLicenseByType(license.LicenseType);
+            //    if (_license != null)
+            //    {
+            //        _licenseRepository.Update(license);
+            //    }
+            //    else
+            //    {
+            //        _licenseRepository.Add(license);
+            //    }
+            //}
+            //else
+            //{
+            //    throw new Exceptions.KeyExpiredException();
+            //}
+            Models.Licenses.License _license = GetLicenseByType(license.LicenseType);
+            if (_license != null)
             {
-                Models.Licenses.License _license =GetLicenseByType(license.LicenseType);
-                if (_license != null)
-                {
-                    _licenseRepository.Update(license);
-                }
-                else
-                {
-                    _licenseRepository.Add(license);
-                }
+                _licenseRepository.Update(license);
             }
             else
             {
-                throw new Exceptions.KeyExpiredException();
+                _licenseRepository.Add(license);
+            }
+        }
+
+        public void GenerateLicenseSoftrack(Models.Licenses.Registration registration)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var json = JsonSerializer.Serialize(registration);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = client.PostAsync("https://localhost:44308/Product/Register", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseData = response.Content.ReadAsStringAsync().Result;
+                    var result = JsonSerializer.Deserialize<Models.Licenses.SoftrackLicenseResponse>(responseData);
+                    Models.Licenses.License license = new Models.Licenses.License
+                    {
+                        LicenseType="WatchWare",
+                        LicenseKey=result.Key,
+                        Active=true,
+                    };
+                    Update(license);
+                }
+                else
+                {
+                    Console.WriteLine("Error: " + response.StatusCode);
+                }
+            }
+        }
+
+        public string GetCompanyNameSoftrack(int id)
+        {
+            string apiUrl = $"https://localhost:44308/Company/GetName?id={id}";
+
+            using (HttpClient client = new HttpClient())
+            {
+                HttpResponseMessage response = client.GetAsync(apiUrl).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string companyName = response.Content.ReadAsStringAsync().Result;
+                    return companyName;
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return "Not found";
+                }
+                else
+                {
+                    return "Not found";
+                }
             }
         }
     }

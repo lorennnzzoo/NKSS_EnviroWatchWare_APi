@@ -98,11 +98,11 @@ namespace Repositories
 
                 if (_databaseProvider == "NPGSQL")
                 {
-                    query = "SELECT * FROM public.\"License\" WHERE \"LicenseType\" = @LicenseType AND \"Active\" = True"; 
+                    query = "SELECT * FROM public.\"License\" WHERE \"LicenseType\" = @LicenseType"; 
                 }
                 else
                 {
-                    query = "SELECT * FROM dbo.License WHERE LicenseType = @LicenseType AND Active = 1"; 
+                    query = "SELECT * FROM dbo.License WHERE LicenseType = @LicenseType"; 
                 }
 
                 return db.QuerySingleOrDefault<License>(query, new { LicenseType = licenseType });

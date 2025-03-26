@@ -63,15 +63,23 @@ namespace Services
             var license = _licenseRepository.GetLicenseByType(licenseType);
             if(license != null)
             {
-                string decryptedKey = _cryptoService.Decrypt(license.LicenseKey);
-                if (DateTime.TryParse(decryptedKey, out DateTime licenseValidity))
+                //string decryptedKey = _cryptoService.Decrypt(license.LicenseKey);
+                //if (DateTime.TryParse(decryptedKey, out DateTime licenseValidity))
+                //{
+                //    return DateTime.Now < licenseValidity;
+                //}
+                //else
+                //{
+                //    return false;
+                //}    
+                if (license.Active)
                 {
-                    return DateTime.Now < licenseValidity;
+                    return true;
                 }
                 else
                 {
                     return false;
-                }    
+                }
             }
             else
             {

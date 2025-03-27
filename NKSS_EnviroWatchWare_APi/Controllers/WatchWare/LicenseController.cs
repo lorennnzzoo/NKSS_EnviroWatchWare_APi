@@ -19,43 +19,67 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             this.license_service = _license_service;
         }
 
-        [HttpPost]
-        [Route("Register")]
-        public IHttpActionResult GenerateLicense(Models.Licenses.Registration registration)
-        {
-            try
-            {
-                if (registration.ExpiresAt == null)
-                {
-                    throw new ArgumentNullException("ExpiryDate is required");
-                }
-                if (DateTime.Now > registration.ExpiresAt.Value)
-                {
-                    throw new InvalidOperationException("ExpiryDate Should be in future");
-                }
+        //[HttpPost]
+        //[Route("Register")]
+        //public IHttpActionResult GenerateLicense(Models.Licenses.Registration registration)
+        //{
+        //    try
+        //    {
+        //        if (registration.ExpiresAt == null)
+        //        {
+        //            throw new ArgumentNullException("ExpiryDate is required");
+        //        }
+        //        if (DateTime.Now > registration.ExpiresAt.Value)
+        //        {
+        //            throw new InvalidOperationException("ExpiryDate Should be in future");
+        //        }
 
-                license_service.GenerateLicenseSoftrack(registration);
-                return Ok();
-            }
-            catch(Exception ex)
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                {
-                    Content = new StringContent(ex.Message)
-                };
+        //        license_service.GenerateLicenseSoftrack(registration);
+        //        return Ok();
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        //        {
+        //            Content = new StringContent(ex.Message)
+        //        };
 
-                return ResponseMessage(response);
-            }            
-        }
+        //        return ResponseMessage(response);
+        //    }            
+        //}
+
+        //[HttpGet]
+        //[Route("GetCompanyNameById")]
+        //public IHttpActionResult GetCompanyName(int id)
+        //{
+        //    try
+        //    {
+        //        string name = license_service.GetCompanyNameSoftrack(id);
+        //        return Ok(name);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        //        {
+        //            Content = new StringContent(ex.Message)
+        //        };
+
+        //        return ResponseMessage(response);
+        //    }
+        //}
 
         [HttpGet]
-        [Route("GetCompanyNameById")]
-        public IHttpActionResult GetCompanyName(int id)
+        [Route("GetProductDetails")]
+        public IHttpActionResult GetProductDetails(string licenseKey)
         {
             try
             {
-                string name = license_service.GetCompanyNameSoftrack(id);
-                return Ok(name);
+                var details = license_service.GetProductSoftwareTrack(licenseKey);
+                if (details == null)
+                {
+                    return NotFound();
+                }
+                return Ok(details);
             }
             catch (Exception ex)
             {
@@ -67,6 +91,60 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+
+        [HttpPost]
+        [Route("RegisterProduct")]
+        public IHttpActionResult RegisterProduct(Models.Licenses.ProductDetails product)
+        {
+            try
+            {
+                license_service.RegisterProduct(product);
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetLicenseStatus")]
+        public IHttpActionResult GetLicenseStatus()
+        {
+            try
+            {
+                var license = license_service.GetLicenseStatus();
+                if (license == null)
+                {
+                    return Ok(false);
+                }
+
+                if (license.Active)
+                {
+                    return Ok(true);
+                }
+                else
+                {
+                    return Ok(false);
+                }
+            }
+            catch(Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
         //[HttpGet]
         //[Route("GetLicense")]
         //public IHttpActionResult Get(string type)

@@ -10,7 +10,7 @@ namespace Models.Licenses
     {
         public string LicenseType { get; set; }
         public string LicenseKey { get; set; }
-        public bool Active { get; set; } = true;
+        public bool Active { get; set; }
     }
     public class LicenseResponse
     {

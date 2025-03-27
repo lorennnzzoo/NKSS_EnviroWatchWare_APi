@@ -14,10 +14,13 @@ namespace Services
     {
         private readonly ILicenseRepository _licenseRepository;
         private readonly ICryptoService _cryptoService;
+        private string LICENSE_URL;
+        private const string LICENSE_TYPE= "WatchWare";
         public LicenseService(ILicenseRepository licenseRepository, ICryptoService cryptoService)
         {
             _licenseRepository = licenseRepository;
             _cryptoService = cryptoService;
+            LICENSE_URL = System.Configuration.ConfigurationManager.AppSettings["LicenseUrl"];
         }
 
         public void AddLicense(Models.Licenses.License license)
@@ -44,7 +47,7 @@ namespace Services
             {
                 response.LicenseType = license.LicenseType;
                 response.LicenseKey = license.LicenseKey;
-                response.Valid = IsValid(license.LicenseKey);
+                response.Valid = license.Active;
             }
             
             return response;
@@ -89,26 +92,26 @@ namespace Services
             }                        
         }
 
-        public bool IsValid(string key)
-        {
-            try
-            {
-                string decryptedKey = _cryptoService.Decrypt(key);
-                if (DateTime.TryParse(decryptedKey, out DateTime licenseValidity))
-                {
-                    return DateTime.Now < licenseValidity;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch(Exception ex)
-            {
-                throw new Exceptions.InvalidKeyException();
-            }
+        //public bool IsValid(string key)
+        //{
+        //    try
+        //    {
+        //        string decryptedKey = _cryptoService.Decrypt(key);
+        //        if (DateTime.TryParse(decryptedKey, out DateTime licenseValidity))
+        //        {
+        //            return DateTime.Now < licenseValidity;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        throw new Exceptions.InvalidKeyException();
+        //    }
             
-        }
+        //}
 
         public void Update(Models.Licenses.License license)
         {
@@ -138,38 +141,12 @@ namespace Services
                 _licenseRepository.Add(license);
             }
         }
+        
 
-        public void GenerateLicenseSoftrack(Models.Licenses.Registration registration)
+        public Models.Licenses.ProductDetails GetProductSoftwareTrack(string key)
         {
-            using (HttpClient client = new HttpClient())
-            {
-                var json = JsonSerializer.Serialize(registration);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = client.PostAsync("https://localhost:44308/Product/Register", content).Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseData = response.Content.ReadAsStringAsync().Result;
-                    var result = JsonSerializer.Deserialize<Models.Licenses.SoftrackLicenseResponse>(responseData);
-                    Models.Licenses.License license = new Models.Licenses.License
-                    {
-                        LicenseType="WatchWare",
-                        LicenseKey=result.Key,
-                        Active=true,
-                    };
-                    Update(license);
-                }
-                else
-                {
-                    Console.WriteLine("Error: " + response.StatusCode);
-                }
-            }
-        }
-
-        public string GetCompanyNameSoftrack(int id)
-        {
-            string apiUrl = $"https://localhost:44308/Company/GetName?id={id}";
+            string apiUrl = $"{LICENSE_URL}License/GetProductDetailsByLicenseKey?licenseKey={key}";
+            Models.Licenses.ProductDetails details = new Models.Licenses.ProductDetails();
 
             using (HttpClient client = new HttpClient())
             {
@@ -177,18 +154,35 @@ namespace Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string companyName = response.Content.ReadAsStringAsync().Result;
-                    return companyName;
+                    string detailsString = response.Content.ReadAsStringAsync().Result;
+                    details = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.Licenses.ProductDetails>(detailsString);
+                    return details;
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    return "Not found";
+                    return null;
                 }
                 else
                 {
-                    return "Not found";
+                    return null;
                 }
             }
+        }
+
+        public void RegisterProduct(Models.Licenses.ProductDetails product)
+        {
+            Models.Licenses.License license = new Models.Licenses.License
+            {
+                Active = true,
+                LicenseKey = product.licenseKey,
+                LicenseType = LICENSE_TYPE,
+            };
+            Update(license);
+        }
+
+        public Models.Licenses.License GetLicenseStatus()
+        {
+            return _licenseRepository.GetLicenseByType(LICENSE_TYPE);
         }
     }
 }

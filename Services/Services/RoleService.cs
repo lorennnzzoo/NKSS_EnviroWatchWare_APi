@@ -16,6 +16,35 @@ namespace Services
         {
             _roleRepository = roleRepository;
         }
+
+        public void CreateAdminRole()
+        {
+            var existingRoles = GetAllRoles();
+            //if (existingRoles.Any()||existingRoles==null)
+            //{
+                var adminRole = existingRoles.Where(e => e.Name.ToUpper() == "ADMIN").FirstOrDefault();
+                if (adminRole==null)
+                {
+                    Models.Post.Authentication.Role role = new Models.Post.Authentication.Role
+                    {
+                        Name = "Admin",
+                        Description = "Administrator"
+                    };
+                    _roleRepository.CreateRole(role);
+                }
+                var customerRole=existingRoles.Where(e => e.Name.ToUpper() == "CUSTOMER").FirstOrDefault();
+                if (customerRole == null)
+                {
+                    Models.Post.Authentication.Role role = new Models.Post.Authentication.Role
+                    {
+                        Name = "Customer",
+                        Description = "Customer"
+                    };
+                    _roleRepository.CreateRole(role);
+                }
+            //}
+        }
+
         public IEnumerable<Role> GetAllRoles()
         {
             return _roleRepository.GetAll();

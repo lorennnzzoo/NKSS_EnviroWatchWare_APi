@@ -14,12 +14,16 @@ namespace Services
     {
         private readonly ILicenseRepository _licenseRepository;
         private readonly ICryptoService _cryptoService;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
         private string LICENSE_URL;
         private const string LICENSE_TYPE= "WatchWare";
-        public LicenseService(ILicenseRepository licenseRepository, ICryptoService cryptoService)
+        public LicenseService(ILicenseRepository licenseRepository, ICryptoService cryptoService, IUserService userService, IRoleService roleService)
         {
             _licenseRepository = licenseRepository;
             _cryptoService = cryptoService;
+            _userService = userService;
+            _roleService = roleService;
             LICENSE_URL = System.Configuration.ConfigurationManager.AppSettings["LicenseUrl"];
         }
 
@@ -171,13 +175,37 @@ namespace Services
 
         public void RegisterProduct(Models.Licenses.ProductDetails product)
         {
-            Models.Licenses.License license = new Models.Licenses.License
+            var licenseStatus=GetLicenseStatus();
+            if (licenseStatus == null)
             {
-                Active = true,
-                LicenseKey = product.licenseKey,
-                LicenseType = LICENSE_TYPE,
-            };
-            Update(license);
+                Models.Licenses.License license = new Models.Licenses.License
+                {
+                    Active = true,
+                    LicenseKey = product.licenseKey,
+                    LicenseType = LICENSE_TYPE,
+                };
+                Update(license);
+                _roleService.CreateAdminRole();
+                
+                _userService.CreateAdminAccount();
+            }
+            else if (!licenseStatus.Active)
+            {
+                Models.Licenses.License license = new Models.Licenses.License
+                {
+                    Active = true,
+                    LicenseKey = product.licenseKey,
+                    LicenseType = LICENSE_TYPE,
+                };
+                Update(license);
+                _roleService.CreateAdminRole();
+                
+                _userService.CreateAdminAccount();
+            }
+            else
+            {
+                throw new ArgumentException("Product already registered.");
+            }
         }
 
         public Models.Licenses.License GetLicenseStatus()

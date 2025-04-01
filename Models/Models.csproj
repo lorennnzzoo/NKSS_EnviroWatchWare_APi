@@ -67,6 +67,7 @@
     <Compile Include="ConfigSetting.cs" />
     <Compile Include="DashBoard\ChannelDataFeedByStation.cs" />
     <Compile Include="DisplayBoard\Template.cs" />
+    <Compile Include="Get\User.cs" />
     <Compile Include="Licenses\License.cs" />
     <Compile Include="Licenses\ProductDetails.cs" />
     <Compile Include="MonitoringType.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Oxide.cs" />
     <Compile Include="PollutionData\PollutantDataUploadRequest.cs" />
     <Compile Include="Post\Analyzer.cs" />
+    <Compile Include="Post\Authentication\Role.cs" />
     <Compile Include="Post\Authentication\User.cs" />
     <Compile Include="Post\Authentication\UserLogin.cs" />
     <Compile Include="Post\Channel.cs" />

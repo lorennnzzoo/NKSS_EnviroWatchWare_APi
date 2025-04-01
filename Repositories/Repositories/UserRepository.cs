@@ -130,7 +130,7 @@ namespace Repositories
             }
         }
 
-        public User GetByUsername(string username)
+        public Models.Get.User GetByUsername(string username)
         {
             using (IDbConnection db = CreateConnection()) 
             {
@@ -146,7 +146,7 @@ namespace Repositories
                     query = "SELECT * FROM dbo.[User] WHERE [Username] = @Username";
                 }
 
-                return db.QuerySingleOrDefault<User>(query, new { Username = username });
+                return db.QuerySingleOrDefault<Models.Get.User>(query, new { Username = username });
             }
         }
 

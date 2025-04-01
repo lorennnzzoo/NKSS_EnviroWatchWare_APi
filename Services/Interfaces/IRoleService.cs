@@ -9,5 +9,8 @@ namespace Services.Interfaces
     public interface IRoleService
     {
         IEnumerable<Models.Role> GetAllRoles();
+        Models.Role GetRoleById(int id);
+
+        void CreateAdminRole();
     }
 }

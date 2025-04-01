@@ -20,6 +20,8 @@ namespace Services.Interfaces
 
         void ActivateUser(Guid id);
 
-        Models.User GetUserProfile(string username);
+        Models.Get.User GetUserProfile(string username);
+
+        void CreateAdminAccount();
     }
 }

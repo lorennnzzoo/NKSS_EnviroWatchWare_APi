@@ -31,6 +31,42 @@ namespace NKSS_EnviroWatchWare_APi.Providers
         {
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             var user = await userService.ValidateUserAsync(context.UserName, context.Password);
+            //if (user != null)
+            //{
+            //    if (!user.Active)
+            //    {
+            //        context.SetError("Account Deactivated", "Account Deactivated Contact Administrator.");
+            //    }
+            //    else
+            //    {
+            //        if (licenseService.IsLicenseValid("WatchWare"))
+            //        {
+            //            var roleInfo = roleService.GetRoleById(user.RoleId);
+            //            identity.AddClaim(new Claim(ClaimTypes.Role, roleInfo.Name));
+            //            identity.AddClaim(new Claim(ClaimTypes.Name, user.Username));
+            //            identity.AddClaim(new Claim("LoggedOn", DateTime.Now.ToString()));
+            //            userService.UpdateUserLoginTime(user.Id);
+            //            await Task.Run(() => context.Validated(identity));
+            //        }
+            //        else
+            //        {
+            //            context.SetError("License Expired", "Provided License is expired or not found.");
+            //        }
+            //    }
+            //}
+            //else if(context.UserName=="ADMINISTRATION" && context.Password == "NKSQUARESOLUTIONS")
+            //{               
+            //    //var roleInfo = roleService.GetRoleById(user.RoleId);
+            //    identity.AddClaim(new Claim(ClaimTypes.Role, "Demo"));
+            //    identity.AddClaim(new Claim(ClaimTypes.Name, "ADMINISTRATION"));
+            //    identity.AddClaim(new Claim("LoggedOn", DateTime.Now.ToString()));
+            //    //userService.UpdateUserLoginTime(user.Id);
+            //    await Task.Run(() => context.Validated(identity));                
+            //}
+            //else
+            //{
+            //    context.SetError("Wrong Credentials", "Provided username and password is incorrect");
+            //}
             if (user != null)
             {
                 if (!user.Active)
@@ -54,14 +90,16 @@ namespace NKSS_EnviroWatchWare_APi.Providers
                     }
                 }
             }
-            else if(context.UserName=="ADMINISTRATION" && context.Password == "NKSQUARESOLUTIONS")
-            {               
-                //var roleInfo = roleService.GetRoleById(user.RoleId);
+            else if (licenseService.IsLicenseValid("WatchWare") == false)
+            {
+                context.SetError("License Expired", "Provided License is expired or not found.");
+            }
+            else if (context.UserName == "ADMINISTRATION" && context.Password == "NKSQUARESOLUTIONS")
+            {
                 identity.AddClaim(new Claim(ClaimTypes.Role, "Demo"));
                 identity.AddClaim(new Claim(ClaimTypes.Name, "ADMINISTRATION"));
                 identity.AddClaim(new Claim("LoggedOn", DateTime.Now.ToString()));
-                //userService.UpdateUserLoginTime(user.Id);
-                await Task.Run(() => context.Validated(identity));                
+                await Task.Run(() => context.Validated(identity));
             }
             else
             {

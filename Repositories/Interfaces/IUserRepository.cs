@@ -13,7 +13,7 @@ namespace Repositories.Interfaces
         void Delete(Guid id);
         void Activate(Guid id);
 
-        Models.User GetByUsername(string username);
+        Models.Get.User GetByUsername(string username);
         Task<Models.User> GetByUsernameAsync(string username);
 
         void UpdateUserLoginTime( Guid userId);

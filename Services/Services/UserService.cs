@@ -26,6 +26,32 @@ namespace Services
             _userRepository.Activate(id);
         }
 
+        public void CreateAdminAccount()
+        {
+            var users = _userRepository.GetAll();
+            //if (users.Any() || users == null)
+            //{
+                var adminRole=roleService.GetAllRoles().Where(e => e.Name.ToUpper() == "ADMIN").FirstOrDefault();
+                var adminAccounts = users.Where(e => e.RoleId == adminRole.Id).FirstOrDefault();
+                if (adminAccounts == null)
+                {
+                    Models.Post.Authentication.User user = new Models.Post.Authentication.User
+                    {
+                        Username = "Admin",
+                        Password = "Admin@nksquare",
+                        PhoneNumber = "0000000000",
+                        Email = "admin@nksquare.com",
+                        RoleId = adminRole.Id
+                    };
+                    CreateUser(user);
+                }
+                else
+                {
+                    //admin account already exists
+                }
+            //}
+        }
+
         public void CreateUser(Models.Post.Authentication.User user)
         {
             if (roleService.GetAllRoles().Where(e => e.Id == user.RoleId).Select(e => e.Name).FirstOrDefault().ToUpper() == "ADMIN")
@@ -39,7 +65,7 @@ namespace Services
             {
                 throw new Exceptions.CannotUseReservedUsernameException(user.Username);
             }
-            Models.User user_exists = _userRepository.GetByUsername(user.Username);
+            Models.Get.User user_exists = _userRepository.GetByUsername(user.Username);
             if (user_exists != null)
             {
                 throw new Exceptions.UserAlreadyExistsException(user.Username);
@@ -70,7 +96,7 @@ namespace Services
             return users;
         }
 
-        public Models.User GetUserProfile(string username)
+        public Models.Get.User GetUserProfile(string username)
         {
             return _userRepository.GetByUsername(username);
         }

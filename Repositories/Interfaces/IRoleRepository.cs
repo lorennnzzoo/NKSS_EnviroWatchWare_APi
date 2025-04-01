@@ -9,5 +9,6 @@ namespace Repositories.Interfaces
     public interface IRoleRepository
     {
         IEnumerable<Models.Role> GetAll();
+        void CreateRole(Models.Post.Authentication.Role role);
     }
 }

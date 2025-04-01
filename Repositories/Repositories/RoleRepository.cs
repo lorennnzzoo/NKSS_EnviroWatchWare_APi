@@ -67,5 +67,25 @@ namespace Repositories
                 return db.Query<Role>(query).ToList();
             }
         }
+
+        public void CreateRole(Models.Post.Authentication.Role role)
+        {
+            using (IDbConnection db = CreateConnection())
+            {
+                db.Open();
+                string query;
+
+                if (_databaseProvider == "NPGSQL")
+                {
+                    query = @"INSERT INTO public.""Roles"" (""Name"",""Description"") Values(@Name,@Description)";
+                }
+                else
+                {
+                    query = "INSERT INTO Roles (Name,Description) Values (@Name,@Description)";
+                }
+
+                db.Execute(query,new { Name=role.Name,Description=role.Description});
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace NKSS_EnviroWatchWare_APi.Services
+namespace NKSS_EnviroWatchWare_APi.Callers
 {
     public class ApiCaller
     {

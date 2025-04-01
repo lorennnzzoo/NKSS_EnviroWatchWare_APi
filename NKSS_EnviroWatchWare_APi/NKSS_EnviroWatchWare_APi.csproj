@@ -340,7 +340,7 @@
     <Compile Include="Providers\KeyValidityHelper.cs" />
     <Compile Include="Providers\OAuthProvider.cs" />
     <Compile Include="Providers\PollutantAuthorizeAttribute.cs" />
-    <Compile Include="Services\ApiCaller.cs" />
+    <Compile Include="Callers\ApiCaller.cs" />
     <Compile Include="SwaggerFilter\AddAuthorizationHeaderOperationFilter.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -187,7 +187,7 @@ namespace Services
                 Update(license);
                 _roleService.CreateAdminRole();
                 
-                _userService.CreateAdminAccount();
+                _userService.CreateAdminAccount(product.UserDetails.Password,product.UserDetails.Email,product.UserDetails.PhoneNumber);
             }
             else if (!licenseStatus.Active)
             {
@@ -200,7 +200,7 @@ namespace Services
                 Update(license);
                 _roleService.CreateAdminRole();
                 
-                _userService.CreateAdminAccount();
+                _userService.CreateAdminAccount(product.UserDetails.Password, product.UserDetails.Email, product.UserDetails.PhoneNumber);
             }
             else
             {

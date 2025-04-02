@@ -26,7 +26,7 @@ namespace Services
             _userRepository.Activate(id);
         }
 
-        public void CreateAdminAccount()
+        public void CreateAdminAccount(string password,string email,string phonenumber)
         {
             var users = _userRepository.GetAll();
             //if (users.Any() || users == null)
@@ -38,9 +38,9 @@ namespace Services
                     Models.Post.Authentication.User user = new Models.Post.Authentication.User
                     {
                         Username = "Admin",
-                        Password = "Admin@nksquare",
-                        PhoneNumber = "0000000000",
-                        Email = "admin@nksquare.com",
+                        Password = password,
+                        PhoneNumber = phonenumber,
+                        Email = email,
                         RoleId = adminRole.Id
                     };
                     CreateUser(user);

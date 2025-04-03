@@ -15,8 +15,7 @@ namespace Services
         private readonly ConfigSettingService configSettingService;
         private readonly ChannelService channelService;
         private readonly StationService stationService;
-        private readonly string subscriptionsGroupName = "NotificationSubscription";
-        private readonly string conditionsGroupName = "NotificationCondition";
+        private const string GROUPNAME = "NotificationGenerator";        
         public NotificationService(ConfigSettingService _configSettingService, ChannelService _channelService, StationService _stationService)
         {
             configSettingService = _configSettingService;
@@ -28,7 +27,7 @@ namespace Services
         {
             Models.Post.ConfigSetting settings = new Models.Post.ConfigSetting
             {
-                GroupName = conditionsGroupName,
+                GroupName = GROUPNAME,
                 ContentName = $"Condition_{Guid.NewGuid().ToString()}",
                 ContentValue = JsonConvert.SerializeObject(condition),
             };
@@ -44,7 +43,7 @@ namespace Services
             };
             Models.Post.ConfigSetting setting = new Models.Post.ConfigSetting
             {
-                GroupName = subscriptionsGroupName,
+                GroupName = GROUPNAME,
                 ContentName = $"Subscription_{Guid.NewGuid().ToString()}",
                 ContentValue = JsonConvert.SerializeObject(subscription),
             };
@@ -54,7 +53,7 @@ namespace Services
         public IEnumerable<Condition> GetAllConditions()
         {
             List<Condition> conditions = new List<Condition>();
-            IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(conditionsGroupName);
+            IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e=>e.ContentName.StartsWith("Condition_"));
             foreach(ConfigSetting setting in settings)
             {
                 conditions.Add(JsonConvert.DeserializeObject<Condition>(setting.ContentValue));
@@ -95,7 +94,7 @@ namespace Services
         public IEnumerable<Condition> GetSubscribedConditionsOfChannel(int channelId)
         {
             List<NotificationSubscription> subscriptions = new List<NotificationSubscription>();            
-            IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(subscriptionsGroupName);
+            IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e=>e.ContentName.StartsWith("Subscription_"));
             foreach(ConfigSetting setting in settings)
             {
                 var contentValue = setting.ContentValue;
@@ -117,7 +116,7 @@ namespace Services
 
         public IEnumerable<ConfigSetting> GetSubscriptions()
         {
-            return configSettingService.GetConfigSettingsByGroupName(subscriptionsGroupName);
+            return configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e=>e.ContentName.StartsWith("Subscription_"));
         }
     }
 }

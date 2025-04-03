@@ -217,7 +217,8 @@ namespace Repositories
 
                     foreach (var channel in channels)
                     {
-                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
+                        //string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
 
                         string columnExpression = $@"
                     CAST(AVG(CASE 
@@ -417,7 +418,8 @@ namespace Repositories
 
                     foreach (var channel in channels)
                     {
-                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
+                        string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
+                        //string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
 
                         string columnExpression = $@"
                                 CAST(AVG(CASE 

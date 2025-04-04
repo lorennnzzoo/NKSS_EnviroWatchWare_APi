@@ -2,7 +2,9 @@
 using Post = Models.Post;
 using Repositories.Interfaces;
 using Services.Interfaces;
+using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace Services
 {
@@ -13,6 +15,24 @@ namespace Services
         {
             _monitoringTypeRepository = monitoringTypeRepository;
         }
+
+        public void CreateDefaultMonitoringTypes()
+        {
+            IEnumerable<MonitoringType> existingMonitoringTypes = GetAllMonitoringTypes();
+            var defaultTypes = new List<string> { "STACK", "WATER", "AMBIENT" };
+            foreach(string typeName in defaultTypes)
+            {
+                if (!existingMonitoringTypes.Any(mt => mt.MonitoringTypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    Post.MonitoringType monitoringType = new Post.MonitoringType
+                    {
+                        MonitoringTypeName = typeName
+                    };
+                    CreateMonitoringType(monitoringType);
+                }
+            }
+        }
+
         public void CreateMonitoringType(Models.Post.MonitoringType monitoringType)
         {
             _monitoringTypeRepository.Add(monitoringType);

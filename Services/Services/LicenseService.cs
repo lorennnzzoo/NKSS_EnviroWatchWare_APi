@@ -13,15 +13,17 @@ namespace Services
     public class LicenseService : ILicenseService
     {
         private readonly ILicenseRepository _licenseRepository;
-        private readonly ICryptoService _cryptoService;
+        private readonly IChannelTypeService _channelTypeService;
+        private readonly IMonitoringTypeService _monitoringTypeService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private string LICENSE_URL;
         private const string LICENSE_TYPE= "WatchWare";
-        public LicenseService(ILicenseRepository licenseRepository, ICryptoService cryptoService, IUserService userService, IRoleService roleService)
+        public LicenseService(ILicenseRepository licenseRepository, ICryptoService cryptoService, IUserService userService, IRoleService roleService, IChannelTypeService channelTypeService, IMonitoringTypeService monitoringTypeService)
         {
             _licenseRepository = licenseRepository;
-            _cryptoService = cryptoService;
+            _channelTypeService = channelTypeService;
+            _monitoringTypeService = monitoringTypeService;
             _userService = userService;
             _roleService = roleService;
             LICENSE_URL = System.Configuration.ConfigurationManager.AppSettings["LicenseUrl"];
@@ -186,7 +188,8 @@ namespace Services
                 };
                 Update(license);
                 _roleService.CreateAdminRole();
-                
+                _channelTypeService.CreateDefaultChannelTypes();
+                _monitoringTypeService.CreateDefaultMonitoringTypes();
                 _userService.CreateAdminAccount(product.UserDetails.Password,product.UserDetails.Email,product.UserDetails.PhoneNumber);
             }
             else if (!licenseStatus.Active)
@@ -199,7 +202,8 @@ namespace Services
                 };
                 Update(license);
                 _roleService.CreateAdminRole();
-                
+                _channelTypeService.CreateDefaultChannelTypes();
+                _monitoringTypeService.CreateDefaultMonitoringTypes();
                 _userService.CreateAdminAccount(product.UserDetails.Password, product.UserDetails.Email, product.UserDetails.PhoneNumber);
             }
             else

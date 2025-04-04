@@ -11,5 +11,6 @@ namespace Services.Interfaces
         void CreateMonitoringType(Post.MonitoringType monitoringType);
         void UpdateMonitoringType(MonitoringType monitoringType);
         void DeleteMonitoringType(int id);
+        void CreateDefaultMonitoringTypes();
     }
 }

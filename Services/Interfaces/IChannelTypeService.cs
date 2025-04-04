@@ -11,5 +11,6 @@ namespace Services.Interfaces
         void CreateChannelType(Post.ChannelType channelType);
         void UpdateChannelType(ChannelType channelType);
         void DeleteChannelType(int id);
+        void CreateDefaultChannelTypes();
     }
 }

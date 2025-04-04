@@ -1,8 +1,10 @@
 ﻿using Models;
+using System.Linq;
 using Post = Models.Post;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System.Collections.Generic;
+using System;
 
 namespace Services
 {
@@ -16,6 +18,29 @@ namespace Services
         public void CreateChannelType(Post.ChannelType channelType)
         {
             _channelTypeRepository.Add(channelType);
+        }
+
+        public void CreateDefaultChannelTypes()
+        {           
+            IEnumerable<ChannelType> existingTypes = GetAllChannelTypes();
+
+            
+            var defaultTypes = new List<string> { "SCALAR", "VECTOR", "TOTAL", "FLOW", "FLOWTOTALIZER" };
+
+            foreach (var typeName in defaultTypes)
+            {
+                
+                if (!existingTypes.Any(ct => ct.ChannelTypeValue.Equals(typeName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    Post.ChannelType newType = new Post.ChannelType
+                    {
+                        ChannelTypeValue = typeName,
+                        
+                    };
+
+                    CreateChannelType(newType); 
+                }
+            }
         }
 
         public void DeleteChannelType(int id)

@@ -76,6 +76,19 @@ namespace NKSS_EnviroWatchWare_APi.Controllers
                     {
                         throw new ArgumentException("One channel must be of type VECTOR and the other of type SCALAR.");
                     }
+                    string channel1Name = channel1.Name.ToLower();
+                    string channel2Name = channel2.Name.ToLower();
+
+                    bool channel1IsSpeed = channel1Name.Contains("speed");
+                    bool channel1IsDirection = channel1Name.Contains("direction");
+                    bool channel2IsSpeed = channel2Name.Contains("speed");
+                    bool channel2IsDirection = channel2Name.Contains("direction");
+
+                    
+                    if (!((channel1IsSpeed && channel2IsDirection) || (channel1IsDirection && channel2IsSpeed)))
+                    {
+                        throw new ArgumentException("You must select one 'wind speed' channel and one 'wind direction' channel.");
+                    }
 
                 }
 

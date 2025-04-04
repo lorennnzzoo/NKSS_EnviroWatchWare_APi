@@ -19,6 +19,7 @@ namespace Repositories
     {
         private readonly string _connectionString;
         private readonly string _databaseProvider;
+        private const string PASS_PHRASE = "honed86eyeing90Gnats69Striate95Woman58Withe71Griffith67szilard00believe72lynch";
         public ReportRepository()
         {
             _databaseProvider = ConfigurationManager.AppSettings["DatabaseProvider"];
@@ -220,34 +221,66 @@ namespace Repositories
                         string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
                         //string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
 
+                        //string columnExpression = $@"
+                        //CAST(AVG(CASE 
+                        //    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.""ChannelValue"")) 
+                        //    ELSE NULL 
+                        //END) AS NUMERIC(10,2)) AS ""{columnAlias}_SIN"", 
+
+                        //CAST(AVG(CASE 
+                        //    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(cd.""ChannelValue"")) 
+                        //    ELSE NULL 
+                        //END) AS NUMERIC(10,2)) AS ""{columnAlias}_COS"", 
+
+                        //CAST(MAX(CASE 
+                        //    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.""ChannelValue""
+                        //    ELSE NULL 
+                        //END) - MIN(CASE 
+                        //    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.""ChannelValue""
+                        //    ELSE NULL 
+                        //END) AS NUMERIC(10,2)) AS ""{columnAlias}_TOTAL_RANGE"",
+
+                        //CAST(SUM(CASE 
+                        //    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN cd.""ChannelValue""
+                        //    ELSE NULL 
+                        //END) AS NUMERIC(10,2)) AS ""{columnAlias}_FLOW_SUM"",
+
+                        //CAST(AVG(CASE 
+                        //    WHEN cd.""ChannelId"" = {channel.ChannelId} THEN cd.""ChannelValue""
+                        //    ELSE NULL 
+                        //END) AS NUMERIC(10,2)) AS ""{columnAlias}""";
+
                         string columnExpression = $@"
-                    CAST(AVG(CASE 
-                        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.""ChannelValue"")) 
-                        ELSE NULL 
-                    END) AS NUMERIC(10,2)) AS ""{columnAlias}_SIN"", 
+    CAST(AVG(CASE 
+        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC))) 
+        ELSE NULL 
+    END) AS NUMERIC(10,2)) AS ""{columnAlias}_SIN"", 
 
-                    CAST(AVG(CASE 
-                        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(cd.""ChannelValue"")) 
-                        ELSE NULL 
-                    END) AS NUMERIC(10,2)) AS ""{columnAlias}_COS"", 
+    CAST(AVG(CASE 
+        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC))) 
+        ELSE NULL 
+    END) AS NUMERIC(10,2)) AS ""{columnAlias}_COS"", 
 
-                    CAST(MAX(CASE 
-                        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.""ChannelValue""
-                        ELSE NULL 
-                    END) - MIN(CASE 
-                        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.""ChannelValue""
-                        ELSE NULL 
-                    END) AS NUMERIC(10,2)) AS ""{columnAlias}_TOTAL_RANGE"",
+    CAST(MAX(CASE 
+        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
+        ELSE NULL 
+    END) - MIN(CASE 
+        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
+        ELSE NULL 
+    END) AS NUMERIC(10,2)) AS ""{columnAlias}_TOTAL_RANGE"",
 
-                    CAST(SUM(CASE 
-                        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN cd.""ChannelValue""
-                        ELSE NULL 
-                    END) AS NUMERIC(10,2)) AS ""{columnAlias}_FLOW_SUM"",
+    CAST(SUM(CASE 
+        WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
+        ELSE NULL 
+    END) AS NUMERIC(10,2)) AS ""{columnAlias}_FLOW_SUM"", 
 
-                    CAST(AVG(CASE 
-                        WHEN cd.""ChannelId"" = {channel.ChannelId} THEN cd.""ChannelValue""
-                        ELSE NULL 
-                    END) AS NUMERIC(10,2)) AS ""{columnAlias}""";
+    CAST(AVG(CASE 
+        WHEN cd.""ChannelId"" = {channel.ChannelId} THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
+        ELSE NULL 
+    END) AS NUMERIC(10,2)) AS ""{columnAlias}""";
+
+
+
 
                         columnClauses.Add(columnExpression);
                     }
@@ -423,36 +456,36 @@ namespace Repositories
 
                         string columnExpression = $@"
                                 CAST(AVG(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(cd.""ChannelValue"")) 
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN SIN(RADIANS(CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)))
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) AS ""{columnAlias}_SIN"", 
 
                                 CAST(AVG(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(cd.""ChannelValue"")) 
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'VECTOR' THEN COS(RADIANS(CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)))
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) AS ""{columnAlias}_COS"", 
 
                                 CAST(MAX(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.""ChannelValue""
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
                                     ELSE NULL 
                                 END) - MIN(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN cd.""ChannelValue""
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'TOTAL' THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) AS ""{columnAlias}_TOTAL_RANGE"",
 
                                 CAST(SUM(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN cd.""ChannelValue""
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} AND '{channel.ChannelTypeValue}' = 'FLOW' THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) AS ""{columnAlias}_FLOW_SUM"",
 
                                 CAST(AVG(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} THEN cd.""ChannelValue""
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) AS ""{columnAlias}"",
 
                                 -- Exceeded column
                                 (CAST(AVG(CASE 
-                                    WHEN cd.""ChannelId"" = {channel.ChannelId} THEN cd.""ChannelValue""
+                                    WHEN cd.""ChannelId"" = {channel.ChannelId} THEN CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)
                                     ELSE NULL 
                                 END) AS NUMERIC(10,2)) > {channel.OxideLimit}) AS ""{columnAlias}_Exceeded""";
 
@@ -622,7 +655,8 @@ namespace Repositories
                     {
                         string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}";
                         //string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}-{channel.OxideLimit}-{channel.ChannelTypeValue}";
-                        string columnExpression = $"MAX(cd.\"ChannelValue\") FILTER (WHERE cd.\"ChannelId\" = {channel.ChannelId}) AS \"{columnAlias}\"";
+                        //string columnExpression = $"MAX(cd.\"ChannelValue\") FILTER (WHERE cd.\"ChannelId\" = {channel.ChannelId}) AS \"{columnAlias}\"";
+                        string columnExpression = $"MAX(pgp_sym_decrypt(cd.\"ChannelValue\"::bytea, '{PASS_PHRASE}')) FILTER (WHERE cd.\"ChannelId\" = {channel.ChannelId}) AS \"{columnAlias}\"";
                         columnClauses.Add(columnExpression);
                     }
 
@@ -744,10 +778,10 @@ namespace Repositories
                         string columnAlias = $"{channel.StationName}-{channel.ChannelName}-{channel.ChannelUnits}".Replace(" ", "_");
 
                         string columnExpression = $@"
-                                    MAX(cd.""ChannelValue"") FILTER (WHERE cd.""ChannelId"" = {channel.ChannelId}) AS ""{columnAlias}""";
+                                    MAX(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}')) FILTER (WHERE cd.""ChannelId"" = {channel.ChannelId}) AS ""{columnAlias}""";
 
                         string exceededColumnExpression = $@"
-                                    (MAX(cd.""ChannelValue"") FILTER (WHERE cd.""ChannelId"" = {channel.ChannelId}) > {channel.OxideLimit}) AS ""{columnAlias}_Exceeded""";
+                                    (MAX(CAST(pgp_sym_decrypt(cd.""ChannelValue""::bytea, '{PASS_PHRASE}'::text) AS NUMERIC)) FILTER (WHERE cd.""ChannelId"" = {channel.ChannelId}) > {channel.OxideLimit}) AS ""{columnAlias}_Exceeded""";
 
                         columnClauses.Add(columnExpression);
                         columnClauses.Add(exceededColumnExpression);

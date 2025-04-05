@@ -22,6 +22,8 @@ namespace Services.Interfaces
 
         Models.Get.User GetUserProfile(string username);
 
+        void ChangePassword(string newPassword,string userName);
+
         void CreateAdminAccount(string password, string email, string phonenumber);
     }
 }

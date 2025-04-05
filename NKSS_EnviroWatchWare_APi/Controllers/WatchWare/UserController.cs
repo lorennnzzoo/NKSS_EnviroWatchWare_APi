@@ -28,7 +28,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 var users = user_service.GetAllUsers(username);
                 //if (users.Count() > 0)
                 //{
-                    return Ok(users);
+                return Ok(users);
                 //}
                 //return NotFound();
             }
@@ -97,6 +97,27 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 var username = User.Identity.Name;
                 var user = user_service.GetUserProfile(username);
                 return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPut]
+        [Route("ChangePassword")]
+        public IHttpActionResult ChangePassword(string newPassword)
+        {
+            try
+            {
+                var username = User.Identity.Name;
+                user_service.ChangePassword(newPassword, username);
+                return Ok();
             }
             catch (Exception ex)
             {

@@ -210,5 +210,20 @@ namespace Repositories
                 db.Execute(query, new { UserId = userId });
             }
         }
+
+        public void ChangePassword(Guid userid,string newPassword)
+        {
+            using (IDbConnection db = CreateConnection())
+            {
+                db.Open();
+                string query;
+
+                
+                query = "UPDATE public.\"User\" SET \"Password\" = @password WHERE \"Id\" = @UserId";
+                
+
+                db.Execute(query, new { UserId = userid,password= newPassword });
+            }
+        }
     }
 }

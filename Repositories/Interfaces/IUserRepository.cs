@@ -19,6 +19,8 @@ namespace Repositories.Interfaces
         void UpdateUserLoginTime( Guid userId);
 
         List<Models.User> GetAll();
+
+        void ChangePassword(Guid userid, string newPassword);
     }
 }
 

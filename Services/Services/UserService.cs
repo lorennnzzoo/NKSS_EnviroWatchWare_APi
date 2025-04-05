@@ -26,6 +26,22 @@ namespace Services
             _userRepository.Activate(id);
         }
 
+        public void ChangePassword(string newPassword,string userName)
+        {
+            var profile = GetUserProfile(userName);
+            if (profile == null)
+            {
+                throw new ArgumentException("Account not found.");
+            }
+            if (string.Equals(newPassword, cryptoService.Decrypt(profile.Password), StringComparison.Ordinal))
+            {
+                throw new ArgumentException("New password cant be the same as old password.");
+            }
+
+
+            _userRepository.ChangePassword(profile.Id,cryptoService.Encrypt(newPassword)); 
+        }
+
         public void CreateAdminAccount(string password,string email,string phonenumber)
         {
             var users = _userRepository.GetAll();

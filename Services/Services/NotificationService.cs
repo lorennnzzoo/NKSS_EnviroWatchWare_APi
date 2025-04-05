@@ -25,10 +25,12 @@ namespace Services
 
         public void CreateCondition(Condition condition)
         {
+            Guid conditionId = Guid.NewGuid();
+            condition.Id = conditionId;
             Models.Post.ConfigSetting settings = new Models.Post.ConfigSetting
             {
                 GroupName = GROUPNAME,
-                ContentName = $"Condition_{Guid.NewGuid().ToString()}",
+                ContentName = $"Condition_{conditionId}",
                 ContentValue = JsonConvert.SerializeObject(condition),
             };
             configSettingService.CreateConfigSetting(settings);
@@ -36,15 +38,17 @@ namespace Services
 
         public void GenerateSubscription(SubscribeRequest subscribeRequest)
         {
-            NotificationSubscription subscription =new NotificationSubscription
+            Guid subscriptionId = Guid.NewGuid();
+            NotificationSubscription subscription = new NotificationSubscription
             {
+                Id = subscriptionId,
                 ChannelId = subscribeRequest.ChannelId,
                 Conditions = subscribeRequest.Conditions
             };
             Models.Post.ConfigSetting setting = new Models.Post.ConfigSetting
             {
                 GroupName = GROUPNAME,
-                ContentName = $"Subscription_{Guid.NewGuid().ToString()}",
+                ContentName = $"Subscription_{subscriptionId}",
                 ContentValue = JsonConvert.SerializeObject(subscription),
             };
             configSettingService.CreateConfigSetting(setting);
@@ -91,7 +95,7 @@ namespace Services
             return stationService.GetStationById(id);
         }
 
-        public IEnumerable<Condition> GetSubscribedConditionsOfChannel(int channelId)
+        public NotificationSubscription GetSubscriptionOfChannel(int channelId)
         {
             List<NotificationSubscription> subscriptions = new List<NotificationSubscription>();            
             IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e=>e.ContentName.StartsWith("Subscription_"));
@@ -101,22 +105,34 @@ namespace Services
                 NotificationSubscription subscription = JsonConvert.DeserializeObject<NotificationSubscription>(contentValue);
                 subscriptions.Add(subscription);
             }
-            return subscriptions.Where(e => e.ChannelId == channelId).FirstOrDefault().Conditions;
-
-            //i was dumb to write the below code to whoever reading this shit in future.
-            //foreach(NotificationSubscription subscription in subscriptions)
-            //{
-            //    if (subscription.ChannelId == channelId)
-            //    {
-            //        conditions = subscription.Conditions;
-            //    }
-            //}
+            return subscriptions.Where(e => e.ChannelId == channelId).FirstOrDefault();           
             
         }
 
         public IEnumerable<ConfigSetting> GetSubscriptions()
         {
             return configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e=>e.ContentName.StartsWith("Subscription_"));
+        }
+
+        public void UpdateSubscription(NotificationSubscription notificationSubscription)
+        {
+            var subscription = GetSubscriptions().Where(e => e.ContentName == $"Subscription_{notificationSubscription.Id}").FirstOrDefault();
+            if (subscription == null)
+            {
+                throw new ArgumentException("Subscription not found.");                
+            }
+            subscription.ContentValue= JsonConvert.SerializeObject(notificationSubscription);
+            configSettingService.UpdateConfigSetting(subscription);
+        }
+
+        public void Unsubscribe(Guid id)
+        {
+            var subscription = GetSubscriptions().Where(e => e.ContentName == $"Subscription_{id}").FirstOrDefault();
+            if (subscription == null)
+            {
+                throw new ArgumentException("Subscription not found.");
+            }
+            configSettingService.DeleteConfigSetting(subscription.Id);
         }
     }
 }

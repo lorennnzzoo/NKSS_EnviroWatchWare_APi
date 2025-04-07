@@ -262,5 +262,50 @@ namespace Services
                 }
             }
         }
+
+        public void UpdatePreference(NotificationPreference preference)
+        {
+            var setting = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e => e.ContentName == "Preference").FirstOrDefault();
+            if (setting != null)
+            {
+                setting.ContentValue = preference.ToString();
+                configSettingService.UpdateConfigSetting(setting);
+            }
+            else
+            {
+                Models.Post.ConfigSetting preferenceCreate = new Models.Post.ConfigSetting
+                {
+                    GroupName = GROUPNAME,
+                    ContentName = "Preference",
+                    ContentValue = preference.ToString(),
+                };
+
+                configSettingService.CreateConfigSetting(preferenceCreate);
+            }
+        }
+
+        public NotificationPreference GetPreference()
+        {
+            var setting = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e => e.ContentName == "Preference").FirstOrDefault();
+            if (setting != null)
+            {
+                if (setting.ContentValue == NotificationPreference.GroupAll.ToString())
+                {
+                    return NotificationPreference.GroupAll;
+                }
+                else if(setting.ContentValue == NotificationPreference.GroupByStation.ToString())
+                {
+                    return NotificationPreference.GroupByStation;
+                }
+                else
+                {
+                    return NotificationPreference.OnePerChannel;
+                }
+            }
+            else
+            {
+                return NotificationPreference.OnePerChannel;
+            }
+        }
     }
 }

@@ -36,6 +36,20 @@ namespace Models.Notification
         public string address { get; set; }
     }
 
+
+    public enum NotificationPreference
+    {
+        OnePerChannel = 0,   
+        GroupByStation = 1,  
+        GroupAll = 2         
+    }
+
+    public class UpdatePreference
+    {
+        public NotificationPreference Preference { get; set; }
+    }
+
+
     public class ChannelStatus
     {
         public int ChannelId { get; set; }

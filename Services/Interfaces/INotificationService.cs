@@ -24,5 +24,9 @@ namespace Services.Interfaces
         IEnumerable<Contact> GetContacts(Models.Notification.ContactType type);
         void EditContact(Models.Notification.ContactType type, Guid contactId,string contactAddress);
         void DeleteContact(Models.Notification.ContactType type, Guid contactId);
+
+        void UpdatePreference(Models.Notification.NotificationPreference preference);
+
+        Models.Notification.NotificationPreference GetPreference();
     }
 }

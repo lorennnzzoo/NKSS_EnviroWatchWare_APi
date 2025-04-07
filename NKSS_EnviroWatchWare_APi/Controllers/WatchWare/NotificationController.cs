@@ -251,5 +251,46 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetPreference")]
+        public IHttpActionResult GetPreference()
+        {
+            try
+            {
+                var preference=notificationService.GetPreference();
+                return Ok(preference);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+
+        [HttpPut]
+        [Route("UpdatePreference")]
+        public IHttpActionResult UpdatePreference(Models.Notification.UpdatePreference preference)
+        {
+            try
+            {
+                notificationService.UpdatePreference(preference.Preference);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

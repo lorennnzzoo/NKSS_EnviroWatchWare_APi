@@ -16,6 +16,8 @@ namespace Services.Interfaces
         void CreateCondition(Models.Notification.Condition condition);
         IEnumerable<Condition> GetAllConditions();
         void GenerateSubscription(Models.Notification.SubscribeRequest subscribeRequest);
+        void MultiChannelSubscription(List<int> ChannelIds);
+        IEnumerable<ChannelStatus> GetMultiChannelSubscriptionStatus();
         void UpdateSubscription(Models.Notification.NotificationSubscription notificationSubscription);
         void Unsubscribe(Guid id);
         NotificationSubscription GetSubscriptionOfChannel(int channelId);

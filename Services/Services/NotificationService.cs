@@ -307,5 +307,43 @@ namespace Services
                 return NotificationPreference.OnePerChannel;
             }
         }
+
+        public void MultiChannelSubscription(List<int> ChannelIds)
+        {
+            var conditions = GetAllConditions();
+            if (conditions.Any())
+            {
+                foreach (int ChannelId in ChannelIds)
+                {
+                    var status = GetChannelsStatuses().Where(e => e.ChannelId == ChannelId).FirstOrDefault();
+                    if (!status.Subscribed)
+                    {
+                        Guid subscriptionId = Guid.NewGuid();
+                        NotificationSubscription subscription = new NotificationSubscription
+                        {
+                            Id = subscriptionId,
+                            ChannelId = ChannelId,
+                            Conditions = conditions.ToList()
+                        };
+                        Models.Post.ConfigSetting setting = new Models.Post.ConfigSetting
+                        {
+                            GroupName = GROUPNAME,
+                            ContentName = $"Subscription_{subscriptionId}",
+                            ContentValue = JsonConvert.SerializeObject(subscription),
+                        };
+                        configSettingService.CreateConfigSetting(setting);
+                    }                    
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Please create conditions before subscribing.");
+            }
+        }
+
+        public IEnumerable<ChannelStatus> GetMultiChannelSubscriptionStatus()
+        {
+            return GetChannelsStatuses().Where(e => e.Subscribed);
+        }
     }
 }

@@ -292,5 +292,52 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+
+        [HttpPost]
+        [Route("MultiChannelSubscribe")]
+        public IHttpActionResult MultiChannelSubscribe(List<int> ChannelIds)
+        {
+            try
+            {
+                if (ChannelIds.Count == 0)
+                {
+                    throw new ArgumentException("Please select atleast one channel to subscribe");
+                }
+                notificationService.MultiChannelSubscription(ChannelIds);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("LoadMultiChannelSubscriptionStatus")]
+        public IHttpActionResult LoadMultiChannelSubscriptionStatus()
+        {
+            try
+            {
+                var subscribedChannels = notificationService.GetMultiChannelSubscriptionStatus();
+                return Ok(subscribedChannels);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+
     }
 }

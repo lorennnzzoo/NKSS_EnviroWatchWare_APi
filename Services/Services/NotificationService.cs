@@ -15,7 +15,8 @@ namespace Services
         private readonly ConfigSettingService configSettingService;
         private readonly ChannelService channelService;
         private readonly StationService stationService;
-        private const string GROUPNAME = "NotificationGenerator";        
+        private const string GROUPNAME = "NotificationGenerator";
+        private const string CONTACTS_GROUPNAME = "NotificationContacts";
         public NotificationService(ConfigSettingService _configSettingService, ChannelService _channelService, StationService _stationService)
         {
             configSettingService = _configSettingService;
@@ -133,6 +134,133 @@ namespace Services
                 throw new ArgumentException("Subscription not found.");
             }
             configSettingService.DeleteConfigSetting(subscription.Id);
+        }
+
+        public void CreateContact(ContactType type, string contactAddress)
+        {
+            
+            var contacts = GetContacts(type);
+            if (contacts.Any())
+            {
+                var matchedContact=contacts.Where(e => e.Address.ToLower() == contactAddress.ToLower()).FirstOrDefault();
+                if (matchedContact != null)
+                {
+                    throw new ArgumentException($"Contact already exists : {contactAddress}");
+                }               
+            }
+
+            Guid contactId = Guid.NewGuid();
+            Models.Post.ConfigSetting contact = new Models.Post.ConfigSetting
+            {
+                GroupName = CONTACTS_GROUPNAME,
+                ContentName = type == ContactType.Email ? $"Email_{contactId}" : $"Mobile_{contactId}",
+                ContentValue = contactAddress.ToLower(),
+            };
+            configSettingService.CreateConfigSetting(contact);
+        }
+
+        public IEnumerable<Contact> GetContacts(ContactType type)
+        {
+            List<Contact> contacts = new List<Contact>();
+            var settings = configSettingService.GetConfigSettingsByGroupName(CONTACTS_GROUPNAME);
+            if (settings.Any())
+            {
+                if (type == ContactType.Email)
+                {
+                    var emails = settings.Where(e => e.ContentName.StartsWith("Email_"));
+                    if (emails.Any())
+                    {
+                        foreach(var email in emails)
+                        {
+                            contacts.Add(new Contact { Id = Guid.Parse(email.ContentName.Replace("Email_","")), Address = email.ContentValue });
+                        }
+                    }
+                }
+                else
+                {
+                    var mobiles = settings.Where(e => e.ContentName.StartsWith("Mobile_"));
+                    if (mobiles.Any())
+                    {
+                        foreach(var mobile in mobiles)
+                        {
+                            contacts.Add(new Contact { Id = Guid.Parse(mobile.ContentName.Replace("Mobile_","")), Address = mobile.ContentValue });
+                        }
+                    }
+                }
+            }
+            return contacts;
+        }
+
+        public void EditContact(ContactType type, Guid contactId, string contactAddress)
+        {
+            var settings = configSettingService.GetConfigSettingsByGroupName(CONTACTS_GROUPNAME);
+            if (settings.Any())
+            {
+                if (type == ContactType.Email)
+                {
+                    var contactToEdit = settings.Where(e => e.ContentName == $"Email_{contactId.ToString()}").FirstOrDefault();
+                    if (contactToEdit == null)
+                    {
+                        throw new ArgumentException("Cannot find contact to edit.");
+                    }
+                    var contacts = GetContacts(type).Where(e=>e.Id!=contactId);
+                    if (contacts.Any())
+                    {
+                        var matchedContact = contacts.Where(e => e.Address.ToLower() == contactAddress.ToLower()).FirstOrDefault();
+                        if (matchedContact != null)
+                        {
+                            throw new ArgumentException($"Contact already exists : {contactAddress}");
+                        }
+                    }
+                    contactToEdit.ContentValue = contactAddress.ToLower();
+                    configSettingService.UpdateConfigSetting(contactToEdit);
+                }
+                else
+                {
+                    var contactToEdit = settings.Where(e => e.ContentName == $"Mobile_{contactId.ToString()}").FirstOrDefault();
+                    if (contactToEdit == null)
+                    {
+                        throw new ArgumentException("Cannot find contact to edit.");
+                    }
+                    var contacts = GetContacts(type).Where(e => e.Id != contactId);
+                    if (contacts.Any())
+                    {
+                        var matchedContact = contacts.Where(e => e.Address.ToLower() == contactAddress.ToLower()).FirstOrDefault();
+                        if (matchedContact != null)
+                        {
+                            throw new ArgumentException($"Contact already exists : {contactAddress}");
+                        }
+                    }
+                    contactToEdit.ContentValue = contactAddress.ToLower();
+                    configSettingService.UpdateConfigSetting(contactToEdit);
+                }
+            }
+        }
+
+        public void DeleteContact(ContactType type, Guid contactId)
+        {
+            var settings = configSettingService.GetConfigSettingsByGroupName(CONTACTS_GROUPNAME);
+            if (settings.Any())
+            {
+                if (type == ContactType.Email)
+                {
+                    var contactToDelete = settings.Where(e => e.ContentName == $"Email_{contactId.ToString()}").FirstOrDefault();
+                    if (contactToDelete == null)
+                    {
+                        throw new ArgumentException("Cannot find contact to delete.");
+                    }
+                    configSettingService.DeleteConfigSetting(contactToDelete.Id);
+                }
+                else
+                {
+                    var contactToDelete = settings.Where(e => e.ContentName == $"Mobile_{contactId.ToString()}").FirstOrDefault();
+                    if (contactToDelete == null)
+                    {
+                        throw new ArgumentException("Cannot find contact to delete.");
+                    }
+                    configSettingService.DeleteConfigSetting(contactToDelete.Id);
+                }
+            }
         }
     }
 }

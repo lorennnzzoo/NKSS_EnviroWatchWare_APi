@@ -167,5 +167,89 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetContacts")]
+        public IHttpActionResult GetContacts(Models.Notification.ContactType type)
+        {
+            try
+            {
+                var contacts = notificationService.GetContacts(type);
+                if (contacts == null)
+                {
+                    return NotFound();
+                }
+                return Ok(contacts);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPost]
+        [Route("CreateContact")]
+        public IHttpActionResult CreateContact(Models.Notification.ContactCreation creation)
+        {
+            try
+            {
+                notificationService.CreateContact(creation.type,creation.address); 
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPut]
+        [Route("EditContact")]
+        public IHttpActionResult EditContact(Models.Notification.ContactEdition edition)
+        {
+            try
+            {
+                notificationService.EditContact(edition.type, edition.id, edition.address);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteContact")]
+        public IHttpActionResult DeleteContact(Models.Notification.ContactDeletion deletion)
+        {
+            try
+            {
+                notificationService.DeleteContact(deletion.type, deletion.id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

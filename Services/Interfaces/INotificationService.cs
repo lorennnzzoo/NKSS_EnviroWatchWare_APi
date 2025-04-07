@@ -19,5 +19,10 @@ namespace Services.Interfaces
         void UpdateSubscription(Models.Notification.NotificationSubscription notificationSubscription);
         void Unsubscribe(Guid id);
         NotificationSubscription GetSubscriptionOfChannel(int channelId);
+
+        void CreateContact(Models.Notification.ContactType type, string contactAddress);
+        IEnumerable<Contact> GetContacts(Models.Notification.ContactType type);
+        void EditContact(Models.Notification.ContactType type, Guid contactId,string contactAddress);
+        void DeleteContact(Models.Notification.ContactType type, Guid contactId);
     }
 }

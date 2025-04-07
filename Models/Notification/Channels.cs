@@ -6,6 +6,36 @@ using System.Threading.Tasks;
 
 namespace Models.Notification
 {
+    public enum ContactType
+    {
+        Email,
+        Mobile
+    }
+
+    public class Contact
+    {
+        public Guid Id { get; set; }
+        public string Address { get; set; }
+    }
+
+    public class ContactCreation
+    {
+        public Models.Notification.ContactType type { get; set; }
+        public string address { get; set; }
+    }
+
+    public class ContactDeletion
+    {
+        public Models.Notification.ContactType type { get; set; }
+        public Guid id { get; set; }
+    }
+    public class ContactEdition
+    {
+        public Guid id { get; set; }
+        public Models.Notification.ContactType type { get; set; }
+        public string address { get; set; }
+    }
+
     public class ChannelStatus
     {
         public int ChannelId { get; set; }

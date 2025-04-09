@@ -83,6 +83,8 @@ namespace NKSS_EnviroWatchWare_APi
             //displayBoard
             container.RegisterType<IDisplayBoardService, DisplayBoardService>(new HierarchicalLifetimeManager());
             //notification
+            container.RegisterType<INotificationHistoryRepository, NotificationHistoryRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<INotificationHistoryService, NotificationHistoryService>(new HierarchicalLifetimeManager());
             container.RegisterType<INotificationService, NotificationService>(new HierarchicalLifetimeManager());
             //
             // Set up Unity as the Dependency Resolver

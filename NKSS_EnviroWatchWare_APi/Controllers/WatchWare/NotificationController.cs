@@ -13,9 +13,11 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
     public class NotificationController : ApiController
     {
         private readonly NotificationService notificationService;
-        public NotificationController(NotificationService _notificationService)
+        private readonly NotificationHistoryService notificationHistoryService;
+        public NotificationController(NotificationService _notificationService, NotificationHistoryService _notificationHistoryService)
         {
             notificationService = _notificationService;
+            notificationHistoryService = _notificationHistoryService;
         }
         [HttpGet]
         [Route("GetChannelsStatus")]
@@ -339,5 +341,72 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         }
 
 
+        [HttpGet]
+        [Route("GetUnreadNotifications")]
+        public IHttpActionResult GetUnreadNotifications()
+        {
+            try
+            {
+                var unreadNotifications = notificationHistoryService.GetUnreadNotifications();
+                if (unreadNotifications == null)
+                {
+                    return NotFound();
+                }
+                return Ok(unreadNotifications);
+            }
+            catch(Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllNotifications")]
+        public IHttpActionResult GetAllNotifications()
+        {
+            try
+            {
+                var allNotifications = notificationHistoryService.GetAllNotifications();
+                if (allNotifications == null)
+                {
+                    return NotFound();
+                }
+                return Ok(allNotifications);                
+            }
+            catch(Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPut]
+        [Route("ReadNotification")]
+        public IHttpActionResult ReadNotification(int id)
+        {
+            try
+            {
+                notificationHistoryService.ReadNotification(id);
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

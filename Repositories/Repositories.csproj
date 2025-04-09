@@ -87,6 +87,7 @@
     <Compile Include="Interfaces\IConfigSettingRepository.cs" />
     <Compile Include="Interfaces\IConfigurationRepository.cs" />
     <Compile Include="Interfaces\ILicenseRepository.cs" />
+    <Compile Include="Interfaces\INotificationHistoryRepository.cs" />
     <Compile Include="Interfaces\IReportRepository.cs" />
     <Compile Include="Interfaces\IRoleRepository.cs" />
     <Compile Include="Interfaces\IScalingFactorRepository.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Repositories\ConfigurationRepository.cs" />
     <Compile Include="Repositories\LicenseRepository.cs" />
     <Compile Include="Repositories\MonitoringTypeRepository.cs" />
+    <Compile Include="Repositories\NotificationHistoryRepository.cs" />
     <Compile Include="Repositories\OxideRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ReportRepository.cs" />

@@ -72,6 +72,7 @@
     <Compile Include="Licenses\ProductDetails.cs" />
     <Compile Include="MonitoringType.cs" />
     <Compile Include="Notification\Notification.cs" />
+    <Compile Include="Notification\NotificationHistory.cs" />
     <Compile Include="Oxide.cs" />
     <Compile Include="PollutionData\PollutantDataUploadRequest.cs" />
     <Compile Include="Post\Analyzer.cs" />

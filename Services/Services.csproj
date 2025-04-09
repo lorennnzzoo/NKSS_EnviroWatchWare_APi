@@ -99,6 +99,7 @@
     <Compile Include="Interfaces\IDisplayBoardService.cs" />
     <Compile Include="Interfaces\ILicenseService.cs" />
     <Compile Include="Interfaces\IMonitoringTypeService.cs" />
+    <Compile Include="Interfaces\INotificationHistoryService.cs" />
     <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IPollutionDataService.cs" />
     <Compile Include="Interfaces\IReportService.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Services\DisplayBoardService.cs" />
     <Compile Include="Services\LicenseService.cs" />
     <Compile Include="Services\MonitoringTypeService.cs" />
+    <Compile Include="Services\NotificationHistoryService.cs" />
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Services\OxideService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

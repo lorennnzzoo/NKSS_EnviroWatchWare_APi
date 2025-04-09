@@ -10,6 +10,7 @@ namespace Models.Notification
     {
         public int Id { get; set; }
         public int ChannelId { get; set; }
+        public Models.Notification.ConditionType? ConditionType { get; set; }
         public string ChannelName { get; set; }
         public Guid ConditionId { get; set; }
         public DateTime RaisedTime { get; set; }

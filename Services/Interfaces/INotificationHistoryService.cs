@@ -8,8 +8,7 @@ namespace Services.Interfaces
 {
     public interface INotificationHistoryService
     {
-        IEnumerable<Models.Notification.NotificationHistory> GetAllNotifications();
-        IEnumerable<Models.Notification.NotificationHistory> GetUnreadNotifications();
+        IEnumerable<Models.Notification.NotificationHistory> GetAllNotifications();        
         void ReadNotification(int notificationId);
     }
 }

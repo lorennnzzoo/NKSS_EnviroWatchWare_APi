@@ -341,30 +341,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         }
 
 
-        [HttpGet]
-        [Route("GetUnreadNotifications")]
-        public IHttpActionResult GetUnreadNotifications()
-        {
-            try
-            {
-                var unreadNotifications = notificationHistoryService.GetUnreadNotifications();
-                if (unreadNotifications == null)
-                {
-                    return NotFound();
-                }
-                return Ok(unreadNotifications);
-            }
-            catch(Exception ex)
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
-                {
-                    Content = new StringContent(ex.Message)
-                };
-
-                return ResponseMessage(response);
-            }
-        }
-
+        
         [HttpGet]
         [Route("GetAllNotifications")]
         public IHttpActionResult GetAllNotifications()

@@ -12,19 +12,26 @@ namespace Services
     public class NotificationHistoryService : INotificationHistoryService
     {
         private readonly INotificationHistoryRepository notificationHistoryRepository;
-        public NotificationHistoryService(INotificationHistoryRepository _notificationHistoryRepository)
+        private readonly NotificationService notificationService;
+        public NotificationHistoryService(INotificationHistoryRepository _notificationHistoryRepository, NotificationService _notificationService)
         {
             notificationHistoryRepository = _notificationHistoryRepository;
+            notificationService = _notificationService;
         }
         public IEnumerable<NotificationHistory> GetAllNotifications()
         {
-            return notificationHistoryRepository.GetAllNotifications();
-        }
+            var rawHistory = notificationHistoryRepository.GetAllNotifications();
+            foreach(var notification in rawHistory)
+            {
+                var condition = notificationService.GetAllConditions().Where(e => e.Id == notification.ConditionId).FirstOrDefault();
+                if (condition != null)
+                {
+                    notification.ConditionType = condition.ConditionType;
+                }
 
-        public IEnumerable<NotificationHistory> GetUnreadNotifications()
-        {
-            return notificationHistoryRepository.GetUnreadNotifications();
-        }
+            }
+            return rawHistory;
+        }       
 
         public void ReadNotification(int notificationId)
         {

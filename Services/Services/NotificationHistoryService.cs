@@ -20,16 +20,7 @@ namespace Services
         }
         public IEnumerable<NotificationHistory> GetAllNotifications()
         {
-            var rawHistory = notificationHistoryRepository.GetAllNotifications();
-            foreach(var notification in rawHistory)
-            {
-                var condition = notificationService.GetAllConditions().Where(e => e.Id == notification.ConditionId).FirstOrDefault();
-                if (condition != null)
-                {
-                    notification.ConditionType = condition.ConditionType;
-                }
-
-            }
+            var rawHistory = notificationHistoryRepository.GetAllNotifications();            
             return rawHistory;
         }       
 

@@ -308,6 +308,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\Authentication\AuthController.cs" />
     <Compile Include="Controllers\WatchWare\AnalyzerController.cs" />
+    <Compile Include="Controllers\WatchWare\AutoMailReportController.cs" />
     <Compile Include="Controllers\WatchWare\ChannelController.cs" />
     <Compile Include="Controllers\WatchWare\ChannelDataFeedController.cs" />
     <Compile Include="Controllers\WatchWare\ChannelTypeController.cs" />

@@ -91,6 +91,7 @@
     <Compile Include="Exceptions\ScalingFactorExceptions.cs" />
     <Compile Include="Exceptions\StationExceptions.cs" />
     <Compile Include="Exceptions\UserExceptions.cs" />
+    <Compile Include="Interfaces\IAutoMailReportService.cs" />
     <Compile Include="Interfaces\IChannelDataFeedService.cs" />
     <Compile Include="Interfaces\IChannelTypeService.cs" />
     <Compile Include="Interfaces\IConfigSettingService.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Interfaces\IServiceLogsService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="Services\AnalyzerService.cs" />
+    <Compile Include="Services\AutoMailReportService.cs" />
     <Compile Include="Services\ChannelDataFeedService.cs" />
     <Compile Include="Services\ChannelService.cs" />
     <Compile Include="Services\ChannelTypeService.cs" />

@@ -86,6 +86,8 @@ namespace NKSS_EnviroWatchWare_APi
             container.RegisterType<INotificationHistoryRepository, NotificationHistoryRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<INotificationHistoryService, NotificationHistoryService>(new HierarchicalLifetimeManager());
             container.RegisterType<INotificationService, NotificationService>(new HierarchicalLifetimeManager());
+            //automail
+            container.RegisterType<IAutoMailReportService, AutoMailReportService>(new HierarchicalLifetimeManager());
             //
             // Set up Unity as the Dependency Resolver
             config.DependencyResolver = new UnityDependencyResolver(container);

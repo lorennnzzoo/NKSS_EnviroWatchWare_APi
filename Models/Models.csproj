@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyzer.cs" />
+    <Compile Include="AutoMailReport\ReportSubscription.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelType.cs" />
     <Compile Include="Company.cs" />

@@ -345,5 +345,32 @@ namespace Services
         {
             return GetChannelsStatuses().Where(e => e.Subscribed);
         }
+
+        public Condition GetCondition(string id)
+        {
+            var condition = GetAllConditions().Where(e => e.Id == Guid.Parse(id)).FirstOrDefault();
+            return condition;
+        }
+
+        public void UpdateCondition(Condition condition)
+        {
+            var conditionToEdit = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e => e.ContentName == $"Condition_{condition.Id}").FirstOrDefault();
+            if (conditionToEdit == null)
+            {
+                throw new ArgumentException("Cannot find condition to update.");
+            }
+            conditionToEdit.ContentValue= JsonConvert.SerializeObject(condition);
+            configSettingService.UpdateConfigSetting(conditionToEdit);
+        }
+
+        public void DeleteCondition(string id)
+        {
+            var conditionSetting = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e => e.ContentName == $"Condition_{id}").FirstOrDefault();
+            if (conditionSetting == null)
+            {
+                throw new ArgumentException("Cannot find subscription to delete.");
+            }
+            configSettingService.DeleteConfigSetting(conditionSetting.Id);
+        }
     }
 }

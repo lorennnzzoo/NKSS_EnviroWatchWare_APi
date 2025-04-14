@@ -385,5 +385,69 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetCondition")]
+        public IHttpActionResult GetCondition(string id)
+        {
+            try
+            {
+                var condition = notificationService.GetCondition(id);
+                if (condition == null)
+                {
+                    return NotFound();
+                }
+                return Ok(condition);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateCondition")]
+        public IHttpActionResult UpdateCondition(Models.Notification.Condition condition)
+        {
+            try
+            {
+                notificationService.UpdateCondition(condition);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteCondition")]
+        public IHttpActionResult DeleteCondition(string id)
+        {
+            try
+            {
+                notificationService.DeleteCondition(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

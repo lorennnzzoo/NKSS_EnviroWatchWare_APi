@@ -15,6 +15,9 @@ namespace Services.Interfaces
         Station GetStation(int id);
         void CreateCondition(Models.Notification.Condition condition);
         IEnumerable<Condition> GetAllConditions();
+        Condition GetCondition(string id);
+        void UpdateCondition(Condition condition);
+        void DeleteCondition(string id);
         void GenerateSubscription(Models.Notification.SubscribeRequest subscribeRequest);
         void MultiChannelSubscription(List<int> ChannelIds);
         IEnumerable<ChannelStatus> GetMultiChannelSubscriptionStatus();

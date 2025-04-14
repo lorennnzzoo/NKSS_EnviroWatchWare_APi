@@ -60,5 +60,69 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetSubscription")]
+        public IHttpActionResult GetSubscription(string id)
+        {
+            try
+            {
+                var subscription = autoMailReportService.GetSubscription(id);
+                if (subscription == null)
+                {
+                    return NotFound();
+                }
+                return Ok(subscription);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpPut]
+        [Route("UpdateSubscription")]
+        public IHttpActionResult UpdateSubscription(Models.AutoMailReport.ReportSubscription subscription)
+        {
+            try
+            {
+                autoMailReportService.UpdateSubscription(subscription);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteSubscription")]
+        public IHttpActionResult DeleteSubscription(string id)
+        {
+            try
+            {
+                autoMailReportService.DeleteSubscription(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

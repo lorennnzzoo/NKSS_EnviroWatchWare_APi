@@ -27,6 +27,12 @@ namespace Services
 
         public void CreateSubscription(ReportSubscription subscription)
         {
+            subscription.EmailScheduleTime = new TimeSpan(
+                subscription.EmailScheduleTime.Hours,
+                subscription.EmailScheduleTime.Minutes,
+                0
+            );
+
             Guid subscriptionId = Guid.NewGuid();
             subscription.Id = subscriptionId;
             Models.Post.ConfigSetting setting = new Models.Post.ConfigSetting
@@ -47,6 +53,33 @@ namespace Services
                 subscriptions.Add(JsonConvert.DeserializeObject<Models.AutoMailReport.ReportSubscription>(setting.ContentValue));
             }
             return subscriptions;
+        }
+
+        public ReportSubscription GetSubscription(string id)
+        {
+            var subscriptions = GetSubscriptions();
+            return subscriptions.Where(e => e.Id ==Guid.Parse( id)).FirstOrDefault();
+        }
+
+        public void UpdateSubscription(ReportSubscription subscription)
+        {
+            var subscriptionSetting = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e=>e.ContentName== $"Subscription_{subscription.Id}").FirstOrDefault();
+            if (subscriptionSetting == null)
+            {
+                throw new ArgumentException("Cannot find subscription to update.");
+            }
+            subscriptionSetting.ContentValue = JsonConvert.SerializeObject(subscription);
+            configSettingService.UpdateConfigSetting(subscriptionSetting);
+        }
+
+        public void DeleteSubscription(string id)
+        {
+            var subscriptionSetting = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e => e.ContentName == $"Subscription_{id}").FirstOrDefault();
+            if (subscriptionSetting == null)
+            {
+                throw new ArgumentException("Cannot find subscription to delete.");
+            }
+            configSettingService.DeleteConfigSetting(subscriptionSetting.Id);
         }
     }
 }

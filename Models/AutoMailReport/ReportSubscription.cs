@@ -10,7 +10,6 @@ namespace Models.AutoMailReport
     {
         public Guid Id { get; set; }
         public int StationId { get; set; }
-        public List<int> ChannelIds { get; set; } = new List<int>();
         public Models.Post.Report.DataAggregationType Interval { get; set; }
         public ReportRange Range { get; set; }
         public TimeSpan EmailScheduleTime { get; set; }

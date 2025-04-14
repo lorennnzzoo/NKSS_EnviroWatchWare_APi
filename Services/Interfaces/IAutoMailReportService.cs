@@ -10,5 +10,8 @@ namespace Services.Interfaces
     {
         void CreateSubscription(Models.AutoMailReport.ReportSubscription subscription);
         IEnumerable<Models.AutoMailReport.ReportSubscription> GetSubscriptions();
+        Models.AutoMailReport.ReportSubscription GetSubscription(string id);
+        void DeleteSubscription(string id);
+        void UpdateSubscription(Models.AutoMailReport.ReportSubscription subscription);
     }
 }

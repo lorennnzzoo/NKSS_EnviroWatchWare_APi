@@ -75,6 +75,7 @@
     <Compile Include="Notification\Notification.cs" />
     <Compile Include="Notification\NotificationHistory.cs" />
     <Compile Include="Oxide.cs" />
+    <Compile Include="PCB\CPCB\StationStatus.cs" />
     <Compile Include="PollutionData\PollutantDataUploadRequest.cs" />
     <Compile Include="Post\Analyzer.cs" />
     <Compile Include="Post\Authentication\Role.cs" />

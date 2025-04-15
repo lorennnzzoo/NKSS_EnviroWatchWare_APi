@@ -89,6 +89,9 @@ namespace NKSS_EnviroWatchWare_APi
             //automail
             container.RegisterType<IAutoMailReportService, AutoMailReportService>(new HierarchicalLifetimeManager());
             //
+            //pcb service
+            container.RegisterType<IPCBService, PCBService>(new HierarchicalLifetimeManager());
+            //
             // Set up Unity as the Dependency Resolver
             config.DependencyResolver = new UnityDependencyResolver(container);
 

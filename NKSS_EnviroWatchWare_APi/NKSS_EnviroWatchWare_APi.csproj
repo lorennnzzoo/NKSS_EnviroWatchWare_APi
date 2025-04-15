@@ -321,6 +321,7 @@
     <Compile Include="Controllers\WatchWare\MonitoringTypeController.cs" />
     <Compile Include="Controllers\WatchWare\NotificationController.cs" />
     <Compile Include="Controllers\WatchWare\OxideController.cs" />
+    <Compile Include="Controllers\WatchWare\PCBController.cs" />
     <Compile Include="Controllers\WatchWare\PollutantDataController.cs" />
     <Compile Include="Controllers\WatchWare\ReportController.cs" />
     <Compile Include="Controllers\WatchWare\ScalingFactorController.cs" />

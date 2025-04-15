@@ -41,12 +41,13 @@ namespace NKSS_EnviroWatchWare_APi.App_Start
         {
             var corsPolicy = new CorsPolicy
             {
+                AllowAnyOrigin=true,
                 AllowAnyMethod = true,
                 AllowAnyHeader = true,
                 SupportsCredentials = true // Required if credentials (e.g., Authorization headers) are used
             };
 
-            corsPolicy.Origins.Add(origin); // Set the allowed origin explicitly
+            //corsPolicy.Origins.Add(origin); // Set the allowed origin explicitly
                                                                 // corsPolicy.Origins.Add("*"); // Do NOT use * if you need authentication
 
             var corsOptions = new CorsOptions

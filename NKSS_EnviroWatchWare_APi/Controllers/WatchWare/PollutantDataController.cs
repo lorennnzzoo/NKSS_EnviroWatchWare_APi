@@ -13,7 +13,6 @@ using System.Web.Http.Cors;
 
 namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 {
-    [DisableCors]
     [PollutantAuthorize]    
     [RoutePrefix("PollutantData")]
     public class PollutantDataController : ApiController

@@ -112,6 +112,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         {
             try
             {
+                pcbService.UpdateCPCBStationConfig(stationConfiguration);
                 return Ok();
             }
             catch (Exception ex)
@@ -126,11 +127,100 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
         }
 
         [HttpPut]
-        [Route("UpdateCPCBStationConfiguration")]
-        public IHttpActionResult UpdateCPCBStationConfiguration(Models.PCB.CPCB.ChannelConfiguration channelConfiguration)
+        [Route("UpdateCPCBChannelConfiguration")]
+        public IHttpActionResult UpdateCPCBChannelConfiguration(Models.PCB.CPCB.ChannelConfiguration channelConfiguration)
         {
             try
             {
+                pcbService.UpdateCPCBChannelConfig(channelConfiguration);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetCPCBStationConfigurationById")]
+        public IHttpActionResult GetCPCBStationConfigurationById(string id)
+        {
+            try
+            {
+                var configuration = pcbService.GetCPCBStationConfigurationById(id);
+                if (configuration == null)
+                {
+                    return NotFound();
+                }
+                return Ok(configuration);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetCPCBChannelConfigurationById")]
+        public IHttpActionResult GetCPCBChannelConfigurationById(string id)
+        {
+            try
+            {
+                var configuration = pcbService.GetCPCBChannelConfigurationById(id);
+                if (configuration == null)
+                {
+                    return NotFound();
+                }
+                return Ok(configuration);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteCPCBStationConfiguration")]
+        public IHttpActionResult DeleteCPCBStationConfiguration(string id)
+        {
+            try
+            {
+                pcbService.DeleteCPCBStationConfig(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteCPCBChannelConfiguration")]
+        public IHttpActionResult DeleteCPCBChannelConfiguration(string id)
+        {
+            try
+            {
+                pcbService.DeleteCPCBChannelConfig(id);
                 return Ok();
             }
             catch (Exception ex)

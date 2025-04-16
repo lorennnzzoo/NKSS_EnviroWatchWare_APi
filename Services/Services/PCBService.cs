@@ -92,5 +92,81 @@ namespace Services
         {
             return GetChannelsConfigs().Where(e => e.StationId == stationId);
         }
+
+        public StationConfiguration GetCPCBStationConfigurationById(string id)
+        {
+            var stationConfigurations = GetCPCBStationsConfigs();
+            return stationConfigurations.Where(e => e.Id == Guid.Parse(id)).FirstOrDefault();
+        }
+
+        public ChannelConfiguration GetCPCBChannelConfigurationById(string id)
+        {
+            var channelConfigurations = GetChannelsConfigs();
+            return channelConfigurations.Where(e => e.Id == Guid.Parse(id)).FirstOrDefault();
+        }
+
+        public void UpdateCPCBStationConfig(StationConfiguration stationConfiguration)
+        {
+            var existingConfigs = GetCPCBStationsConfigs().Where(e=>e.Id!=stationConfiguration.Id);
+            if (existingConfigs.Any())
+            {
+                var matchedConfigWithSameStation = existingConfigs.Where(e => e.StationId == stationConfiguration.StationId).FirstOrDefault();
+                if (matchedConfigWithSameStation != null)
+                {
+                    throw new ArgumentException($"Configuration already exists for station : {matchedConfigWithSameStation.StationName}");
+                }
+            }
+            var station = stationService.GetStationById(stationConfiguration.StationId);
+            stationConfiguration.StationName = station.Name;
+            var stationConfigurationToEdit = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName == $"StationConfiguration_{stationConfiguration.Id}").FirstOrDefault();
+            if (stationConfigurationToEdit == null)
+            {
+                throw new ArgumentException("Cannot find configuration to update.");
+            }            
+            stationConfigurationToEdit.ContentValue = JsonConvert.SerializeObject(stationConfiguration);
+            configSettingService.UpdateConfigSetting(stationConfigurationToEdit);
+        }
+
+        public void UpdateCPCBChannelConfig(ChannelConfiguration channelConfiguration)
+        {
+            var existingConfigs = GetCPCBChannelsConfigsByStationId(channelConfiguration.StationId);
+            if (existingConfigs.Any())
+            {
+                var matchedConfigWithSameChannel = existingConfigs.Where(e => e.ChannelId == channelConfiguration.ChannelId).FirstOrDefault();
+                if (matchedConfigWithSameChannel != null)
+                {
+                    throw new ArgumentException($"Configuration already exists for channel : {matchedConfigWithSameChannel.ChannelName}");
+                }
+            }
+            var channel = channelService.GetChannelById(channelConfiguration.ChannelId);
+            channelConfiguration.ChannelName = channel.Name;
+            var channelConfigurationToEdit = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName == $"ChannelConfiguration_{channelConfiguration.Id}").FirstOrDefault();
+            if (channelConfigurationToEdit == null)
+            {
+                throw new ArgumentException("Cannot find configuration to update.");
+            }
+            channelConfigurationToEdit.ContentValue = JsonConvert.SerializeObject(channelConfiguration);
+            configSettingService.UpdateConfigSetting(channelConfigurationToEdit);
+        }
+
+        public void DeleteCPCBStationConfig(string id)
+        {
+            var stationConfig = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName == $"StationConfiguration_{id}").FirstOrDefault();
+            if (stationConfig == null)
+            {
+                throw new ArgumentException("Cannot find configuration to delete.");
+            }
+            configSettingService.DeleteConfigSetting(stationConfig.Id);
+        }
+
+        public void DeleteCPCBChannelConfig(string id)
+        {
+            var channelConfig = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName == $"ChannelConfiguration_{id}").FirstOrDefault();
+            if (channelConfig == null)
+            {
+                throw new ArgumentException("Cannot find configuration to delete.");
+            }
+            configSettingService.DeleteConfigSetting(channelConfig.Id);
+        }
     }
 }

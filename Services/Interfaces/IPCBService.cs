@@ -17,6 +17,9 @@ namespace Services.Interfaces
         void DeleteCPCBStationConfig(string id);
         void DeleteCPCBChannelConfig(string id);
 
+        Models.PCB.UploadSettings GetCPCBUploadSettings();
+        void UpdateCPCBUploadSettings(Models.PCB.UploadSettings uploadSettings);
+
         Models.PCB.CPCB.StationConfiguration GetCPCBStationConfigurationById(string id);
         Models.PCB.CPCB.ChannelConfiguration GetCPCBChannelConfigurationById(string id);
 

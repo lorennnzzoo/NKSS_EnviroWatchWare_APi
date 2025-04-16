@@ -233,5 +233,49 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpPut]
+        [Route("UpdateCPCBUploadSettings")]
+        public IHttpActionResult UpdateCPCBUploadSettings(Models.PCB.UploadSettings uploadSettings)
+        {
+            try
+            {
+                pcbService.UpdateCPCBUploadSettings(uploadSettings);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetCPCBUploadSettings")]
+        public IHttpActionResult GetCPCBUploadSettings()
+        {
+            try
+            {
+                var settings = pcbService.GetCPCBUploadSettings();
+                if (settings == null)
+                {
+                    return NotFound();
+                }
+                return Ok(settings);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

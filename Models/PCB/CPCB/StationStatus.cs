@@ -25,5 +25,5 @@ namespace Models.PCB.CPCB
         public int CPCB_ChannelId { get; set; }
         public string CPCB_ChannelName { get; set; }
         public string CPCB_Units { get; set; }
-    }
+    }    
 }

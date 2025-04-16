@@ -1,4 +1,5 @@
-﻿using Models.PCB.CPCB;
+﻿using Models.PCB;
+using Models.PCB.CPCB;
 using Newtonsoft.Json;
 using Services.Interfaces;
 using System;
@@ -167,6 +168,47 @@ namespace Services
                 throw new ArgumentException("Cannot find configuration to delete.");
             }
             configSettingService.DeleteConfigSetting(channelConfig.Id);
+        }
+
+        public void UpdateCPCBUploadSettings(UploadSettings uploadSettings)
+        {
+            var settings = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName == "UploadSettings").FirstOrDefault();
+            if (settings == null)
+            {
+                Models.Post.ConfigSetting configSetting = new Models.Post.ConfigSetting
+                {
+                    GroupName = CPCB_GROUPNAME,
+                    ContentName = "UploadSettings",
+                    ContentValue = JsonConvert.SerializeObject(uploadSettings)
+                };
+                configSettingService.CreateConfigSetting(configSetting);
+            }
+            else
+            {
+                settings.ContentValue = JsonConvert.SerializeObject(uploadSettings);
+                configSettingService.UpdateConfigSetting(settings);
+            }
+        }
+
+        public UploadSettings GetCPCBUploadSettings()
+        {
+            var settings = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName == "UploadSettings").FirstOrDefault();
+            if (settings != null)
+            {
+                return JsonConvert.DeserializeObject<Models.PCB.UploadSettings>(settings.ContentValue);
+            }
+            else
+            {
+                return new UploadSettings
+                {
+                    LiveUrl = "",
+                    DelayUrl = "",
+                    LiveInterval = 60,
+                    DelayInterval = 60,
+                    LiveRecords = 1,
+                    DelayRecords = 1
+                };
+            }
         }
     }
 }

@@ -42,6 +42,16 @@ namespace Services
                     };
                     _roleRepository.CreateRole(role);
                 }
+                var serviceRole = existingRoles.Where(e => e.Name.ToUpper() == "SERVICE").FirstOrDefault();
+                if (serviceRole == null)
+                {
+                    Models.Post.Authentication.Role role = new Models.Post.Authentication.Role
+                    {
+                        Name = "Service",
+                        Description = "Customer"
+                    };
+                    _roleRepository.CreateRole(role);
+                }
             //}
         }
 

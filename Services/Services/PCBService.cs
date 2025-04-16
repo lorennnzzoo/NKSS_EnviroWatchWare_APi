@@ -43,7 +43,6 @@ namespace Services
                 ContentValue = JsonConvert.SerializeObject(channelConfiguration),
             };
             configSettingService.CreateConfigSetting(setting);
-            //update channel is cpcb to true
         }
 
         public void CreateCPCBStationConfig(StationConfiguration stationConfiguration)
@@ -68,20 +67,6 @@ namespace Services
                 ContentValue = JsonConvert.SerializeObject(stationConfiguration),
             };
             configSettingService.CreateConfigSetting(setting);
-            UpdateStationCPCBFlag(true, station);
-        }
-        public void UpdateStationCPCBFlag(bool isCpcb,Models.Station station)
-        {
-            Models.Put.Station stationPut = new Models.Put.Station
-            {
-                Id = station.Id,
-                CompanyId = station.CompanyId,
-                MonitoringTypeId = station.MonitoringTypeId,
-                Name = station.Name,
-                IsCpcb = true,
-                IsSpcb = false,
-            };
-            stationService.UpdateStation(stationPut);
         }
         public IEnumerable<StationConfiguration> GetCPCBStationsConfigs()
         {

@@ -50,7 +50,12 @@ namespace Services
             IEnumerable<ConfigSetting> settings = configSettingService.GetConfigSettingsByGroupName(GROUPNAME).Where(e => e.ContentName.StartsWith("Subscription_"));
             foreach (ConfigSetting setting in settings)
             {
-                subscriptions.Add(JsonConvert.DeserializeObject<Models.AutoMailReport.ReportSubscription>(setting.ContentValue));
+                var subscription = JsonConvert.DeserializeObject<Models.AutoMailReport.ReportSubscription>(setting.ContentValue);
+                var station = stationService.GetStationById(subscription.StationId);
+                if (station != null)
+                {
+                    subscriptions.Add(subscription);
+                }
             }
             return subscriptions;
         }

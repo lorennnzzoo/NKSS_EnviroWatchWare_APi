@@ -8,7 +8,7 @@ namespace Services.Exceptions
 {
     public class StationWithSameNameExists:Exception
     {
-        public StationWithSameNameExists(string station, string company) : base($"Station with name : {station} already exists in company : {company}")
+        public StationWithSameNameExists(string station) : base($"Station with name : {station} already exist")
         {
 
         }

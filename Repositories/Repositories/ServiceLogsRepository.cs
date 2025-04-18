@@ -99,23 +99,22 @@ namespace Repositories
                 db.Open();
                 string query;
 
-                
-                    query = @"
-                                WITH FirstMinute AS (
-                                    SELECT DATE_TRUNC('minute', ""LogTimestamp"") AS minute
-                                    FROM public.""ServiceLogs""
-                                    WHERE ""SoftwareType"" = @Type
-                                    ORDER BY ""LogId"" ASC
-                                    LIMIT 1
-                                )
-                                SELECT *
-                                FROM public.""ServiceLogs"", FirstMinute
-                                WHERE ""SoftwareType"" = @Type
-                                  AND DATE_TRUNC('minute', ""LogTimestamp"") = FirstMinute.minute
-                                ORDER BY ""LogId"" ASC;
-                                ";
 
-                
+                query = @"
+                        WITH LastMinute AS (
+                            SELECT DATE_TRUNC('minute', MAX(""LogTimestamp"")) AS minute
+                            FROM public.""ServiceLogs""
+                            WHERE ""SoftwareType"" = @Type
+                        )
+                        SELECT *
+                        FROM public.""ServiceLogs"", LastMinute
+                        WHERE ""SoftwareType"" = @Type
+                          AND DATE_TRUNC('minute', ""LogTimestamp"") = LastMinute.minute
+                        ORDER BY ""LogId"" DESC;
+                    ";
+
+
+
 
                 return db.Query<ServiceLogs>(query, new { Type = Type }).ToList();
             }

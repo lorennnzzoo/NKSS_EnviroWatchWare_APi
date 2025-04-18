@@ -91,5 +91,34 @@ namespace Repositories
                 return db.Query<string>(query).ToList();
             }
         }
+
+        public IEnumerable<ServiceLogs> GetLastMinuteLogsByType(string Type)
+        {
+            using (IDbConnection db = CreateConnection())
+            {
+                db.Open();
+                string query;
+
+                
+                    query = @"
+                                WITH FirstMinute AS (
+                                    SELECT DATE_TRUNC('minute', ""LogTimestamp"") AS minute
+                                    FROM public.""ServiceLogs""
+                                    WHERE ""SoftwareType"" = @Type
+                                    ORDER BY ""LogId"" ASC
+                                    LIMIT 1
+                                )
+                                SELECT *
+                                FROM public.""ServiceLogs"", FirstMinute
+                                WHERE ""SoftwareType"" = @Type
+                                  AND DATE_TRUNC('minute', ""LogTimestamp"") = FirstMinute.minute
+                                ORDER BY ""LogId"" ASC;
+                                ";
+
+                
+
+                return db.Query<ServiceLogs>(query, new { Type = Type }).ToList();
+            }
+        }
     }
 }

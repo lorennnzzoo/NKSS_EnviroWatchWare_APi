@@ -358,14 +358,14 @@ namespace Services
                 {
                     string columnName = col.ColumnName;
 
-                    bool containsUnderscore = columnName.Contains('_');
-                    bool containsUnderscoreE = columnName.Contains("_E");
+                    //bool containsUnderscore = columnName.Contains('_');
+                    //bool containsUnderscoreE = columnName.Contains("_E");
                     bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
 
-                    if (containsUnderscore && !containsUnderscoreE)
-                    {
-                        continue;
-                    }
+                    //if (containsUnderscore && !containsUnderscoreE)
+                    //{
+                    //    continue;
+                    //}
 
                     if (isLogTime)
                     {
@@ -373,7 +373,7 @@ namespace Services
                     }
                     else
                     {
-                        rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+                        rowDict[columnName] = row[col] == DBNull.Value ? "NA" : row[col];
                     }
                 }
                 result.Add(rowDict);
@@ -505,14 +505,14 @@ namespace Services
                     {
                         string columnName = col.ColumnName;
 
-                        bool containsUnderscore = columnName.Contains('_');
-                        bool containsUnderscoreE = columnName.Contains("_E");
+                        //bool containsUnderscore = columnName.Contains('_');
+                        //bool containsUnderscoreE = columnName.Contains("_E");
                         bool isLogTime = string.Equals(columnName, logTimeColumnName, caseInsensitiveComparison);
 
-                        if (containsUnderscore && !containsUnderscoreE)
-                        {
-                            continue;
-                        }
+                        //if (containsUnderscore && !containsUnderscoreE)
+                        //{
+                        //    continue;
+                        //}
                         if (isLogTime)
                         {
                             rowDict[columnName] = row[col] == DBNull.Value
@@ -521,7 +521,7 @@ namespace Services
                         }
                         else
                         {
-                            rowDict[columnName] = row[col] == DBNull.Value ? null : row[col];
+                            rowDict[columnName] = row[col] == DBNull.Value ? "NA" : row[col];
                         }
                     }
                     result.Add(rowDict);

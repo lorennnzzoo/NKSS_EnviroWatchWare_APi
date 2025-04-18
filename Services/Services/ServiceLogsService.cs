@@ -20,6 +20,12 @@ namespace Services
         {
             return _serviceLogsRepository.GetPast24HourLogsByType(Type);
         }
+
+        public IEnumerable<ServiceLogs> GetLastMinuteLogsByType(string Type)
+        {
+            return _serviceLogsRepository.GetLastMinuteLogsByType(Type);
+        }
+
         public IEnumerable<string> GetTypes()
         {
             return _serviceLogsRepository.GetSoftwareTypes();

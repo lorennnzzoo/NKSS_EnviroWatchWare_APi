@@ -11,5 +11,7 @@ namespace Repositories.Interfaces
     {
         IEnumerable<ServiceLogs> GetPast24HourLogsByType(string Type);
         IEnumerable<string> GetSoftwareTypes();
+
+        IEnumerable<ServiceLogs> GetLastMinuteLogsByType(string Type);
     }
 }

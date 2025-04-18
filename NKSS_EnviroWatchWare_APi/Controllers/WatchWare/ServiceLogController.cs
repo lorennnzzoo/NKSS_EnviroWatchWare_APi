@@ -40,6 +40,29 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
             }
         }
 
+
+        [HttpGet]
+        [Route("GetLastMinuteLogs")]
+        public IHttpActionResult GetLastMinuteLogs(string type)
+        {
+            try
+            {
+                var logs = serviceLogs_service.GetLastMinuteLogsByType(type);
+                if (logs == null)
+                    return NotFound();
+                return Ok(logs);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
+
         [HttpGet]
         [Route("GetSoftwareTypes")]
         public IHttpActionResult Get()

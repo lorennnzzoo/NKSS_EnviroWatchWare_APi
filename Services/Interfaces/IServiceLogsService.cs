@@ -11,5 +11,6 @@ namespace Services.Interfaces
     {
         IEnumerable<ServiceLogs> Get24HourLogsByType(string Type);
         IEnumerable<string> GetTypes();
+        IEnumerable<ServiceLogs> GetLastMinuteLogsByType(string Type);
     }
 }

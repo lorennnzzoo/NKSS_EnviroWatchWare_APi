@@ -75,7 +75,15 @@ namespace Services
             var stationsConfigs = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName.StartsWith("StationConfiguration_"));
             foreach(var config in stationsConfigs)
             {
-                stationConfigurations.Add(JsonConvert.DeserializeObject<StationConfiguration>(config.ContentValue));
+                var stationConfiguration = JsonConvert.DeserializeObject<StationConfiguration>(config.ContentValue);
+                var station = stationService.GetStationById(stationConfiguration.StationId);
+                if (station != null)
+                {
+                    if (station.Active)
+                    {
+                        stationConfigurations.Add(stationConfiguration);
+                    }
+                }
             }
             return stationConfigurations;
         }
@@ -85,7 +93,15 @@ namespace Services
             var channelsConfig = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName.StartsWith("ChannelConfiguration_"));
             foreach (var config in channelsConfig)
             {
-                channelConfigurations.Add(JsonConvert.DeserializeObject<ChannelConfiguration>(config.ContentValue));
+                var channelConfiguration = JsonConvert.DeserializeObject<ChannelConfiguration>(config.ContentValue);
+                var channel = channelService.GetChannelById(channelConfiguration.ChannelId);
+                if (channel != null)
+                {
+                    if (channel.Active)
+                    {
+                        channelConfigurations.Add(channelConfiguration);
+                    }
+                }
             }
             return channelConfigurations;
         }

@@ -146,7 +146,7 @@ namespace Services
 
         public void UpdateCPCBChannelConfig(ChannelConfiguration channelConfiguration)
         {
-            var existingConfigs = GetCPCBChannelsConfigsByStationId(channelConfiguration.StationId);
+            var existingConfigs = GetCPCBChannelsConfigsByStationId(channelConfiguration.StationId).Where(e=>e.Id!=channelConfiguration.Id);
             if (existingConfigs.Any())
             {
                 var matchedConfigWithSameChannel = existingConfigs.Where(e => e.ChannelId == channelConfiguration.ChannelId).FirstOrDefault();

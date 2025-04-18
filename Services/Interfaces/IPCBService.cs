@@ -25,5 +25,7 @@ namespace Services.Interfaces
 
         IEnumerable<Models.PCB.CPCB.StationConfiguration> GetCPCBStationsConfigs();
         IEnumerable<Models.PCB.CPCB.ChannelConfiguration> GetCPCBChannelsConfigsByStationId(int stationId);
+
+        IEnumerable<Models.PCB.CPCB.SyncStatus> GetCPCBChannelSyncStatuses();
     }
 }

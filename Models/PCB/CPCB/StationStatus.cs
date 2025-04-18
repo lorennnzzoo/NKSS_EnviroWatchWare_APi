@@ -25,5 +25,14 @@ namespace Models.PCB.CPCB
         public int CPCB_ChannelId { get; set; }
         public string CPCB_ChannelName { get; set; }
         public string CPCB_Units { get; set; }
-    }    
+    }
+
+    public class SyncStatus
+    {
+        public Guid Id { get; set; }
+        public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
+        public long LastChannelDataId { get; set; }
+        public DateTime LastRunTime { get; set; }
+    }
 }

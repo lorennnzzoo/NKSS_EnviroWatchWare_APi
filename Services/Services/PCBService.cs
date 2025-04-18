@@ -87,7 +87,7 @@ namespace Services
             }
             return stationConfigurations;
         }
-        public IEnumerable<ChannelConfiguration> GetChannelsConfigs()
+        private IEnumerable<ChannelConfiguration> GetChannelsConfigs()
         {
             List<ChannelConfiguration> channelConfigurations = new List<ChannelConfiguration>();
             var channelsConfig = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName.StartsWith("ChannelConfiguration_"));
@@ -225,6 +225,26 @@ namespace Services
                     DelayRecords = 1
                 };
             }
+        }
+
+        public IEnumerable<SyncStatus> GetCPCBChannelSyncStatuses()
+        {
+            List<SyncStatus> syncStatuses = new List<SyncStatus>();
+            var syncStatusSettings = configSettingService.GetConfigSettingsByGroupName(CPCB_GROUPNAME).Where(e => e.ContentName.StartsWith("SyncStatus_"));
+            foreach(var setting in syncStatusSettings)
+            {
+                var syncStatus = JsonConvert.DeserializeObject<SyncStatus>(setting.ContentValue);
+                var channel = channelService.GetChannelById(syncStatus.ChannelId);
+
+                if (channel != null)
+                {
+                    if (channel.Active)
+                    {
+                        syncStatuses.Add(syncStatus);
+                    }
+                }
+            }
+            return syncStatuses;
         }
     }
 }

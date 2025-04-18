@@ -277,5 +277,29 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
                 return ResponseMessage(response);
             }
         }
+
+        [HttpGet]
+        [Route("GetCPCBChannelSyncStatuses")]
+        public IHttpActionResult GetCPCBChannelSyncStatuses()
+        {
+            try
+            {
+                var syncStatuses = pcbService.GetCPCBChannelSyncStatuses();
+                if (syncStatuses == null)
+                {
+                    return NotFound();
+                }
+                return Ok(syncStatuses);
+            }
+            catch (Exception ex)
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+
+                return ResponseMessage(response);
+            }
+        }
     }
 }

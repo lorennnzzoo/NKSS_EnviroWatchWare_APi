@@ -92,7 +92,7 @@ LEFT JOIN
     channel_availability ca
     ON ca.""ChannelId"" = chnl.""Id""
 WHERE
-    chnl.""StationId"" = @stationId
+    chnl.""StationId"" = @stationId and chnl.""Active""=TRUE
 ORDER BY
     chnl.""Priority"";
 ";

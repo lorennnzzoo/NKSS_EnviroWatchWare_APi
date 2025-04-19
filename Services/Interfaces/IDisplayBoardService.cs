@@ -11,5 +11,8 @@ namespace Services.Interfaces
     {
         void CreateTemplate(Template template);
         IEnumerable<Template> GetAllTemplates();
+        Template GetTemplate(string id);
+        void UpdateTemplate(Template template);
+        void DeleteTemplate(string id);
     }
 }

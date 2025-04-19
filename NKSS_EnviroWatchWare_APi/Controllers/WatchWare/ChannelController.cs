@@ -63,7 +63,7 @@ namespace NKSS_EnviroWatchWare_APi.Controllers.WatchWare
 
         [HttpGet]
         [Route("GetAllChannelsByStation")]
-        public IHttpActionResult GetAllByCompany(int stationId)
+        public IHttpActionResult GetAllChannelsByStation(int stationId)
         {
             try
             {

@@ -110,7 +110,7 @@ namespace Repositories
                         FROM public.""ServiceLogs"", LastMinute
                         WHERE ""SoftwareType"" = @Type
                           AND DATE_TRUNC('minute', ""LogTimestamp"") = LastMinute.minute
-                        ORDER BY ""LogId"" DESC;
+                        ORDER BY ""LogId"" ASC;
                     ";
 
 

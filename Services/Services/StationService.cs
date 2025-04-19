@@ -62,6 +62,32 @@ namespace Services
             {
                 throw new Exceptions.StationWithSameNameExists(station.Name);
             }
+
+            var channelsLinkedToStation = channelService.GetAllChannelsByStationId(station.Id.Value).ToList();
+            if (!station.IsCpcb)
+            {
+                if (channelsLinkedToStation.Any())
+                {
+                    foreach (var channel in channelsLinkedToStation)
+                    {
+                        channel.IsCpcb = false;
+                        channelService.UpdateChannel(channel);
+                    }
+                }
+            }
+
+            if (!station.IsSpcb)
+            {
+
+                if (channelsLinkedToStation.Any())
+                {
+                    foreach (var channel in channelsLinkedToStation)
+                    {
+                        channel.IsSpcb = false;
+                        channelService.UpdateChannel(channel);
+                    }
+                }
+            }
             _stationRepository.Update(station);
         }
     }

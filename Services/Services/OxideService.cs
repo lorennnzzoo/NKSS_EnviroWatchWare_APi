@@ -19,6 +19,12 @@ namespace Services
         }
         public void CreateOxide(Post.Oxide oxide)
         {
+            var oxidesWithSameName = GetAllOxides().Where(e=>e.OxideName.ToUpper()==oxide.OxideName.ToUpper());
+            if (oxidesWithSameName.Any())
+            {
+                throw new System.Exception($"Oxide With Name '{oxide.OxideName}' Exists");
+            }
+            
             _oxideRepository.Add(oxide);
         }
 
@@ -45,6 +51,11 @@ namespace Services
 
         public void UpdateOxide(Oxide oxide)
         {
+            var oxidesWithSameName = GetAllOxides().Where(e=>e.Id!=oxide.Id).Where(e => e.OxideName.ToUpper() == oxide.OxideName.ToUpper());
+            if (oxidesWithSameName.Any())
+            {
+                throw new System.Exception($"Oxide With Name '{oxide.OxideName}' Exists");
+            }
             _oxideRepository.Update(oxide);
         }
     }

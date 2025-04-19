@@ -19,12 +19,27 @@ namespace Services
         }
         public void CreateChannel(Post.Channel channel)
         {
+            //checking if channel with same name exists in the same station
+            var station = stationRepository.GetById(Convert.ToInt32( channel.StationId));
             var allChannelsOfStation = _channelRepository.GetAll().Where(e => e.StationId == channel.StationId).Where(e => e.Name.ToUpper() == channel.Name.ToUpper());
             if (allChannelsOfStation.Any())
             {
-                var station = stationRepository.GetById(Convert.ToInt32( channel.StationId));
                 throw new Exceptions.ChannelWithSameNameExists(channel.Name,station.Name);
             }
+
+            //checking if channel has isCpcb isSpcb flags true even though station doesnt
+            
+
+            if (channel.IsCpcb && !station.IsCpcb)
+            {
+                throw new Exception("Channel is marked as CPCB but the associated Station is not marked as CPCB.");
+            }
+
+            if (channel.IsSpcb && !station.IsSpcb)
+            {
+                throw new Exception("Channel is marked as SPCB but the associated Station is not marked as SPCB.");
+            }
+
             _channelRepository.Add(channel);
         }
 
@@ -55,11 +70,20 @@ namespace Services
 
         public void UpdateChannel(Channel channel)
         {
+            var station = stationRepository.GetById(Convert.ToInt32(channel.StationId));
             var allChannelsOfStation = _channelRepository.GetAll().Where(e => e.StationId == channel.StationId).Where(e => e.Name.ToUpper() == channel.Name.ToUpper()).Where(e=>e.Id!=channel.Id);
             if (allChannelsOfStation.Any())
             {
-                var station = stationRepository.GetById(Convert.ToInt32(channel.StationId));
                 throw new Exceptions.ChannelWithSameNameExists(channel.Name, station.Name);
+            }
+            if (channel.IsCpcb && !station.IsCpcb)
+            {
+                throw new Exception("Channel is marked as CPCB but the associated Station is not marked as CPCB.");
+            }
+
+            if (channel.IsSpcb && !station.IsSpcb)
+            {
+                throw new Exception("Channel is marked as SPCB but the associated Station is not marked as SPCB.");
             }
             _channelRepository.Update(channel);
         }
